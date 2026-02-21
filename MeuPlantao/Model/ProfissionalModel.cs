@@ -1,6 +1,6 @@
 namespace MeuPlantao.Model;
 
-public class MedicoModel
+public class ProfissionalModel
 {
     
 }
