@@ -23,4 +23,9 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\MeuPlantao.Application\MeuPlantao.Application.csproj" />
+      <ProjectReference Include="..\MeuPlantao.Communication\MeuPlantao.Communication.csproj" />
+    </ItemGroup>
+
 </Project>

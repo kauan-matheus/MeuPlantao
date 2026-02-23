@@ -1,4 +1,4 @@
-﻿using MeuPlantao.Model;
+﻿using MeuPlantao.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeuPlantao.Data;

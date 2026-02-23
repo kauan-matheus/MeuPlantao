@@ -1,4 +1,4 @@
-﻿namespace MeuPlantao.Model;
+﻿namespace MeuPlantao.Entities;
 
 /*Com TrocaHistorico, você responde:
 Quem criou

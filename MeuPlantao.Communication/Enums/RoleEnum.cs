@@ -1,4 +1,4 @@
-﻿namespace MeuPlantao.Services.Enums;
+﻿namespace MeuPlantao.Communication.Enums;
 
 public enum RoleEnum
 {
