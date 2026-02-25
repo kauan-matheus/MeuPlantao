@@ -1,0 +1,14 @@
+Se der algum problema de git, só trocar pela solution
+
+dotnet new classlib -n MeuPlantao.Application
+dotnet new classlib -n MeuPlantao.Communication
+
+Depois:
+
+dotnet sln add MeuPlantao.Application/MeuPlantao.Application.csproj
+dotnet sln add MeuPlantao.Communication/MeuPlantao.Communication.csproj
+
+Depois:
+
+dotnet restore
+dotnet build
