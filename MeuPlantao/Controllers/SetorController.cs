@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using MeuPlantao.Data;
+using MeuPlantao.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace MeuPlantao.Controllers;
 
@@ -6,16 +10,32 @@ namespace MeuPlantao.Controllers;
 [Route("api/[controller]")]
 public class SetorController : ControllerBase
 {
-    [HttpGet("setores")]
-    public IActionResult GetSetores()
+    private readonly AppDbContext _appDbContext;
+
+    public SetorController(AppDbContext appDbContext)
     {
-        return Ok();
+        _appDbContext = appDbContext;
+    }
+
+
+    [HttpGet("setores")]
+    public async Task<IActionResult> GetSetores()
+    {
+        var resultado = await _appDbContext.Setores.ToListAsync();
+        return Ok(resultado);
     }
     
     [HttpPost("setores")]
-    public IActionResult PostSetores()
+    public async Task<IActionResult> PostSetores([FromBody] SetorModel setor)
     {
-        return Ok();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        _appDbContext.Setores.Add(setor);
+        await _appDbContext.SaveChangesAsync();
+
+        return Created("setor adcionado", setor);
     }
 
     [HttpPut("setores/{idSetores}")]
