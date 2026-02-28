@@ -10,4 +10,5 @@ public class RequestProfissionalRegisterJson
     public string Crm { get; set; } = String.Empty;
     [MaxLength(9)]
     public string Telefone { get; set; } = String.Empty; 
+    public int UserId { get; set; }
 }

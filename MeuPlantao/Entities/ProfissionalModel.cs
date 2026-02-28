@@ -13,4 +13,5 @@ public class ProfissionalModel
     public string Telefone { get; set; } = String.Empty; 
     public int UserId { get; set; } //FK
     public UserModel User { get; set; } //navegação
-}   
+    
+}

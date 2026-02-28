@@ -1,4 +1,3 @@
-﻿using System.Threading.Tasks;
 using MeuPlantao.Data;
 using MeuPlantao.Entities;
 using Microsoft.AspNetCore.Mvc;
