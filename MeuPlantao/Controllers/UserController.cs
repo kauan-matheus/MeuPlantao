@@ -15,30 +15,30 @@ namespace MeuPlantao.Controllers
     {
         private readonly AppDbContext _appDbContext;
 
-    public UserController(AppDbContext appDbContext)
-    {
-        _appDbContext = appDbContext;
-    }
-
-    [HttpGet("users")]
-    public async Task<IActionResult> GetProfissionais()
-    {
-        var resultado = await _appDbContext.Usuarios.ToListAsync();
-        return Ok(resultado);
-    }
-
-    [HttpPost("setores")]
-    public async Task<IActionResult> PostSetores([FromBody]  UserModel user)
-    {
-        if (!ModelState.IsValid)
+        public UserController(AppDbContext appDbContext)
         {
-            return BadRequest(ModelState);
+            _appDbContext = appDbContext;
         }
 
-        _appDbContext.Usuarios.Add(user);
-        await _appDbContext.SaveChangesAsync();
+        [HttpGet("users")]
+        public async Task<IActionResult> GetProfissionais()
+        {
+            var resultado = await _appDbContext.Usuarios.ToListAsync();
+            return Ok(resultado);
+        }
 
-        return Created("setor adcionado", user);
-    }
+        [HttpPost("users")]
+        public async Task<IActionResult> PostUsers([FromBody]  UserModel user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _appDbContext.Usuarios.Add(user);
+            await _appDbContext.SaveChangesAsync();
+
+            return Created("setor adcionado", user);
+        }
     }
 }
