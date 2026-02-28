@@ -13,7 +13,6 @@ public class ProfissionaisController : ControllerBase
         _appDbContext = appDbContext;
     }
 
-
     [HttpGet("profissionais")]
     public async Task<IActionResult> GetProfissionais()
     {
