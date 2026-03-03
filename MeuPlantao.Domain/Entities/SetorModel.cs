@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-namespace MeuPlantao.Entities;
+namespace MeuPlantao.Domain.Entities;
 
 //modelo do setor (Uti, pronto socorro)
 public class SetorModel

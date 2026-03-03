@@ -1,6 +1,6 @@
 using MeuPlantao.Communication.Enums;
 
-namespace MeuPlantao.Entities;
+namespace MeuPlantao.Domain.Entities;
 
 public class PlantaoModel
 {

@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using MeuPlantao.Data;
+using MeuPlantao.Infrastructure.Data;
+using MeuPlantao.Domain.Interfaces;
+using MeuPlantao.Infrastructure.Repository;
+using MeuPlantao.Application.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddScoped<IProfissionalRepository, ProfissionalRepository>();
+builder.Services.AddScoped<ProfissionalService>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

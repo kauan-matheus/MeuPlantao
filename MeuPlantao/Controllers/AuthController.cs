@@ -1,7 +1,7 @@
 ﻿using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Enums;
-using MeuPlantao.Data;
-using MeuPlantao.Entities;
+using MeuPlantao.Infrastructure.Data;
+using MeuPlantao.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

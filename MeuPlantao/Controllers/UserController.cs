@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using MeuPlantao.Data;
-using MeuPlantao.Entities;
+using MeuPlantao.Infrastructure.Data;
+using MeuPlantao.Domain.Entities;
 
 namespace MeuPlantao.Controllers
 {

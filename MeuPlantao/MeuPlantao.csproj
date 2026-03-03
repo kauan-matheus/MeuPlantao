@@ -27,6 +27,8 @@
     <ItemGroup>
       <ProjectReference Include="..\MeuPlantao.Application\MeuPlantao.Application.csproj" />
       <ProjectReference Include="..\MeuPlantao.Communication\MeuPlantao.Communication.csproj" />
+      <ProjectReference Include="..\MeuPlantao.Domain\MeuPlantao.Domain.csproj" />
+      <ProjectReference Include="..\MeuPlantao.Infrastructure\MeuPlantao.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

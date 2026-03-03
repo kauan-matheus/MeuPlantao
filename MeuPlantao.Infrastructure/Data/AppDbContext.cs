@@ -1,7 +1,7 @@
-﻿using MeuPlantao.Entities;
+﻿using MeuPlantao.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeuPlantao.Data;
+namespace MeuPlantao.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {

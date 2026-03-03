@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-namespace MeuPlantao.Entities;
+
+namespace MeuPlantao.Domain.Entities;
 
 //Modelo do banco de Profissional(enfermeiro/médico etc...)
 public class ProfissionalModel

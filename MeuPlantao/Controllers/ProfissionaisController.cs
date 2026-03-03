@@ -1,52 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MeuPlantao.Data;
+using MeuPlantao.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using MeuPlantao.Communication.Dto.Requests;
-using MeuPlantao.Entities;
+using MeuPlantao.Application.Services;
+using MeuPlantao.Domain.Entities;
 
 namespace MeuPlantao.Controllers;
 
+
+[ApiController]
+[Route("api/[controller]")]
 public class ProfissionaisController : ControllerBase
 {
-    private readonly AppDbContext _appDbContext;
+    private readonly ProfissionalService _service;
 
-    public ProfissionaisController(AppDbContext appDbContext)
+    public ProfissionaisController(ProfissionalService service)
     {
-        _appDbContext = appDbContext;
+        _service = service;
     }
 
     [HttpGet("profissionais")]
-    public async Task<IActionResult> GetProfissionais()
+    public IActionResult GetProfissionais()
     {
-        var resultado = await _appDbContext.Profissionais.ToListAsync();
-        return Ok(resultado);
+        var responce = _service.Consultar();
+        return Ok(responce);
     }
 
     [HttpPost("profissionais")]
-    public async Task<IActionResult> PostProfissional([FromBody]  RequestProfissionalRegisterJson profissional)
+    public IActionResult PostProfissional([FromBody]  RequestProfissionalRegisterJson profissional)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var UserExiste = await _appDbContext.Usuarios
-            .FindAsync(profissional.UserId);
-
-        if (UserExiste == null)
-            return BadRequest("Usuario não encontrado");
-
-        var novo = new ProfissionalModel
-        {
-            Nome = profissional.Nome,
-            Crm = profissional.Crm,
-            Telefone = profissional.Telefone,
-            UserId = profissional.UserId,
-            User = UserExiste
-        };
-
-        _appDbContext.Profissionais.Add(novo);
-        await _appDbContext.SaveChangesAsync();
+        var response = _service.Cadastrar(profissional);
 
         return Created("Profissional adcionado", profissional);
     }
