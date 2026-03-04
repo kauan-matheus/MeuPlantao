@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using MeuPlantao.Infrastructure.Data;
+using MeuPlantao.Application.Services;
 using MeuPlantao.Domain.Entities;
 
 namespace MeuPlantao.Controllers
@@ -13,32 +8,31 @@ namespace MeuPlantao.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly UserService _service;
 
-        public UserController(AppDbContext appDbContext)
+        public UserController(UserService service)
         {
-            _appDbContext = appDbContext;
+            _service = service;
         }
 
-        [HttpGet("users")]
-        public async Task<IActionResult> GetProfissionais()
+        [HttpGet("profissionais")]
+        public IActionResult GetProfissionais()
         {
-            var resultado = await _appDbContext.Usuarios.ToListAsync();
-            return Ok(resultado);
+            var responce = _service.Consultar();
+            return Ok(responce);
         }
 
-        [HttpPost("users")]
-        public async Task<IActionResult> PostUsers([FromBody]  UserModel user)
+        [HttpPost("profissionais")]
+        public IActionResult PostUser([FromBody]  UserModel user)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _appDbContext.Usuarios.Add(user);
-            await _appDbContext.SaveChangesAsync();
+            var response = _service.Cadastrar(user);
 
-            return Created("setor adcionado", user);
+            return Created("user adcionado", user);
         }
     }
 }

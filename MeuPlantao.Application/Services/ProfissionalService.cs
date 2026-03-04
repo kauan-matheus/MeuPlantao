@@ -6,16 +6,16 @@ namespace MeuPlantao.Application.Services
 {
     public class ProfissionalService
     {
-        private readonly IProfissionalRepository _repository;
+        private readonly IRepository _repository;
 
-        public ProfissionalService(IProfissionalRepository profissionalRepository)
+        public ProfissionalService(IRepository repository)
         {
-            _repository = profissionalRepository;
+            _repository = repository;
         }
 
         public List<ProfissionalModel> Consultar()
         {
-            var responce = _repository.GetProfissionais()
+            var responce = _repository.Consultar<ProfissionalModel>()
                 .OrderBy(p => p.Id)
                 .ToList();
 
@@ -24,7 +24,7 @@ namespace MeuPlantao.Application.Services
 
         public ProfissionalModel ConsultarId(int Id)
         {
-            var responce = _repository.GetProfissionalById(Id);
+            var responce = _repository.ConsultarPorId<ProfissionalModel>(Id);
             return responce;
         }
 
@@ -38,7 +38,7 @@ namespace MeuPlantao.Application.Services
                 UserId = profissional.UserId,
             };
 
-            var responce = _repository.PostProfissional(novo);
+            var responce = _repository.Cadastrar<ProfissionalModel>(novo);
             return responce;
         }
 
@@ -52,7 +52,7 @@ namespace MeuPlantao.Application.Services
                 UserId = profissional.UserId,
             };
 
-            var responce = _repository.PutProfissional(novo);
+            var responce = _repository.Editar<ProfissionalModel>(novo);
             return responce;
         }
 
@@ -61,7 +61,7 @@ namespace MeuPlantao.Application.Services
             var existente = ConsultarId(Id);
             if (existente != null)
             {
-                _repository.DeleteProfissional(existente);
+                _repository.Excluir<ProfissionalModel>(existente);
                 return existente;
             }
             else

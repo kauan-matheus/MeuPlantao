@@ -1,51 +1,49 @@
 using MeuPlantao.Infrastructure.Data;
-using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace MeuPlantao.Infrastructure.Repository
 {
-    public class ProfissionalRepository : IProfissionalRepository
+    public class Repository : IRepository
     {
         private readonly AppDbContext _appDbContext;
-        public ProfissionalRepository(AppDbContext appDbContext)
+
+        public Repository(AppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
         }
 
-        public ICollection<ProfissionalModel> GetProfissionais()
+        public IQueryable<T> Consultar<T>() where T : class
         {
-            var responce = _appDbContext.Profissionais.ToList();
-            return responce;
+            return _appDbContext.Set<T>();
         }
 
-        public ProfissionalModel? GetProfissionalById(int id)
+        public T? ConsultarPorId<T>(long id) where T : class
         {
-            var responce = _appDbContext.Profissionais.Find(id);
-            return responce;
+            return _appDbContext.Set<T>().Find(id);
         }
 
-        public bool PostProfissional(ProfissionalModel profissional)
+        public bool Cadastrar<T>(T model) where T : class
         {
-            _appDbContext.Profissionais.Add(profissional);
-            return save();
+            _appDbContext.Set<T>().Add(model);
+            return Save();
         }
 
-        public bool PutProfissional(ProfissionalModel profissional)
+        public bool Editar<T>(T model) where T : class
         {
-            _appDbContext.Profissionais.Update(profissional);
-            return save();
+            _appDbContext.Set<T>().Update(model);
+            return Save();
         }
 
-        public void DeleteProfissional(ProfissionalModel profissional)
+        public bool Excluir<T>(T model) where T : class
         {
-            _appDbContext.Profissionais.Remove(profissional);
-            _appDbContext.SaveChanges();
+            _appDbContext.Set<T>().Remove(model);
+            return Save();
         }
 
-        public bool save()
+        public bool Save()
         {
-            var saved = _appDbContext.SaveChanges() > 0? true : false;
-            return saved;
+            return _appDbContext.SaveChanges() > 0;
         }
     }
 }
