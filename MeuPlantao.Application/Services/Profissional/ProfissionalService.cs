@@ -1,10 +1,11 @@
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
-namespace MeuPlantao.Application.Services
+namespace MeuPlantao.Application.Services.Profissional
 {
-    public class ProfissionalService
+    public class ProfissionalService : IProfissionalService
     {
         private readonly IRepository _repository;
 
@@ -13,36 +14,22 @@ namespace MeuPlantao.Application.Services
             _repository = repository;
         }
 
-        public List<ProfissionalModel> Consultar()
+        public async Task<List<ProfissionalModel>> Consultar()
         {
-            var responce = _repository.Consultar<ProfissionalModel>()
+            var responce = await _repository.Consultar<ProfissionalModel>()
                 .OrderBy(p => p.Id)
-                .ToList();
+                .ToListAsync();
 
             return responce;
         }
 
-        public ProfissionalModel ConsultarId(int Id)
+        public async Task<ProfissionalModel> ConsultarId(long Id)
         {
-            var responce = _repository.ConsultarPorId<ProfissionalModel>(Id);
+            var responce = await _repository.ConsultarPorId<ProfissionalModel>(Id);
             return responce;
         }
 
-        public bool Cadastrar(RequestProfissionalRegisterJson profissional)
-        {
-            var novo = new ProfissionalModel
-            {
-                Nome = profissional.Nome,
-                Crm = profissional.Crm,
-                Telefone = profissional.Telefone,
-                UserId = profissional.UserId,
-            };
-
-            var responce = _repository.Cadastrar<ProfissionalModel>(novo);
-            return responce;
-        }
-
-        public bool Editar(RequestProfissionalRegisterJson profissional)
+        public async Task<bool> Cadastrar(RequestProfissionalRegisterJson profissional)
         {
             var novo = new ProfissionalModel
             {
@@ -52,16 +39,30 @@ namespace MeuPlantao.Application.Services
                 UserId = profissional.UserId,
             };
 
-            var responce = _repository.Editar<ProfissionalModel>(novo);
+            var responce = await _repository.Cadastrar<ProfissionalModel>(novo);
             return responce;
         }
 
-        public ProfissionalModel? Deletar(int Id)
+        public async Task<bool> Editar(RequestProfissionalRegisterJson profissional)
         {
-            var existente = ConsultarId(Id);
+            var novo = new ProfissionalModel
+            {
+                Nome = profissional.Nome,
+                Crm = profissional.Crm,
+                Telefone = profissional.Telefone,
+                UserId = profissional.UserId,
+            };
+
+            var responce = await _repository.Editar<ProfissionalModel>(novo);
+            return responce;
+        }
+
+        public async Task<ProfissionalModel?> Deletar(long Id)
+        {
+            var existente = await ConsultarId(Id);
             if (existente != null)
             {
-                _repository.Excluir<ProfissionalModel>(existente);
+                await _repository.Excluir<ProfissionalModel>(existente);
                 return existente;
             }
             else

@@ -2,8 +2,8 @@
 using MeuPlantao.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using MeuPlantao.Communication.Dto.Requests;
-using MeuPlantao.Application.Services;
 using MeuPlantao.Domain.Entities;
+using MeuPlantao.Application.Services.Profissional;
 
 namespace MeuPlantao.Controllers;
 
@@ -20,23 +20,26 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpGet("profissionais")]
-    public IActionResult GetProfissionais()
+    public async Task<IActionResult> GetProfissionais()
     {
-        var responce = _service.Consultar();
+        var responce = await _service.Consultar();
         return Ok(responce);
     }
 
     [HttpPost("profissionais")]
-    public IActionResult PostProfissional([FromBody]  RequestProfissionalRegisterJson profissional)
+    public async Task<IActionResult> PostProfissional([FromBody]  RequestProfissionalRegisterJson profissional)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var response = _service.Cadastrar(profissional);
-
-        return Created("Profissional adcionado", profissional);
+        var response = await _service.Cadastrar(profissional);
+        if (response)
+        {
+            return Created("Profissional adcionado", profissional);
+        }
+        return BadRequest("Não foi possivel criar esse profissional");
     }
     
 }

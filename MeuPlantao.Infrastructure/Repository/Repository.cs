@@ -15,35 +15,35 @@ namespace MeuPlantao.Infrastructure.Repository
 
         public IQueryable<T> Consultar<T>() where T : class
         {
-            return _appDbContext.Set<T>();
+            return _appDbContext.Set<T>().AsQueryable();
         }
 
-        public T? ConsultarPorId<T>(long id) where T : class
+        public async Task<T?> ConsultarPorId<T>(long id) where T : class
         {
-            return _appDbContext.Set<T>().Find(id);
+            return await _appDbContext.Set<T>().FindAsync(id);
         }
 
-        public bool Cadastrar<T>(T model) where T : class
+        public async Task<bool> Cadastrar<T>(T model) where T : class
         {
-            _appDbContext.Set<T>().Add(model);
-            return Save();
+            await _appDbContext.Set<T>().AddAsync(model);
+            return await Save();
         }
 
-        public bool Editar<T>(T model) where T : class
+        public async Task<bool> Editar<T>(T model) where T : class
         {
             _appDbContext.Set<T>().Update(model);
-            return Save();
+            return await Save();
         }
 
-        public bool Excluir<T>(T model) where T : class
+        public async Task<bool> Excluir<T>(T model) where T : class
         {
             _appDbContext.Set<T>().Remove(model);
-            return Save();
+            return await Save();
         }
 
-        public bool Save()
+        public async Task<bool> Save()
         {
-            return _appDbContext.SaveChanges() > 0;
+            return await _appDbContext.SaveChangesAsync() > 0;
         }
     }
 }

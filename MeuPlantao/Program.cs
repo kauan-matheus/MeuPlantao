@@ -5,6 +5,8 @@ using MeuPlantao.Infrastructure.Repository;
 using MeuPlantao.Application.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MeuPlantao.Application.Services.Profissional;
+using MeuPlantao.Application.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MeuPlantao.Application.Services;
 using MeuPlantao.Domain.Entities;
+using MeuPlantao.Application.Services.User;
 
 namespace MeuPlantao.Controllers
 {
@@ -16,23 +17,26 @@ namespace MeuPlantao.Controllers
         }
 
         [HttpGet("profissionais")]
-        public IActionResult GetProfissionais()
+        public async Task<IActionResult> GetProfissionais()
         {
-            var responce = _service.Consultar();
+            var responce = await _service.Consultar();
             return Ok(responce);
         }
 
         [HttpPost("profissionais")]
-        public IActionResult PostUser([FromBody]  UserModel user)
+        public async Task<IActionResult> PostUser([FromBody]  UserModel user)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var response = _service.Cadastrar(user);
-
-            return Created("user adcionado", user);
+            var response = await _service.Cadastrar(user);
+            if (response)
+            {
+                return Created("Usuario adcionado", user);
+            }
+            return BadRequest("Não foi possivel criar esse usuario");
         }
     }
 }
