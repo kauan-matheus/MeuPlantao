@@ -4,6 +4,7 @@ using MeuPlantao.Infrastructure.Data;
 using MeuPlantao.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MeuPlantao.Application.Services;
 
 namespace MeuPlantao.Controllers;
 
@@ -14,10 +15,12 @@ public class AuthController : ControllerBase
 {
 
     private readonly AppDbContext _appDbContext;
+    private readonly TokenService _tokenService;
 
-    public AuthController(AppDbContext appDbContext)
+    public AuthController(AppDbContext appDbContext, TokenService tokenService)
     {
         _appDbContext = appDbContext;
+        _tokenService = tokenService;
     }
 
     [HttpPost("/auth/login")]
@@ -30,19 +33,25 @@ public class AuthController : ControllerBase
         var usuario = await _appDbContext.Usuarios
             .FirstOrDefaultAsync(usuario => usuario.Email == auth.Email);
 
-        if (usuario == null)
+        if (usuario == null || !BCrypt.Net.BCrypt.Verify(auth.Password, usuario.PasswordHash))
             return Unauthorized("Email ou senha inválidos");
 
-        if (usuario.PasswordHash != auth.Password)
-            return Unauthorized("Email ou senha inválidos");
+        if (!usuario.Active)
+            return Unauthorized("Usuário inativo");
 
-        return Ok("Login realizado com sucesso");
+        var token = _tokenService.GenerateToken(usuario);
+
+        return Ok(new
+        {
+            token,
+            expiresIn = "8h",
+            usuario = new {usuario.Id, usuario.Email, role = usuario.Role.ToString()}
+        });
     }
 
     [HttpPost("/auth/register")]
     public async Task<IActionResult> Register([FromBody] RequestAuthRegisterJson request)
     {
-
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
@@ -78,7 +87,14 @@ public class AuthController : ControllerBase
         _appDbContext.Profissionais.Add(profissional);
         await _appDbContext.SaveChangesAsync();
 
-        return Ok("Usuário registrado com sucesso");
+        var token = _tokenService.GenerateToken(usuario);
+
+        return Ok(new
+        {
+            messge = "Usuario registrado com sucesso",
+            token,
+            usuario = new {usuario.Id, usuario.Email}
+        });
     }
 
 }
