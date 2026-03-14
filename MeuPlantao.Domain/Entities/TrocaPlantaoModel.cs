@@ -5,14 +5,14 @@ namespace MeuPlantao.Domain.Entities;
 
 public class TrocaPlantaoModel
 {
-    public int Id { get; set; }
-    public int PlantaoId { get; set; }
+    public long Id { get; set; }
+    public long PlantaoId { get; set; }
     public PlantaoModel Plantao { get; set; } = null!;
 
-    public int SolicitanteId { get; set; }
+    public long SolicitanteId { get; set; }
     public ProfissionalModel Solicitante { get; set; } = null!;
 
-    public int DestinatarioId { get; set; }
+    public long DestinatarioId { get; set; }
     public ProfissionalModel Destinatario { get; set; } = null!;
 
     public StatusTrocaPlantaoEnum Status { get; set; }

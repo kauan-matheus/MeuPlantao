@@ -5,7 +5,7 @@ namespace MeuPlantao.Domain.Entities;
 
 public class UserModel
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     [MaxLength(100)]
     public string Email { get; set; } = string.Empty;
     [MaxLength(100)]

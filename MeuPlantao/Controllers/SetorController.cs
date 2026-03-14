@@ -2,6 +2,8 @@
 using MeuPlantao.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MeuPlantao.Application.Services.Setor;
+using System.Threading.Tasks;
 
 namespace MeuPlantao.Controllers;
 
@@ -9,19 +11,30 @@ namespace MeuPlantao.Controllers;
 [Route("api/[controller]")]
 public class SetorController : ControllerBase
 {
-    private readonly AppDbContext _appDbContext;
+    private readonly SetorService _service;
 
-    public SetorController(AppDbContext appDbContext)
+    public SetorController(SetorService service)
     {
-        _appDbContext = appDbContext;
+        _service = service;
     }
 
 
     [HttpGet("setores")]
     public async Task<IActionResult> GetSetores()
     {
-        var resultado = await _appDbContext.Setores.ToListAsync();
-        return Ok(resultado);
+        var responce = await _service.Consultar();
+        return Ok(responce);
+    }
+
+    [HttpGet("setores/{id}")]
+    public async Task<IActionResult> GetSetorId(long id)
+    {
+        var responce = await _service.ConsultarId(id);
+        if (responce != null)
+        {
+            return Ok(responce);
+        }
+        return BadRequest("Setor não existente ou não encontrado");
     }
     
     [HttpPost("setores")]
@@ -31,22 +44,40 @@ public class SetorController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        _appDbContext.Setores.Add(setor);
-        await _appDbContext.SaveChangesAsync();
 
-        return Created("setor adcionado", setor);
+        var response = await _service.Cadastrar(setor);
+        if (response)
+        {
+            return Created("Setor adcionado", setor);
+        }
+        return BadRequest("Não foi possivel criar esse setor");
     }
 
-    [HttpPut("setores/{idSetores}")]
-    public IActionResult PutSetores(int idSetores)
+    [HttpPut("setores")]
+    public async Task<IActionResult> PutSetores([FromBody] SetorModel setor)
     {
-        return Ok();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var response = await _service.Editar(setor);
+        if (response)
+        {
+            return Created("Setor editado", setor);
+        }
+        return BadRequest("Não foi possivel alterar esse setor");
     }
 
-    [HttpDelete("setores/{idSetores}")]
-    public IActionResult DeleteSetores(int idSetores)
+    [HttpDelete("setores/{id}")]
+    public async Task<IActionResult> DeleteSetores(long id)
     {
-        return Ok();
+        var responce = await _service.Deletar(id);
+        if (responce != null)
+        {
+            return Accepted("Setor deletado com sucesso", responce);
+        }
+        return BadRequest("Não foi possivel deletar esse setor");
     }
     
 }

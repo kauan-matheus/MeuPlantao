@@ -24,11 +24,11 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.PlantaoModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("Fim")
                         .HasColumnType("timestamp with time zone");
@@ -36,11 +36,11 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.Property<DateTime>("Inicio")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("ProfissionalResponsavelId")
-                        .HasColumnType("integer");
+                    b.Property<long>("ProfissionalResponsavelId")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("SetorId")
-                        .HasColumnType("integer");
+                    b.Property<long>("SetorId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -56,11 +56,11 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.ProfissionalModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Crm")
                         .HasMaxLength(10)
@@ -74,8 +74,8 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .HasMaxLength(9)
                         .HasColumnType("character varying(9)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -87,11 +87,11 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.SetorModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Nome")
                         .HasMaxLength(100)
@@ -104,11 +104,11 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.TrocaHistoricoModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("Data")
                         .HasColumnType("timestamp with time zone");
@@ -120,11 +120,11 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int>("TrocaPlantaoId")
-                        .HasColumnType("integer");
+                    b.Property<long>("TrocaPlantaoId")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer");
+                    b.Property<long>("UsuarioId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -137,27 +137,27 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.TrocaPlantaoModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DestinatarioId")
-                        .HasColumnType("integer");
+                    b.Property<long>("DestinatarioId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Motivo")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<int>("PlantaoId")
-                        .HasColumnType("integer");
+                    b.Property<long>("PlantaoId")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("SolicitanteId")
-                        .HasColumnType("integer");
+                    b.Property<long>("SolicitanteId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -175,11 +175,11 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.UserModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Active")
                         .HasColumnType("boolean");

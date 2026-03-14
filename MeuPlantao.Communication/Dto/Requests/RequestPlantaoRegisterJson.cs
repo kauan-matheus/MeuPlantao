@@ -1,14 +1,12 @@
 using MeuPlantao.Communication.Enums;
 
-namespace MeuPlantao.Domain.Entities;
+namespace MeuPlantao.Communication.Dto.Requests;
 
-public class PlantaoModel
+public class RequestPlantaoRegisterJson
 {
     public long Id { get; set; }
     public long SetorId { get; set; }
-    public SetorModel Setor { get; set; } = null!;
     public long ProfissionalResponsavelId { get; set; }
-    public ProfissionalModel ProfissionalResponsavel { get; set; } = null!;
     public DateTime Inicio { get; set; }
     public DateTime Fim { get; set; }
     public StatusPlantaoEnum Status { get; set; }

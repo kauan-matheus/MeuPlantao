@@ -2,6 +2,7 @@ using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace MeuPlantao.Application.Services.Profissional
 {
@@ -31,30 +32,43 @@ namespace MeuPlantao.Application.Services.Profissional
 
         public async Task<bool> Cadastrar(RequestProfissionalRegisterJson profissional)
         {
-            var novo = new ProfissionalModel
-            {
-                Nome = profissional.Nome,
-                Crm = profissional.Crm,
-                Telefone = profissional.Telefone,
-                UserId = profissional.UserId,
-            };
+            var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
+            if (existente != null){
+                var novo = new ProfissionalModel
+                {
+                    Nome = profissional.Nome,
+                    Crm = profissional.Crm,
+                    Telefone = profissional.Telefone,
+                    UserId = profissional.UserId,
+                    User = existente,
+                };
 
-            var responce = await _repository.Cadastrar<ProfissionalModel>(novo);
-            return responce;
+                var responce = await _repository.Cadastrar<ProfissionalModel>(novo);
+                return responce;
+            }
+
+            return false;
         }
 
         public async Task<bool> Editar(RequestProfissionalRegisterJson profissional)
         {
-            var novo = new ProfissionalModel
-            {
-                Nome = profissional.Nome,
-                Crm = profissional.Crm,
-                Telefone = profissional.Telefone,
-                UserId = profissional.UserId,
-            };
+            var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
+            if (existente != null){
+                var novo = new ProfissionalModel
+                {
+                    Id = profissional.Id,
+                    Nome = profissional.Nome,
+                    Crm = profissional.Crm,
+                    Telefone = profissional.Telefone,
+                    UserId = profissional.UserId,
+                    User = existente,
+                };
 
-            var responce = await _repository.Editar<ProfissionalModel>(novo);
-            return responce;
+                var responce = await _repository.Editar<ProfissionalModel>(novo);
+                return responce;
+            }
+
+            return false;
         }
 
         public async Task<ProfissionalModel?> Deletar(long Id)

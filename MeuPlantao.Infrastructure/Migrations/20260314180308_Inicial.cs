@@ -16,7 +16,7 @@ namespace MeuPlantao.Infrastructure.Migrations
                 name: "Setores",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
                 },
@@ -29,7 +29,7 @@ namespace MeuPlantao.Infrastructure.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     PasswordHash = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
@@ -45,12 +45,12 @@ namespace MeuPlantao.Infrastructure.Migrations
                 name: "Profissionais",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Crm = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
                     Telefone = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    UserId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -67,10 +67,10 @@ namespace MeuPlantao.Infrastructure.Migrations
                 name: "Plantoes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    SetorId = table.Column<int>(type: "integer", nullable: false),
-                    ProfissionalResponsavelId = table.Column<int>(type: "integer", nullable: false),
+                    SetorId = table.Column<long>(type: "bigint", nullable: false),
+                    ProfissionalResponsavelId = table.Column<long>(type: "bigint", nullable: false),
                     Inicio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Fim = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false)
@@ -96,11 +96,11 @@ namespace MeuPlantao.Infrastructure.Migrations
                 name: "TrocaPlantoes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PlantaoId = table.Column<int>(type: "integer", nullable: false),
-                    SolicitanteId = table.Column<int>(type: "integer", nullable: false),
-                    DestinatarioId = table.Column<int>(type: "integer", nullable: false),
+                    PlantaoId = table.Column<long>(type: "bigint", nullable: false),
+                    SolicitanteId = table.Column<long>(type: "bigint", nullable: false),
+                    DestinatarioId = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     Motivo = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -132,12 +132,12 @@ namespace MeuPlantao.Infrastructure.Migrations
                 name: "Historico",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TrocaPlantaoId = table.Column<int>(type: "integer", nullable: false),
+                    TrocaPlantaoId = table.Column<long>(type: "bigint", nullable: false),
                     Evento = table.Column<int>(type: "integer", nullable: false),
                     Data = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UsuarioId = table.Column<int>(type: "integer", nullable: false),
+                    UsuarioId = table.Column<long>(type: "bigint", nullable: false),
                     Observacao = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>

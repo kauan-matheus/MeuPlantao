@@ -8,6 +8,8 @@ using System.Text;
 using MeuPlantao.Application.Services.Profissional;
 using MeuPlantao.Application.Services.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MeuPlantao.Application.Services.Setor;
+using MeuPlantao.Application.Services.Plantao;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,8 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<ProfissionalService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<SetorService>();
+builder.Services.AddScoped<PlantaoService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

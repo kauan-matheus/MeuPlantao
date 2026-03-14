@@ -4,6 +4,7 @@ namespace MeuPlantao.Communication.Dto.Requests;
 
 public class RequestProfissionalRegisterJson
 {
+    public long Id { get; set; }
     [MaxLength(100)]
     public string Nome { get; set; } = String.Empty;
     [MaxLength(10)]
