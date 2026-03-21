@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using MeuPlantao.Domain.Interfaces;
+using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Domain.Entities;
+using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeuPlantao.Application.Services.User
@@ -19,43 +16,52 @@ namespace MeuPlantao.Application.Services.User
 
         public async Task<List<UserModel>> Consultar()
         {
-            var responce = await _repository.Consultar<UserModel>()
+            return await _repository.Consultar<UserModel>()
                 .OrderBy(p => p.Id)
                 .ToListAsync();
-
-            return responce;
         }
 
-        public async Task<UserModel> ConsultarId(long Id)
+        public async Task<UserModel?> ConsultarId(long id)
         {
-            var responce = await _repository.ConsultarPorId<UserModel>(Id);
-            return responce;
+            return await _repository.ConsultarPorId<UserModel>(id);
         }
 
-        public async Task<bool> Cadastrar(UserModel user)
+        public async Task<bool> Cadastrar(RequestUserRegisterJson user)
         {
-            var responce = await _repository.Cadastrar<UserModel>(user);
-            return responce;
-        }
-
-        public async Task<bool> Editar(UserModel user)
-        {
-            var responce = await _repository.Editar<UserModel>(user);
-            return responce;
-        }
-
-        public async Task<UserModel?> Deletar(long Id)
-        {
-            var existente = await ConsultarId(Id);
-            if (existente != null)
+            // Mapeia DTO para entidade — hash da senha deve ser feito aqui antes de salvar
+            var novo = new UserModel
             {
-                await _repository.Excluir<UserModel>(existente);
-                return existente;
-            }
-            else
+                Email = user.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                Role = user.Role,
+                Active = user.Active
+            };
+
+            return await _repository.Cadastrar(novo);
+        }
+
+        public async Task<bool> Editar(RequestUserRegisterJson user)
+        {
+            var novo = new UserModel
             {
+                Id = user.Id,
+                Email = user.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                Role = user.Role,
+                Active = user.Active
+            };
+
+            return await _repository.Editar(novo);
+        }
+
+        public async Task<UserModel?> Deletar(long id)
+        {
+            var existente = await ConsultarId(id);
+            if (existente is null)
                 return null;
-            }
+
+            await _repository.Excluir(existente);
+            return existente;
         }
     }
 }

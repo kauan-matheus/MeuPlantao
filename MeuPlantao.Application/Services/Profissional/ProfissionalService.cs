@@ -2,7 +2,6 @@ using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace MeuPlantao.Application.Services.Profissional
 {
@@ -17,72 +16,63 @@ namespace MeuPlantao.Application.Services.Profissional
 
         public async Task<List<ProfissionalModel>> Consultar()
         {
-            var responce = await _repository.Consultar<ProfissionalModel>()
+            return await _repository.Consultar<ProfissionalModel>()
                 .OrderBy(p => p.Id)
                 .ToListAsync();
-
-            return responce;
         }
 
-        public async Task<ProfissionalModel> ConsultarId(long Id)
+        public async Task<ProfissionalModel?> ConsultarId(long id)
         {
-            var responce = await _repository.ConsultarPorId<ProfissionalModel>(Id);
-            return responce;
+            return await _repository.ConsultarPorId<ProfissionalModel>(id);
         }
 
         public async Task<bool> Cadastrar(RequestProfissionalRegisterJson profissional)
         {
+            // Valida se o usuário vinculado existe antes de cadastrar o profissional
             var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
-            if (existente != null){
-                var novo = new ProfissionalModel
-                {
-                    Nome = profissional.Nome,
-                    Crm = profissional.Crm,
-                    Telefone = profissional.Telefone,
-                    UserId = profissional.UserId,
-                    User = existente,
-                };
+            if (existente is null)
+                return false;
 
-                var responce = await _repository.Cadastrar<ProfissionalModel>(novo);
-                return responce;
-            }
+            var novo = new ProfissionalModel
+            {
+                Nome = profissional.Nome,
+                Crm = profissional.Crm,
+                Telefone = profissional.Telefone,
+                UserId = profissional.UserId,
+                User = existente,
+            };
 
-            return false;
+            return await _repository.Cadastrar(novo);
         }
 
         public async Task<bool> Editar(RequestProfissionalRegisterJson profissional)
         {
+            // Valida se o usuário vinculado existe antes de editar o profissional
             var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
-            if (existente != null){
-                var novo = new ProfissionalModel
-                {
-                    Id = profissional.Id,
-                    Nome = profissional.Nome,
-                    Crm = profissional.Crm,
-                    Telefone = profissional.Telefone,
-                    UserId = profissional.UserId,
-                    User = existente,
-                };
+            if (existente is null)
+                return false;
 
-                var responce = await _repository.Editar<ProfissionalModel>(novo);
-                return responce;
-            }
+            var novo = new ProfissionalModel
+            {
+                Id = profissional.Id,
+                Nome = profissional.Nome,
+                Crm = profissional.Crm,
+                Telefone = profissional.Telefone,
+                UserId = profissional.UserId,
+                User = existente,
+            };
 
-            return false;
+            return await _repository.Editar(novo);
         }
 
-        public async Task<ProfissionalModel?> Deletar(long Id)
+        public async Task<ProfissionalModel?> Deletar(long id)
         {
-            var existente = await ConsultarId(Id);
-            if (existente != null)
-            {
-                await _repository.Excluir<ProfissionalModel>(existente);
-                return existente;
-            }
-            else
-            {
+            var existente = await ConsultarId(id);
+            if (existente is null)
                 return null;
-            }
+
+            await _repository.Excluir(existente);
+            return existente;
         }
     }
 }

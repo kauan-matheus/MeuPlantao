@@ -2,17 +2,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MeuPlantao.Domain.Entities;
 
-//Modelo do banco de Profissional(enfermeiro/médico etc...)
+// Modelo do banco de Profissional (enfermeiro, médico etc.)
 public class ProfissionalModel
 {
     public long Id { get; set; }
+
     [MaxLength(100)]
-    public string Nome { get; set; } = String.Empty;
+    public string Nome { get; set; } = string.Empty;
+
     [MaxLength(10)]
-    public string Crm { get; set; } = String.Empty;
+    public string Crm { get; set; } = string.Empty;
+
     [MaxLength(9)]
-    public string Telefone { get; set; } = String.Empty; 
-    public long UserId { get; set; } //FK
-    public UserModel User { get; set; } //navegação
-    
+    public string Telefone { get; set; } = string.Empty;
+
+    public long UserId { get; set; } // FK para UserModel
+
+    // null! indica ao compilador que este campo será preenchido pelo EF Core (não é realmente nulo em runtime)
+    public UserModel User { get; set; } = null!;
 }

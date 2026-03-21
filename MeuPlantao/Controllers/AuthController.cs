@@ -1,15 +1,14 @@
-﻿using MeuPlantao.Communication.Dto.Requests;
+﻿using MeuPlantao.Application.Services.Auth;
+using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Communication.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MeuPlantao.Application.Services.Auth;
 
 namespace MeuPlantao.Controllers;
 
 [ApiController]
 [Route("api/[controller]/")]
-
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -20,8 +19,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("/auth/login")]
-    // Login precisa ficar público para emitir o primeiro JWT.
-    [AllowAnonymous]
+    [AllowAnonymous] // Login precisa ficar público para emitir o primeiro JWT
     [ProducesResponseType(typeof(ResponseAuthLoginJson), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -39,8 +37,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("/auth/register")]
-    // Registro padrão continua público e cria usuário profissional.
-    [AllowAnonymous]
+    [AllowAnonymous] // Registro padrão é público e cria usuário profissional
     [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RequestAuthRegisterJson request)
@@ -57,8 +54,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("/auth/register-admin")]
-    // Apenas admins podem criar novos admins.
-    [Authorize(Roles = nameof(RoleEnum.Admin))]
+    [Authorize(Roles = nameof(RoleEnum.Admin))] // Apenas admins podem criar novos admins
     [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -75,5 +71,4 @@ public class AuthController : ControllerBase
 
         return StatusCode(response.StatusCode, response.Message);
     }
-
 }

@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,43 +16,46 @@ namespace MeuPlantao.Application.Services.Setor
 
         public async Task<List<SetorModel>> Consultar()
         {
-            var responce = await _repository.Consultar<SetorModel>()
+            return await _repository.Consultar<SetorModel>()
                 .OrderBy(p => p.Id)
                 .ToListAsync();
-
-            return responce;
         }
 
-        public async Task<SetorModel> ConsultarId(long Id)
+        public async Task<SetorModel?> ConsultarId(long id)
         {
-            var responce = await _repository.ConsultarPorId<SetorModel>(Id);
-            return responce;
+            return await _repository.ConsultarPorId<SetorModel>(id);
         }
 
-        public async Task<bool> Cadastrar(SetorModel setor)
+        public async Task<bool> Cadastrar(RequestSetorRegisterJson setor)
         {
-            var responce = await _repository.Cadastrar<SetorModel>(setor);
-            return responce;
-        }
-
-        public async Task<bool> Editar(SetorModel setor)
-        {
-            var responce = await _repository.Editar<SetorModel>(setor);
-            return responce;
-        }
-
-        public async Task<SetorModel?> Deletar(long Id)
-        {
-            var existente = await ConsultarId(Id);
-            if (existente != null)
+            // Mapeia o DTO para a entidade de domínio — nunca expõe SetorModel diretamente na API
+            var novo = new SetorModel
             {
-                await _repository.Excluir<SetorModel>(existente);
-                return existente;
-            }
-            else
+                Nome = setor.Nome
+            };
+
+            return await _repository.Cadastrar(novo);
+        }
+
+        public async Task<bool> Editar(RequestSetorRegisterJson setor)
+        {
+            var novo = new SetorModel
             {
+                Id = setor.Id,
+                Nome = setor.Nome
+            };
+
+            return await _repository.Editar(novo);
+        }
+
+        public async Task<SetorModel?> Deletar(long id)
+        {
+            var existente = await ConsultarId(id);
+            if (existente is null)
                 return null;
-            }
+
+            await _repository.Excluir(existente);
+            return existente;
         }
     }
 }

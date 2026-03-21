@@ -3,119 +3,148 @@ using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Communication.Enums;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace MeuPlantao.Application.Services.Auth;
 
 public class AuthService : IAuthService
 {
-	private readonly IRepository _repository;
-	private readonly TokenService _tokenService;
+    private readonly IRepository _repository;
+    private readonly TokenService _tokenService;
+    private readonly ILogger<AuthService> _logger;
 
-	public AuthService(IRepository repository, TokenService tokenService)
-	{
-		_repository = repository;
-		_tokenService = tokenService;
-	}
+    // ILogger injetado para registrar erros sem silenciá-los
+    public AuthService(IRepository repository, TokenService tokenService, ILogger<AuthService> logger)
+    {
+        _repository = repository;
+        _tokenService = tokenService;
+        _logger = logger;
+    }
 
-	public async Task<AuthServiceResponse<ResponseAuthLoginJson>> Login(RequestAuthLoginJson auth)
-	{
-		var usuario = await _repository.ConsultarUsuarioPorEmail(auth.Email);
+    public async Task<AuthServiceResponse<ResponseAuthLoginJson>> Login(RequestAuthLoginJson auth)
+    {
+        var usuario = await _repository.ConsultarUsuarioPorEmail(auth.Email);
 
-		if (usuario == null || !BCrypt.Net.BCrypt.Verify(auth.Password, usuario.PasswordHash))
-			return AuthServiceResponse<ResponseAuthLoginJson>.Unauthorized("Email ou senha inválidos");
+        // Roda o BCrypt em background para não bloquear o fluxo principal
+        // Task.Run retorna false se o usuário não existir, evitando exception
+        var senhaValida = usuario != null && await Task.Run(() => BCrypt.Net.BCrypt.Verify(auth.Password, usuario.PasswordHash));
 
-		if (!usuario.Active)
-			return AuthServiceResponse<ResponseAuthLoginJson>.Unauthorized("Usuário inativo");
+        // Mesma mensagem para email inexistente e senha errada (segurança)
+        if (usuario == null || !senhaValida)
+            return AuthServiceResponse<ResponseAuthLoginJson>.Unauthorized("Email ou senha inválidos");
 
-		var token = _tokenService.GenerateToken(usuario);
+        if (!usuario.Active)
+            return AuthServiceResponse<ResponseAuthLoginJson>.Unauthorized("Usuário inativo");
 
-		return AuthServiceResponse<ResponseAuthLoginJson>.Ok(new ResponseAuthLoginJson
-		{
-			Token = token,
-			ExpiresIn = "8h",
-			Usuario = new ResponseAuthUserJson
-			{
-				Id = usuario.Id,
-				Email = usuario.Email,
-				Role = usuario.Role.ToString()
-			}
-		});
-	}
+        // gerar o token do JWT
+        var token = _tokenService.GenerateToken(usuario);
 
-	public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> Register(RequestAuthRegisterJson request)
-	{
-		var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
-		if (emailExiste)
-			return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
+        return AuthServiceResponse<ResponseAuthLoginJson>.Ok(new ResponseAuthLoginJson
+        {
+            Token = token,
+            ExpiresIn = "8h",
+            Usuario = new ResponseAuthUserJson
+            {
+                Id = usuario.Id,
+                Email = usuario.Email,
+                Role = usuario.Role.ToString()
+            }
+        });
+    }
 
-		var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+    public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> Register(RequestAuthRegisterJson request)
+    {
+        var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
+        if (emailExiste)
+            return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
 
-		var usuario = new UserModel
-		{
-			Email = request.Email,
-			PasswordHash = passwordHash,
-			Role = RoleEnum.Profissional,
-			Active = true
-		};
+        // BCrypt em background — HashPassword é pesado por design (segurança)
+        var passwordHash = await Task.Run(() => BCrypt.Net.BCrypt.HashPassword(request.Password));
 
-		var profissional = new ProfissionalModel
-		{
-			Nome = request.Nome,
-			Crm = request.Crm,
-			Telefone = request.Telefone
-		};
+        var usuario = new UserModel
+        {
+            Email = request.Email,
+            PasswordHash = passwordHash,
+            Role = RoleEnum.Profissional,
+            Active = true
+        };
 
-		var cadastrado = await _repository.CadastrarUsuarioComProfissional(usuario, profissional);
-		if (!cadastrado)
-			return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
+        var profissional = new ProfissionalModel
+        {
+            Nome = request.Nome,
+            Crm = request.Crm,
+            Telefone = request.Telefone
+        };
 
-		var token = _tokenService.GenerateToken(usuario);
+        try
+        {
+            // Cadastra usuário e profissional dentro de uma transaction (atômico)
+            await _repository.CadastrarUsuarioComProfissional(usuario, profissional);
+        }
+        catch (Exception ex)
+        {
+            // Loga o erro real para debug, mas retorna mensagem genérica ao cliente
+            _logger.LogError(ex, "Erro ao registrar usuário: {Email}", request.Email);
+            return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
+        }
 
-		return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
-		{
-			Message = "Usuario registrado com sucesso",
-			Token = token,
-			Usuario = new ResponseAuthUserJson
-			{
-				Id = usuario.Id,
-				Email = usuario.Email
-			}
-		});
-	}
+        // Após o cadastro o EF Core já preencheu usuario.Id com o valor gerado pelo banco
+        // Só geramos o token aqui para garantir que o Id é válido
+        var token = _tokenService.GenerateToken(usuario);
 
-	public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterAdmin(RequestAuthRegisterAdminJson request)
-	{
-		var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
-		if (emailExiste)
-			return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
+        return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
+        {
+            Message = "Usuário registrado com sucesso",
+            Token = token,
+            Usuario = new ResponseAuthUserJson
+            {
+                Id = usuario.Id,   // Id já populado pelo EF Core
+                Email = usuario.Email
+            }
+        });
+    }
 
-		var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+    public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterAdmin(RequestAuthRegisterAdminJson request)
+    {
+        var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
+        if (emailExiste)
+            return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
 
-		// Admin usa a mesma entidade User. A diferença de acesso é definida pelo Role.
-		var usuario = new UserModel
-		{
-			Email = request.Email,
-			PasswordHash = passwordHash,
-			Role = RoleEnum.Admin,
-			Active = true
-		};
+        // BCrypt em background — mesma razão do Register
+        var passwordHash = await Task.Run(() => BCrypt.Net.BCrypt.HashPassword(request.Password));
 
-		var cadastrado = await _repository.Cadastrar(usuario);
-		if (!cadastrado)
-			return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o admin");
+        // Admin usa a mesma entidade User, a diferença de acesso é definida pelo Role
+        var usuario = new UserModel
+        {
+            Email = request.Email,
+            PasswordHash = passwordHash,
+            Role = RoleEnum.Admin,
+            Active = true
+        };
 
-		var token = _tokenService.GenerateToken(usuario);
+        try
+        {
+            await _repository.Cadastrar(usuario);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao registrar admin: {Email}", request.Email);
+            return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o admin");
+        }
 
-		return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
-		{
-			Message = "Admin registrado com sucesso",
-			Token = token,
-			Usuario = new ResponseAuthUserJson
-			{
-				Id = usuario.Id,
-				Email = usuario.Email,
-				Role = usuario.Role.ToString()
-			}
-		});
-	}
+        // Token gerado após cadastro para garantir que usuario.Id foi populado
+        var token = _tokenService.GenerateToken(usuario);
+
+        return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
+        {
+            Message = "Admin registrado com sucesso",
+            Token = token,
+            Usuario = new ResponseAuthUserJson
+            {
+                Id = usuario.Id,
+                Email = usuario.Email,
+                Role = usuario.Role.ToString()
+            }
+        });
+    }
 }

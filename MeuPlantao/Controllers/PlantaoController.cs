@@ -8,82 +8,73 @@ namespace MeuPlantao.Controllers;
 [Route("api/[controller]")]
 public class PlantaoController : ControllerBase
 {
-    private readonly PlantaoService _service;
+    // Injeta a interface, não a classe concreta — segue Clean Architecture
+    private readonly IPlantaoService _service;
 
-    public PlantaoController(PlantaoService service)
+    public PlantaoController(IPlantaoService service)
     {
         _service = service;
     }
 
     [HttpGet("plantoes")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPlantoes()
     {
-        var responce = await _service.Consultar();
-        return Ok(responce);
+        var response = await _service.Consultar();
+        return Ok(response);
     }
 
     [HttpGet("plantoes/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
     public async Task<IActionResult> GetPlantaoId(long id)
     {
-        var responce = await _service.ConsultarId(id);
-        if (responce != null)
-        {
-            return Ok(responce);
-        }
-        return BadRequest("Plantao não existente ou não encontrado");
+        var response = await _service.ConsultarId(id);
+        if (response is not null)
+            return Ok(response);
+
+        return NotFound("Plantão não existente ou não encontrado");
     }
 
     [HttpPost("plantoes")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostPlantao([FromBody]  RequestPlantaoRegisterJson plantao)
+    public async Task<IActionResult> PostPlantao([FromBody] RequestPlantaoRegisterJson plantao)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
 
         var response = await _service.Cadastrar(plantao);
         if (response)
-        {
-            return Created("Plantao adcionado", plantao);
-        }
-        return BadRequest("Não foi possivel criar esse plantao");
+            return Created("Plantão adicionado", plantao);
+
+        return BadRequest("Não foi possível criar esse plantão");
     }
 
     [HttpPut("plantoes")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status200OK)] // PUT bem-sucedido retorna 200, não 201
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PutPlantoes([FromBody] RequestPlantaoRegisterJson plantao)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
 
         var response = await _service.Editar(plantao);
         if (response)
-        {
-            return Created("Plantao editado", plantao);
-        }
-        return BadRequest("Não foi possivel alterar esse plantao");
+            return Ok(plantao);
+
+        return BadRequest("Não foi possível alterar esse plantão");
     }
 
     [HttpDelete("plantoes/{id}")]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado
     public async Task<IActionResult> DeletePlantoes(long id)
     {
-        var responce = await _service.Deletar(id);
-        if (responce != null)
-        {
-            return Accepted("Plantao deletado com sucesso", responce);
-        }
-        return BadRequest("Não foi possivel deletar esse plantao");
+        var response = await _service.Deletar(id);
+        if (response is not null)
+            return Ok(response);
+
+        return NotFound("Não foi possível deletar esse plantão");
     }
-    
 }
