@@ -9,12 +9,12 @@ namespace MeuPlantao.Application.Services.Auth;
 
 public class AuthService : IAuthService
 {
-    private readonly IRepository _repository;
+    private readonly IAuthRepository _repository;
     private readonly TokenService _tokenService;
     private readonly ILogger<AuthService> _logger;
 
     // ILogger injetado para registrar erros sem silenciá-los
-    public AuthService(IRepository repository, TokenService tokenService, ILogger<AuthService> logger)
+    public AuthService(IAuthRepository repository, TokenService tokenService, ILogger<AuthService> logger)
     {
         _repository = repository;
         _tokenService = tokenService;

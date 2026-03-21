@@ -15,11 +15,5 @@ namespace MeuPlantao.Domain.Interfaces
         Task<bool> Cadastrar<T>(T model) where T : class;
         Task<bool> Editar<T>(T model) where T : class;
         Task<bool> Excluir<T>(T model) where T : class;
-
-        // Nullable pois o email pode não estar cadastrado
-        Task<UserModel?> ConsultarUsuarioPorEmail(string email);
-
-        Task<bool> ExisteUsuarioPorEmail(string email);
-        Task<bool> CadastrarUsuarioComProfissional(UserModel usuario, ProfissionalModel profissional);
     }
 }
