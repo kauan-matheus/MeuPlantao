@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using MeuPlantao.Application.Services;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Application.Services.User;
+using MeuPlantao.Communication.Enums;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MeuPlantao.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    // Gestão de usuários é área administrativa.
+    [Authorize(Roles = nameof(RoleEnum.Admin))]
     public class UserController : ControllerBase
     {
         private readonly UserService _service;
@@ -17,6 +20,8 @@ namespace MeuPlantao.Controllers
         }
 
         [HttpGet("usuarios")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetUser()
         {
             var responce = await _service.Consultar();
@@ -24,6 +29,8 @@ namespace MeuPlantao.Controllers
         }
 
         [HttpGet("usuarios/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetUserId(long id)
         {
             var responce = await _service.ConsultarId(id);
@@ -35,6 +42,8 @@ namespace MeuPlantao.Controllers
         }
 
         [HttpPost("usuarios")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PostUser([FromBody]  UserModel user)
         {
             if (!ModelState.IsValid)
@@ -51,6 +60,8 @@ namespace MeuPlantao.Controllers
         }
 
         [HttpPut("usuarios")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> PutUser([FromBody] UserModel user)
         {
             if (!ModelState.IsValid)
@@ -67,6 +78,8 @@ namespace MeuPlantao.Controllers
         }
 
         [HttpDelete("usuarios/{id}")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> DeleteUser(long id)
         {
             var responce = await _service.Deletar(id);

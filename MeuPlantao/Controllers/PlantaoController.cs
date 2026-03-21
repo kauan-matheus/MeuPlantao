@@ -16,6 +16,8 @@ public class PlantaoController : ControllerBase
     }
 
     [HttpGet("plantoes")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPlantoes()
     {
         var responce = await _service.Consultar();
@@ -23,6 +25,8 @@ public class PlantaoController : ControllerBase
     }
 
     [HttpGet("plantoes/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPlantaoId(long id)
     {
         var responce = await _service.ConsultarId(id);
@@ -34,6 +38,8 @@ public class PlantaoController : ControllerBase
     }
 
     [HttpPost("plantoes")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostPlantao([FromBody]  RequestPlantaoRegisterJson plantao)
     {
         if (!ModelState.IsValid)
@@ -50,6 +56,8 @@ public class PlantaoController : ControllerBase
     }
 
     [HttpPut("plantoes")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PutPlantoes([FromBody] RequestPlantaoRegisterJson plantao)
     {
         if (!ModelState.IsValid)
@@ -66,6 +74,8 @@ public class PlantaoController : ControllerBase
     }
 
     [HttpDelete("plantoes/{id}")]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeletePlantoes(long id)
     {
         var responce = await _service.Deletar(id);

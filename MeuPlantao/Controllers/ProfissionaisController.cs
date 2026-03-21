@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MeuPlantao.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using MeuPlantao.Communication.Dto.Requests;
-using MeuPlantao.Domain.Entities;
+using MeuPlantao.Communication.Enums;
 using MeuPlantao.Application.Services.Profissional;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MeuPlantao.Controllers;
 
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ProfissionaisController : ControllerBase
 {
     private readonly ProfissionalService _service;
@@ -20,6 +20,8 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpGet("profissionais")]
+    // Leitura pode ser feita por profissional autenticado e admin.
+    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))]
     public async Task<IActionResult> GetProfissionais()
     {
         var responce = await _service.Consultar();
@@ -27,6 +29,8 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpGet("profissionais/{id}")]
+    // Leitura pode ser feita por profissional autenticado e admin.
+    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))]
     public async Task<IActionResult> GetProfissionalId(long id)
     {
         var responce = await _service.ConsultarId(id);
@@ -38,6 +42,8 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpPost("profissionais")]
+    // Escrita/gestão é restrita ao admin para evitar cadastro paralelo ao fluxo de auth público.
+    [Authorize(Roles = nameof(RoleEnum.Admin))]
     public async Task<IActionResult> PostProfissional([FromBody]  RequestProfissionalRegisterJson profissional)
     {
         if (!ModelState.IsValid)
@@ -54,6 +60,8 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpPut("profissionais")]
+    // Escrita/gestão é restrita ao admin para evitar alteração indevida de perfil.
+    [Authorize(Roles = nameof(RoleEnum.Admin))]
     public async Task<IActionResult> PutProfissionais([FromBody] RequestProfissionalRegisterJson profissional)
     {
         if (!ModelState.IsValid)
@@ -70,6 +78,8 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpDelete("profissionais/{id}")]
+    // Exclusão é operação administrativa.
+    [Authorize(Roles = nameof(RoleEnum.Admin))]
     public async Task<IActionResult> DeleteProfissionais(long id)
     {
         var responce = await _service.Deletar(id);

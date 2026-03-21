@@ -15,3 +15,49 @@ dotnet build
 
 
 jwt decode: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwiZW1haWwiOiJ1c2VyQC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJQcm9maXNzaW9uYWwiLCJqdGkiOiIxMDEwMGFkMS02ZGZmLTQ2YTctYTlkYi0wMDE4NjdlNzFhYjAiLCJleHAiOjE3NzM0ODAzMzMsImlzcyI6Ik1ldVBsYW50YW8iLCJhdWQiOiJNZXVQbGFudGFvVXNlcnMifQ.2F8CKbaXpiHBlE-sJZ6dEzZScoQQ3S_3b5vZ0OwueF8
+
+
+
+
+
+## ANOTAÇÕES COPILOT
+O que eu fiz:
+
+Criei request DTO separado para criar admin
+RequestAuthRegisterAdminJson.cs
+Só email e senha, validado por data annotations.
+Atualizei contrato do serviço de auth
+IAuthService.cs
+Adicionado método RegisterAdmin.
+Implementei caso de uso de criar admin no AuthService
+AuthServices.cs
+Verifica email duplicado.
+Faz hash da senha.
+Cria User com Role = Admin (sem criar entidade nova, conforme conversamos).
+Gera token e retorna DTO.
+Deixei comentário explicando por que admin usa a mesma entidade User.
+Adicionei endpoint protegido para registrar admin
+AuthController.cs
+POST /auth/register-admin com [Authorize(Roles = nameof(RoleEnum.Admin))].
+login e register ficaram com [AllowAnonymous].
+Coloquei comentários sobre por que cada endpoint é público ou protegido.
+Apliquei autorização por role nos controllers de domínio
+ProfissionaisController.cs
+Controller com [Authorize].
+GET liberado para Admin e Profissional.
+POST/PUT/DELETE só Admin.
+Comentários explicando cada escolha.
+UserController.cs
+Controller inteiro com [Authorize(Roles = nameof(RoleEnum.Admin))].
+Comentário explicando que gestão de usuários é administrativa.
+Validação:
+
+Build final passou com sucesso.
+O único problema durante teste foi arquivo bloqueado por processo da API em execução; encerrei o processo e validei.
+Resumo arquitetural que ficou:
+
+Não precisa criar entidade Admin separada agora.
+User + Role resolve autenticação/autorização.
+Profissional continua sendo perfil de domínio específico.
+Admin é controle de acesso, não outro agregado por enquanto.
+Se quiser, próximo passo eu também te monto uma policy-based auth (ex: CanManageUsers, CanManageProfissionais) em vez de usar só Roles, que escala melhor quando crescer permissão por feature.

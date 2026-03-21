@@ -1,10 +1,9 @@
 ﻿using MeuPlantao.Communication.Dto.Requests;
+using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Communication.Enums;
-using MeuPlantao.Infrastructure.Data;
-using MeuPlantao.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MeuPlantao.Application.Services;
+using MeuPlantao.Application.Services.Auth;
 
 namespace MeuPlantao.Controllers;
 
@@ -13,88 +12,68 @@ namespace MeuPlantao.Controllers;
 
 public class AuthController : ControllerBase
 {
+    private readonly IAuthService _authService;
 
-    private readonly AppDbContext _appDbContext;
-    private readonly TokenService _tokenService;
-
-    public AuthController(AppDbContext appDbContext, TokenService tokenService)
+    public AuthController(IAuthService authService)
     {
-        _appDbContext = appDbContext;
-        _tokenService = tokenService;
+        _authService = authService;
     }
 
     [HttpPost("/auth/login")]
+    // Login precisa ficar público para emitir o primeiro JWT.
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseAuthLoginJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] RequestAuthLoginJson auth)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        //FirstOrDefaultAsync da o primeiro registro que satisfaça essa condição se nn encontrar retorna NULL.
-        var usuario = await _appDbContext.Usuarios
-            .FirstOrDefaultAsync(usuario => usuario.Email == auth.Email);
+        var response = await _authService.Login(auth);
 
-        if (usuario == null || !BCrypt.Net.BCrypt.Verify(auth.Password, usuario.PasswordHash))
-            return Unauthorized("Email ou senha inválidos");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        if (!usuario.Active)
-            return Unauthorized("Usuário inativo");
-
-        var token = _tokenService.GenerateToken(usuario);
-
-        return Ok(new
-        {
-            token,
-            expiresIn = "8h",
-            usuario = new {usuario.Id, usuario.Email, role = usuario.Role.ToString()}
-        });
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("/auth/register")]
+    // Registro padrão continua público e cria usuário profissional.
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RequestAuthRegisterJson request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var emailExiste = await _appDbContext.Usuarios
-            .AnyAsync(u => u.Email == request.Email);
+        var response = await _authService.Register(request);
 
-        if (emailExiste)
-            return BadRequest("Email já cadastrado");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        //BCrypt.Net → namespace; BCrypt → classe; HashPassword() → método
-        //O método HashPassword da classe BCrypt que está dentro do namespace BCrypt.Net.
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        return StatusCode(response.StatusCode, response.Message);
+    }
 
-        var usuario = new UserModel
-        {
-            Email = request.Email,
-            PasswordHash = passwordHash,
-            Role = RoleEnum.Profissional,
-            Active = true
-        };
+    [HttpPost("/auth/register-admin")]
+    // Apenas admins podem criar novos admins.
+    [Authorize(Roles = nameof(RoleEnum.Admin))]
+    [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> RegisterAdmin([FromBody] RequestAuthRegisterAdminJson request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        _appDbContext.Usuarios.Add(usuario);
-        await _appDbContext.SaveChangesAsync();
+        var response = await _authService.RegisterAdmin(request);
 
-        var profissional = new ProfissionalModel
-        {
-            Nome = request.Nome,
-            Crm = request.Crm,
-            Telefone = request.Telefone,
-            UserId = usuario.Id
-        };
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        _appDbContext.Profissionais.Add(profissional);
-        await _appDbContext.SaveChangesAsync();
-
-        var token = _tokenService.GenerateToken(usuario);
-
-        return Ok(new
-        {
-            messge = "Usuario registrado com sucesso",
-            token,
-            usuario = new {usuario.Id, usuario.Email}
-        });
+        return StatusCode(response.StatusCode, response.Message);
     }
 
 }

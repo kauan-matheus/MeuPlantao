@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
