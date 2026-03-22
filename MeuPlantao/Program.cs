@@ -91,6 +91,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+Console.WriteLine(builder.Configuration.GetConnectionString("Default"));
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

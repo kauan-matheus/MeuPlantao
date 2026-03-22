@@ -33,7 +33,7 @@ public class PlantaoController : ControllerBase
         if (response is not null)
             return Ok(response);
 
-        return NotFound("Plantão não existente ou não encontrado");
+        return NotFound("Plantao não existente ou não encontrado");
     }
 
     [HttpPost("plantoes")]
@@ -46,9 +46,9 @@ public class PlantaoController : ControllerBase
 
         var response = await _service.Cadastrar(plantao);
         if (response)
-            return Created("Plantão adicionado", plantao);
+            return Created("Plantao adicionado", plantao);
 
-        return BadRequest("Não foi possível criar esse plantão");
+        return BadRequest("Nao foi possível criar esse plantao");
     }
 
     [HttpPut("plantoes")]
@@ -63,7 +63,7 @@ public class PlantaoController : ControllerBase
         if (response)
             return Ok(plantao);
 
-        return BadRequest("Não foi possível alterar esse plantão");
+        return BadRequest("Nao foi possivel alterar esse plantao");
     }
 
     [HttpDelete("plantoes/{id}")]
@@ -75,6 +75,6 @@ public class PlantaoController : ControllerBase
         if (response is not null)
             return Ok(response);
 
-        return NotFound("Não foi possível deletar esse plantão");
+        return NotFound("Nao foi possivel deletar esse plantao");
     }
 }
