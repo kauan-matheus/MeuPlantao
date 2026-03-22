@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
     container: {
         width: "100%",
         height: 50,
-        backgroundColor: colors.gray[500],
+        backgroundColor: colors.gray[400],
         borderRadius: 25,
         paddingHorizontal: 10,
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
