@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using MeuPlantao.Domain.Entities;
+using MeuPlantao.Application.Services.TrocaHistorico;
+using MeuPlantao.Application.Services.TrocaPlantao;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPlantaoService, PlantaoService>();
 builder.Services.AddScoped<IProfissionalService, ProfissionalService>();
 builder.Services.AddScoped<ISetorService, SetorService>();
+builder.Services.AddScoped<ITrocaHistoricoService, TrocaHistoricoService>();
+builder.Services.AddScoped<ITrocaPlantaoService, TrocaPlantaoService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<TokenService>();
