@@ -39,6 +39,6 @@ export const styles = StyleSheet.create({
     },
     link: {
         color: colors.blue[300],
-        textDecorationLine: "underline"
+        textDecorationLine: "underline",
     }
 })
