@@ -4,6 +4,8 @@ public enum EventoHistoricoEnum
 {
     Criada = 0,
     Aceita = 1,
-    Aprovada = 2,
-    Reprovada = 3,
+    Recusada = 2,
+    AguardandoAprovacao = 3,
+    Aprovada = 4,
+    Reprovada = 5,
 }
