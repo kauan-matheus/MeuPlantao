@@ -42,7 +42,7 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
             var novo = new TrocaPlantaoModel
             {
                 PlantaoId = troca.PlantaoId,
-                SolicitanteId = troca.SolicitanteId,
+                SolicitanteId = userId,
                 DestinatarioId = troca.DestinatarioId,
                 Status = troca.Status,
                 Motivo = troca.Motivo,
@@ -50,7 +50,7 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
             };
 
             var response1 = await _repository.Cadastrar(novo);
-
+            
             var response2 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
             {
                 TrocaPlantaoId = novo.Id,
@@ -58,6 +58,7 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 UsuarioId = userId,
                 Observacao = "Troca criada"
             });
+
 
             return response1 && response2;
         }
@@ -78,15 +79,15 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
 
             troca.Status = StatusTrocaPlantaoEnum.Aceita;
 
-            var response1 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
+            var response1 = await _repository.Editar(troca);
+
+            var response2 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
             {
                 TrocaPlantaoId = troca.Id,
                 Evento = EventoHistoricoEnum.Aceita,
                 UsuarioId = userId,
                 Observacao = "Destinatário aceitou"
             });
-
-            var response2 = await _repository.Editar(troca);
 
             return response1 && response2;
         }
@@ -107,15 +108,15 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
 
             troca.Status = StatusTrocaPlantaoEnum.Recusada;
 
-            var response1 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
+            var response1 = await _repository.Editar(troca);
+
+            var response2 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
             {
                 TrocaPlantaoId = troca.Id,
                 Evento = EventoHistoricoEnum.Recusada,
                 UsuarioId = userId,
                 Observacao = "Destinatário recusou"
             });
-
-            var response2 = await _repository.Editar(troca);
 
             return response1 && response2;
         }
@@ -128,14 +129,8 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
             if (troca == null)
                 return false;
 
-            var plantao = await _repository
-                .ConsultarPorId<PlantaoModel>(troca.PlantaoId);
-
-            if (plantao == null)
-                return false;
-
-            if (plantao.ProfissionalResponsavelId != userId)
-                throw new Exception("Apenas o responsavel pode enviar para aprovação");
+            if (troca.SolicitanteId != userId)
+                throw new Exception("Apenas o solicitante pode enviar para aprovação");
 
             if (troca.Status != StatusTrocaPlantaoEnum.Aceita)
                 throw new Exception("Troca precisa estar aceita");
@@ -143,15 +138,15 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
 
             troca.Status = StatusTrocaPlantaoEnum.AguardandoAprovacao;
 
-            var response1 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
+            var response1 = await _repository.Editar(troca);
+
+            var response2 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
             {
                 TrocaPlantaoId = troca.Id,
                 Evento = EventoHistoricoEnum.AguardandoAprovacao,
                 UsuarioId = userId,
                 Observacao = "Enviado para aprovação"
             });
-
-            var response2 = await _repository.Editar(troca);
 
             return response1 && response2;
         }
@@ -164,14 +159,8 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
             if (troca == null)
                 return false;
 
-            var plantao = await _repository
-                .ConsultarPorId<PlantaoModel>(troca.PlantaoId);
-
-            if (plantao == null)
-                return false;
-
-            if (plantao.ProfissionalResponsavelId != userId)
-                throw new Exception("Apenas o responsavel pode aprovar");
+            if (troca.SolicitanteId != userId)
+                throw new Exception("Apenas o solicitante pode aprovar");
 
             if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
                 throw new Exception("Troca não está aguardando aprovação");
@@ -179,15 +168,15 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
 
             troca.Status = StatusTrocaPlantaoEnum.Aprovada;
 
-            var response1 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
+            var response1 = await _repository.Editar(troca);
+
+            var response2 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
             {
                 TrocaPlantaoId = troca.Id,
                 Evento = EventoHistoricoEnum.Aprovada,
                 UsuarioId = userId,
-                Observacao = "Aprovada pelo supervisor"
+                Observacao = "Aprovada"
             });
-
-            var response2 = await _repository.Editar(troca);
 
             return response1 && response2;
         }
@@ -200,29 +189,23 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
             if (troca == null)
                 return false;
 
-            var plantao = await _repository
-                .ConsultarPorId<PlantaoModel>(troca.PlantaoId);
-
-            if (plantao == null)
-                return false;
-
-            if (plantao.ProfissionalResponsavelId != userId)
-                throw new Exception("Apenas o responsavel pode reprovar");
+            if (troca.SolicitanteId != userId)
+                throw new Exception("Apenas o solicitante pode reprovar");
 
             if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
                 throw new Exception("Troca não está aguardando aprovação");
 
             troca.Status = StatusTrocaPlantaoEnum.Reprovada;
 
-            var response1 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
+            var response1 = await _repository.Editar(troca);
+
+            var response2 = await _historicoService.Cadastrar(new RequestTrocaHistoricoRegisterJson
             {
                 TrocaPlantaoId = troca.Id,
                 Evento = EventoHistoricoEnum.Reprovada,
                 UsuarioId = userId,
                 Observacao = "Reprovada"
             });
-
-            var response2 = await _repository.Editar(troca);
 
             return response1 && response2;
         }

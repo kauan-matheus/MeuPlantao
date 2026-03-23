@@ -9,9 +9,7 @@ namespace MeuPlantao.Communication.Dto.Requests
 {
     public class RequestTrocaPlantaoRegisterJson
     {
-        public long Id { get; set; }
         public long PlantaoId { get; set; }
-        public long SolicitanteId { get; set; }
         public long DestinatarioId { get; set; }
         public StatusTrocaPlantaoEnum Status { get; set; }
         [MaxLength(100)]

@@ -15,6 +15,9 @@ using System.Text;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Application.Services.TrocaHistorico;
 using MeuPlantao.Application.Services.TrocaPlantao;
+using System.IdentityModel.Tokens.Jwt;
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 

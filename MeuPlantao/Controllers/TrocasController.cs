@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using MeuPlantao.Application.Services.TrocaPlantao;
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Enums;
@@ -46,10 +47,12 @@ public class TrocasController : ControllerBase
     [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional) )] // Escrita restrita ao admin
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> PostTrocas([FromBody] RequestTrocaPlantaoRegisterJson troca, long userId)
+    public async Task<IActionResult> PostTrocas([FromBody] RequestTrocaPlantaoRegisterJson troca)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+
+        var userId = GetUserId();
 
         var response = await _service.Cadastrar(troca, userId);
         if (response)
@@ -163,11 +166,14 @@ public class TrocasController : ControllerBase
 
     private long GetUserId()
     {
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (userId == null)
-            throw new Exception("Usuário não autenticado");
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Usuário não autenticado");
 
-        return long.Parse(userId);
+        if (!long.TryParse(userId, out var id))
+            throw new Exception("Id do usuário inválido no token");
+
+        return id;
     }
 }
