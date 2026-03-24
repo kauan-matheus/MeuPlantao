@@ -1,6 +1,7 @@
 import { Text, View, TouchableOpacity, ImageBackground, Modal } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useState } from "react"
+import { router } from "expo-router"
 
 import { styles } from "./index/styles"
 import { colors } from "@/styles/colors"
@@ -63,6 +64,7 @@ export default function Index() {
                             text="Entrar"
                             color={colors.blue[300]}
                             textColor={colors.gray[600]}
+                            onPress={() => router.navigate("./interfaceUser")}
                             />
                         </View>
 
