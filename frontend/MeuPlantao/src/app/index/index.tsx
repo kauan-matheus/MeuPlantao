@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons"
 import { useState } from "react"
 import { router } from "expo-router"
 
-import { styles } from "./index/styles"
+import { styles } from "./styles"
 import { colors } from "@/styles/colors"
 
 
@@ -62,7 +62,7 @@ export default function Index() {
                             />
                             <Button 
                             text="Entrar"
-                            color={colors.blue[300]}
+                            color={colors.blue[500]}
                             textColor={colors.gray[600]}
                             onPress={() => router.navigate("./interfaceUser")}
                             />

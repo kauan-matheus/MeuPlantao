@@ -7,11 +7,11 @@ export const styles = StyleSheet.create({
     },
     top: {
         width: "100%",
-        height: "20%",
+        height: "25%",
         backgroundColor: colors.blue[500]
     },
     content: {
-        width: "100%"
+        flex: 1
     },
     navBar: {
         backgroundColor: colors.gray[600],
@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
         padding: 5,
         alignSelf: "center",
         position: "absolute",
-        bottom: 120
+        bottom: 60
     },
     navBarContent: {
         gap: 5
