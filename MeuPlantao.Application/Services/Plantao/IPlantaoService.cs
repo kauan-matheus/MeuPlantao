@@ -10,10 +10,14 @@ namespace MeuPlantao.Application.Services.Plantao
         // Nullable pois o plantão pode não ser encontrado
         Task<PlantaoModel?> ConsultarId(long id);
 
-        Task<bool> Cadastrar(RequestPlantaoRegisterJson plantao);
+        Task<bool> Cadastrar(RequestPlantaoRegisterJson plantao, long userId);
         Task<bool> Editar(RequestPlantaoRegisterJson plantao);
 
         // Nullable pois retorna null se o plantão não existir
         Task<PlantaoModel?> Deletar(long id);
+
+        Task<bool> Solicitar(long id, long UserId);
+        Task<bool> AceitarSolicitacao(long id, long userId);
+        Task<bool> RecusarSolicitacao(long id, long userId);
     }
 }

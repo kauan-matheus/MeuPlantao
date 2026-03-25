@@ -31,7 +31,8 @@ namespace MeuPlantao.Application.Services.Setor
             // Mapeia o DTO para a entidade de domínio — nunca expõe SetorModel diretamente na API
             var novo = new SetorModel
             {
-                Nome = setor.Nome
+                Nome = setor.Nome,
+                RepresentanteId = setor.RepresentanteId
             };
 
             return await _repository.Cadastrar(novo);
@@ -42,7 +43,8 @@ namespace MeuPlantao.Application.Services.Setor
             var novo = new SetorModel
             {
                 Id = setor.Id,
-                Nome = setor.Nome
+                Nome = setor.Nome,
+                RepresentanteId = setor.RepresentanteId
             };
 
             return await _repository.Editar(novo);

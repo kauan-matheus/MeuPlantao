@@ -11,4 +11,6 @@ public class RequestSetorRegisterJson
     [Required(ErrorMessage = "Nome é obrigatório")]
     [MaxLength(100)]
     public string Nome { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Representante é obrigatória")]
+    public long RepresentanteId { get; set; }
 }

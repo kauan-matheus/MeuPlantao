@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MeuPlantao.Application.Services.TrocaHistorico;
+using MeuPlantao.Application.Services.PlantaoHistorico;
 using MeuPlantao.Communication.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,20 +11,20 @@ namespace MeuPlantao.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // Todos os endpoints exigem autenticação por padrão
-    public class HistoricoTrocasController : ControllerBase
+    [Authorize]
+    public class HistoricoPlantaoController : ControllerBase
     {
-        private readonly ITrocaHistoricoService _service;
+        private readonly IPlantaoHistoricoService _service;
 
-        public HistoricoTrocasController(ITrocaHistoricoService service)
+        public HistoricoPlantaoController(IPlantaoHistoricoService service)
         {
             _service = service;
         }
 
-        [HttpGet("trocasHistorico")]
+        [HttpGet("plantoesHistorico")]
         [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))] // Leitura para ambos os roles
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetTrocas()
+        public async Task<IActionResult> GetPlantoes()
         {
             var response = await _service.Consultar();
             return Ok(response);

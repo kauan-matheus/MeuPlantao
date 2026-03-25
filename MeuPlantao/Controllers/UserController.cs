@@ -8,7 +8,7 @@ namespace MeuPlantao.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = nameof(RoleEnum.Admin))]
+    [Authorize]
     public class UserController : ControllerBase
     {
         // Interface em vez da classe concreta
@@ -21,6 +21,7 @@ namespace MeuPlantao.Controllers
 
         [HttpGet("usuarios")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))]
         public async Task<IActionResult> GetUser()
         {
             var response = await _service.Consultar();
@@ -42,6 +43,7 @@ namespace MeuPlantao.Controllers
         [HttpPost("usuarios")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = nameof(RoleEnum.Admin))]
         public async Task<IActionResult> PostUser([FromBody] RequestUserRegisterJson user)
         // RequestUserRegisterJson em vez de UserModel
         {
@@ -58,6 +60,7 @@ namespace MeuPlantao.Controllers
         [HttpPut("usuarios")]
         [ProducesResponseType(StatusCodes.Status200OK)] // PUT retorna 200, não 201
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = nameof(RoleEnum.Admin))]
         public async Task<IActionResult> PutUser([FromBody] RequestUserRegisterJson user)
         // RequestUserRegisterJson em vez de UserModel
         {
@@ -74,6 +77,7 @@ namespace MeuPlantao.Controllers
         [HttpDelete("usuarios/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = nameof(RoleEnum.Admin))]
         public async Task<IActionResult> DeleteUser(long id)
         {
             var response = await _service.Deletar(id);

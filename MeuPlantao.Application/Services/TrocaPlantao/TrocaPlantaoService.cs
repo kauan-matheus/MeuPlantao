@@ -38,6 +38,19 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
 
         public async Task<bool> Cadastrar(RequestTrocaPlantaoRegisterJson troca, long userId)
         {
+            var plantao = await _repository
+                .ConsultarPorId<PlantaoModel>(troca.PlantaoId);
+
+            if (plantao == null)
+            {
+                throw new Exception("plantao não existe");
+            }
+
+            if (plantao.Status != StatusPlantaoEnum.Ativo)
+            {
+                throw new Exception("Plantao não possui responsavel para que possa ocorrer uma troca");
+            }
+
             // Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
             var novo = new TrocaPlantaoModel
             {

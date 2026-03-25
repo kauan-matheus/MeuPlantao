@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<ProfissionalModel> Profissionais { get; set; }
     public DbSet<SetorModel> Setores { get; set; }
     public DbSet<TrocaHistoricoModel> Historico { get; set; }
+    public DbSet<PlantaoHistoricoModel> HistoricoPlantao { get; set; }
     public DbSet<TrocaPlantaoModel> TrocaPlantoes { get; set; }
     public DbSet<UserModel> Usuarios { get; set; }
 
@@ -29,6 +30,24 @@ public class AppDbContext : DbContext
             .HasOne(p => p.User)
             .WithOne()
             .HasForeignKey<ProfissionalModel>(p => p.UserId);
+
+        //Builder pro FK do plantao
+        modelBuilder.Entity<PlantaoModel>()
+            .HasOne(p => p.ProfissionalResponsavel)
+            .WithMany()
+            .HasForeignKey(p => p.ProfissionalResponsavelId)
+            .IsRequired(false);
+        modelBuilder.Entity<PlantaoModel>()
+            .HasOne(p => p.Setor)
+            .WithMany()
+            .HasForeignKey(p => p.SetorId)
+            .IsRequired(true);
+
+        //Builder pro FK do setor 
+        modelBuilder.Entity<SetorModel>()
+            .HasOne(p => p.Representante)
+            .WithOne()
+            .HasForeignKey<SetorModel>(p => p.RepresentanteId);
         
         //Builder pras FK de troca plantao
         modelBuilder.Entity<TrocaPlantaoModel>()
@@ -52,5 +71,18 @@ public class AppDbContext : DbContext
             .HasOne(h => h.Usuario)
             .WithMany()
             .HasForeignKey(h => h.UsuarioId);
+
+        //Builder pras FK do historico de plantao
+        // Plantão → vários históricos
+        modelBuilder.Entity<PlantaoHistoricoModel>()
+            .HasOne(p => p.Plantao)
+            .WithMany()
+            .HasForeignKey(p => p.PlantaoId);
+
+        // Usuário → vários históricos
+        modelBuilder.Entity<PlantaoHistoricoModel>()
+            .HasOne(p => p.Usuario)
+            .WithMany()
+            .HasForeignKey(p => p.UsuarioId);
     }
 }

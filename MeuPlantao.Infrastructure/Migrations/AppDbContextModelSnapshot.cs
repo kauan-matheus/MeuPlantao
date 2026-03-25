@@ -22,6 +22,40 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("MeuPlantao.Domain.Entities.PlantaoHistoricoModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Evento")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Observacao")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("PlantaoId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UsuarioId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlantaoId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("HistoricoPlantao");
+                });
+
             modelBuilder.Entity("MeuPlantao.Domain.Entities.PlantaoModel", b =>
                 {
                     b.Property<long>("Id")
@@ -36,10 +70,13 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.Property<DateTime>("Inicio")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<long>("ProfissionalResponsavelId")
+                    b.Property<long?>("ProfissionalResponsavelId")
                         .HasColumnType("bigint");
 
                     b.Property<long>("SetorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("SolicitanteId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("Status")
@@ -50,6 +87,8 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.HasIndex("ProfissionalResponsavelId");
 
                     b.HasIndex("SetorId");
+
+                    b.HasIndex("SolicitanteId");
 
                     b.ToTable("Plantoes");
                 });
@@ -63,14 +102,17 @@ namespace MeuPlantao.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Crm")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
                     b.Property<string>("Nome")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Telefone")
+                        .IsRequired()
                         .HasMaxLength(9)
                         .HasColumnType("character varying(9)");
 
@@ -94,10 +136,17 @@ namespace MeuPlantao.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Nome")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<long>("RepresentanteId")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("RepresentanteId")
+                        .IsUnique();
 
                     b.ToTable("Setores");
                 });
@@ -117,6 +166,7 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Observacao")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -150,6 +200,7 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Motivo")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -185,10 +236,12 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -200,13 +253,30 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("MeuPlantao.Domain.Entities.PlantaoHistoricoModel", b =>
+                {
+                    b.HasOne("MeuPlantao.Domain.Entities.PlantaoModel", "Plantao")
+                        .WithMany()
+                        .HasForeignKey("PlantaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MeuPlantao.Domain.Entities.UserModel", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plantao");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("MeuPlantao.Domain.Entities.PlantaoModel", b =>
                 {
                     b.HasOne("MeuPlantao.Domain.Entities.ProfissionalModel", "ProfissionalResponsavel")
                         .WithMany()
-                        .HasForeignKey("ProfissionalResponsavelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProfissionalResponsavelId");
 
                     b.HasOne("MeuPlantao.Domain.Entities.SetorModel", "Setor")
                         .WithMany()
@@ -214,9 +284,15 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MeuPlantao.Domain.Entities.ProfissionalModel", "Solicitante")
+                        .WithMany()
+                        .HasForeignKey("SolicitanteId");
+
                     b.Navigation("ProfissionalResponsavel");
 
                     b.Navigation("Setor");
+
+                    b.Navigation("Solicitante");
                 });
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.ProfissionalModel", b =>
@@ -228,6 +304,17 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MeuPlantao.Domain.Entities.SetorModel", b =>
+                {
+                    b.HasOne("MeuPlantao.Domain.Entities.UserModel", "Representante")
+                        .WithOne()
+                        .HasForeignKey("MeuPlantao.Domain.Entities.SetorModel", "RepresentanteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Representante");
                 });
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.TrocaHistoricoModel", b =>

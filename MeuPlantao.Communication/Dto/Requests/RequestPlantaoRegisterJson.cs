@@ -12,15 +12,9 @@ public class RequestPlantaoRegisterJson
     [Required(ErrorMessage = "SetorId é obrigatório")]
     public long SetorId { get; set; }
 
-    [Required(ErrorMessage = "ProfissionalResponsavelId é obrigatório")]
-    public long ProfissionalResponsavelId { get; set; }
-
     [Required(ErrorMessage = "Início é obrigatório")]
     public DateTime Inicio { get; set; }
 
     [Required(ErrorMessage = "Fim é obrigatório")]
     public DateTime Fim { get; set; }
-
-    [Required(ErrorMessage = "Status é obrigatório")]
-    public StatusPlantaoEnum Status { get; set; }
 }

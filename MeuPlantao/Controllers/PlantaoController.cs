@@ -1,4 +1,5 @@
-﻿using MeuPlantao.Application.Services.Plantao;
+﻿using System.Security.Claims;
+using MeuPlantao.Application.Services.Plantao;
 using MeuPlantao.Communication.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,7 +45,9 @@ public class PlantaoController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var response = await _service.Cadastrar(plantao);
+        var userId = GetUserId();
+
+        var response = await _service.Cadastrar(plantao, userId);
         if (response)
             return Created("Plantao adicionado", plantao);
 
@@ -76,5 +79,69 @@ public class PlantaoController : ControllerBase
             return Ok(response);
 
         return NotFound("Nao foi possivel deletar esse plantao");
+    }
+
+    [HttpPut("plantoes/{id}/solicitar")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Solicitar(long id)
+    {
+       if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var userId = GetUserId();
+
+        var response = await _service.Solicitar(id, userId);
+        if (response)
+            return Ok("Solicitacao criada");
+
+        return BadRequest("Nao foi possível executar essa solicitacao");
+    }
+
+    [HttpPut("plantoes/{id}/aceitar")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AceitarSolicitacao(long id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var userId = GetUserId();
+
+        var response = await _service.AceitarSolicitacao(id, userId);
+        if (response)
+            return Ok("Solicitacao aceita");
+
+        return BadRequest("Nao foi possível aceitar essa solicitacao");
+    }
+
+    [HttpPut("plantoes/{id}/recusar")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RecusarSolicitacao(long id)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var userId = GetUserId();
+
+        var response = await _service.AceitarSolicitacao(id, userId);
+        if (response)
+            return Ok("Solicitacao recusada");
+
+        return BadRequest("Nao foi possível recusar essa solicitacao");
+    }
+
+    private long GetUserId()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Usuário não autenticado");
+
+        if (!long.TryParse(userId, out var id))
+            throw new Exception("Id do usuário inválido no token");
+
+        return id;
     }
 }

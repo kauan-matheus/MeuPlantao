@@ -16,6 +16,7 @@ using MeuPlantao.Domain.Entities;
 using MeuPlantao.Application.Services.TrocaHistorico;
 using MeuPlantao.Application.Services.TrocaPlantao;
 using System.IdentityModel.Tokens.Jwt;
+using MeuPlantao.Application.Services.PlantaoHistorico;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -28,6 +29,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPlantaoService, PlantaoService>();
+builder.Services.AddScoped<IPlantaoHistoricoService, PlantaoHistoricoService>();
 builder.Services.AddScoped<IProfissionalService, ProfissionalService>();
 builder.Services.AddScoped<ISetorService, SetorService>();
 builder.Services.AddScoped<ITrocaHistoricoService, TrocaHistoricoService>();
