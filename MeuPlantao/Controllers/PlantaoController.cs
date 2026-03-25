@@ -125,7 +125,7 @@ public class PlantaoController : ControllerBase
 
         var userId = GetUserId();
 
-        var response = await _service.AceitarSolicitacao(id, userId);
+        var response = await _service.RecusarSolicitacao(id, userId);
         if (response)
             return Ok("Solicitacao recusada");
 
