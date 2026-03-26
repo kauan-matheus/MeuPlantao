@@ -7,16 +7,16 @@ export const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        padding: 40,
+        paddingHorizontal: 40,
         alignItems: "center",
         justifyContent: "flex-end",
-        bottom: 50
+        bottom: 90
 
     },
     modalContent: {
         width: "100%",
         height: "75%",
-        backgroundColor: colors.gray[600],
+        backgroundColor: colors.gray[700],
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",

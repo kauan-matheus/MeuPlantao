@@ -4,8 +4,6 @@ import { styles } from "./styles";
 
 export function ScreenHistory() {
     return (
-        <View style={styles.container}>
-            <Text>History</Text>
-        </View>
+        <View style={styles.container}></View>
     )
 }

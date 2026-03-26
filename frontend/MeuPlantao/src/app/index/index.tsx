@@ -25,7 +25,7 @@ export default function Index() {
                 <Button 
                 text="Acessar "
                 text2="Meu Plantão"
-                color={colors.gray[600]}
+                color={colors.gray[700]}
                 textColor={colors.gray[200]}
                 textColor2={colors.blue[400]}
                 onPress={() => setShowModal(true)}
@@ -63,7 +63,7 @@ export default function Index() {
                             <Button 
                             text="Entrar"
                             color={colors.blue[500]}
-                            textColor={colors.gray[600]}
+                            textColor={colors.gray[700]}
                             onPress={() => router.navigate("./interfaceUser")}
                             />
                         </View>
