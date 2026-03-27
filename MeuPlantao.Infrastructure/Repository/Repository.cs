@@ -27,23 +27,19 @@ namespace MeuPlantao.Infrastructure.Repository
         public async Task<bool> Cadastrar<T>(T model) where T : class
         {
             await _appDbContext.Set<T>().AddAsync(model);
-            return await Save();
+            return true;
         }
 
         public async Task<bool> Editar<T>(T model) where T : class
         {
             _appDbContext.Set<T>().Update(model);
-            return await Save();
+            return true;
         }
 
         public async Task<bool> Excluir<T>(T model) where T : class
         {
             _appDbContext.Set<T>().Remove(model);
-            return await Save();
-        }
-        public async Task<bool> Save()
-        {
-            return await _appDbContext.SaveChangesAsync() > 0;
+            return true;
         }
     }
 }

@@ -71,4 +71,24 @@ public class AuthController : ControllerBase
 
         return StatusCode(response.StatusCode, response.Message);
     }
+
+    [HttpPost("/auth/register-gestor")]
+    //[Authorize(Roles = nameof(RoleEnum.Admin))] // Apenas admins podem criar novos gestores
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> RegisterGestor([FromBody] RequestAuthRegisterGestorJson request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _authService.RegisterGestor(request);
+
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
 }

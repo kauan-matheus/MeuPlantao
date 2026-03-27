@@ -20,7 +20,6 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpGet("profissionais")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))] // Leitura para ambos os roles
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProfissionais()
     {
@@ -29,7 +28,6 @@ public class ProfissionaisController : ControllerBase
     }
 
     [HttpGet("profissionais/{id}")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
     public async Task<IActionResult> GetProfissionalId(long id)

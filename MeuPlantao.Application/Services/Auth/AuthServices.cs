@@ -12,13 +12,15 @@ public class AuthService : IAuthService
     private readonly IAuthRepository _repository;
     private readonly TokenService _tokenService;
     private readonly ILogger<AuthService> _logger;
+    private readonly IUnitOfWork _unit;
 
     // ILogger injetado para registrar erros sem silenciá-los
-    public AuthService(IAuthRepository repository, TokenService tokenService, ILogger<AuthService> logger)
+    public AuthService(IAuthRepository repository, TokenService tokenService, ILogger<AuthService> logger, IUnitOfWork unit)
     {
         _repository = repository;
         _tokenService = tokenService;
         _logger = logger;
+        _unit = unit;
     }
 
     public async Task<AuthServiceResponse<ResponseAuthLoginJson>> Login(RequestAuthLoginJson auth)
@@ -125,6 +127,7 @@ public class AuthService : IAuthService
         try
         {
             await _repository.Cadastrar(usuario);
+            await _unit.Commit();
         }
         catch (Exception ex)
         {
@@ -138,6 +141,50 @@ public class AuthService : IAuthService
         return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
         {
             Message = "Admin registrado com sucesso",
+            Token = token,
+            Usuario = new ResponseAuthUserJson
+            {
+                Id = usuario.Id,
+                Email = usuario.Email,
+                Role = usuario.Role.ToString()
+            }
+        });
+    }
+
+    public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterGestor(RequestAuthRegisterGestorJson request)
+    {
+        var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
+        if (emailExiste)
+            return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
+
+        // BCrypt em background — mesma razão do Register
+        var passwordHash = await Task.Run(() => BCrypt.Net.BCrypt.HashPassword(request.Password));
+
+        // Gestor usa a mesma entidade User, a diferença de acesso é definida pelo Role
+        var usuario = new UserModel
+        {
+            Email = request.Email,
+            PasswordHash = passwordHash,
+            Role = RoleEnum.Gestor,
+            Active = true
+        };
+
+        try
+        {
+            await _repository.Cadastrar(usuario);
+            await _unit.Commit();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao registrar gestor: {Email}", request.Email);
+            return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o gestor");
+        }
+
+        // Token gerado após cadastro para garantir que usuario.Id foi populado
+        var token = _tokenService.GenerateToken(usuario);
+        return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
+        {
+            Message = "Gestor registrado com sucesso",
             Token = token,
             Usuario = new ResponseAuthUserJson
             {

@@ -22,7 +22,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpGet("trocas")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))] // Leitura para ambos os roles
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTrocas()
     {
@@ -31,7 +30,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpGet("trocas/{id}")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
     public async Task<IActionResult> GetTrocasId(long id)
@@ -44,7 +42,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpPost("trocas")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional) )] // Escrita restrita ao admin
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PostTrocas([FromBody] RequestTrocaPlantaoRegisterJson troca)
@@ -62,7 +59,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpPost("trocas/{id}/aceitar")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional) )] // Escrita restrita ao admin
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Aceitar(long id)
@@ -80,7 +76,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpPost("trocas/{id}/recusar")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional) )] // Escrita restrita ao admin
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Recusar(long id)
@@ -98,7 +93,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpPost("trocas/{id}/enviar-aprovacao")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional) )] // Escrita restrita ao admin
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> EnviarAprovacao(long id)
@@ -116,7 +110,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpPost("trocas/{id}/aprovar")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional) )] // Escrita restrita ao admin
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> aprovar(long id)
@@ -134,7 +127,6 @@ public class TrocasController : ControllerBase
     }
 
     [HttpPost("trocas/{id}/reprovar")]
-    [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional) )] // Escrita restrita ao admin
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Reprovar(long id)

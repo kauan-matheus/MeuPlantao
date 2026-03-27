@@ -12,10 +12,12 @@ namespace MeuPlantao.Application.Services.PlantaoHistorico
     public class PlantaoHistoricoService : IPlantaoHistoricoService
     {
         private readonly IRepository _repository;
+        private readonly IUnitOfWork _unit;
 
-        public PlantaoHistoricoService(IRepository repository)
+        public PlantaoHistoricoService(IRepository repository, IUnitOfWork unit)
         {
             _repository = repository;
+            _unit = unit;
         }
 
         public async Task<List<PlantaoHistoricoModel>> Consultar()
@@ -30,32 +32,33 @@ namespace MeuPlantao.Application.Services.PlantaoHistorico
             return await _repository.ConsultarPorId<PlantaoHistoricoModel>(id);
         }
 
-        public async Task<bool> Cadastrar(RequestPlantaoHistoricoRegisterJson troca)
+        public async Task<bool> Cadastrar(RequestPlantaoHistoricoRegisterJson plantao)
         {
-            // Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
+            //Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
             var novo = new PlantaoHistoricoModel
             {
-                PlantaoId = troca.PlantaoId,
-                Evento = troca.Evento,
-                UsuarioId = troca.UsuarioId,
-                Observacao = troca.Observacao
+                PlantaoId = plantao.PlantaoId,
+                Evento = plantao.Evento,
+                UsuarioId = plantao.UsuarioId,
+                Observacao = plantao.Observacao
             };
 
-            return await _repository.Cadastrar(novo);
+            return await _unit.Commit();
         }
 
-        public async Task<bool> Editar(RequestPlantaoHistoricoRegisterJson troca)
+        public async Task<bool> Editar(RequestPlantaoHistoricoRegisterJson plantao)
         {
             var novo = new PlantaoHistoricoModel
             {
-                Id = troca.Id,
-                PlantaoId = troca.PlantaoId,
-                Evento = troca.Evento,
-                UsuarioId = troca.UsuarioId,
-                Observacao = troca.Observacao
+                Id = plantao.Id,
+                PlantaoId = plantao.PlantaoId,
+                Evento = plantao.Evento,
+                UsuarioId = plantao.UsuarioId,
+                Observacao = plantao.Observacao
             };
 
-            return await _repository.Editar(novo);
+            await _repository.Editar(plantao);
+            return await _unit.Commit();
         }
 
         public async Task<PlantaoHistoricoModel?> Deletar(long id)
@@ -65,6 +68,7 @@ namespace MeuPlantao.Application.Services.PlantaoHistorico
                 return null;
 
             await _repository.Excluir(existente);
+            await _unit.Commit();
             return existente;
         }
     }

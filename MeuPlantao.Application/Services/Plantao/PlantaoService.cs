@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using MeuPlantao.Application.Services.PlantaoHistorico;
 using MeuPlantao.Application.Services.TrocaHistorico;
 using MeuPlantao.Communication.Dto.Requests;
@@ -11,12 +12,14 @@ namespace MeuPlantao.Application.Services.Plantao
     public class PlantaoService : IPlantaoService
     {
         private readonly IRepository _repository;
-        private readonly IPlantaoHistoricoService _historicoService;
+        private readonly IUnitOfWork _unit;
+        private readonly IProfRepository _profRepository;
 
-        public PlantaoService(IRepository repository, IPlantaoHistoricoService historicoService)
+        public PlantaoService(IRepository repository, IUnitOfWork unit, IProfRepository profRepository)
         {
             _repository = repository;
-            _historicoService = historicoService;
+            _unit = unit;
+            _profRepository = profRepository;
 
         }
 
@@ -38,7 +41,7 @@ namespace MeuPlantao.Application.Services.Plantao
             var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
 
             if (setorExistente is null)
-                return false;
+                throw new Exception("setor não existe");
 
             var novo = new PlantaoModel
             {
@@ -49,17 +52,19 @@ namespace MeuPlantao.Application.Services.Plantao
                 Status = StatusPlantaoEnum.AguardandoProfissional
             };
 
-            var response1 = await _repository.Cadastrar(novo);
-            
-            var response2 = await _historicoService.Cadastrar(new RequestPlantaoHistoricoRegisterJson
+            await _repository.Cadastrar(novo);
+
+            Console.WriteLine($"ID do plantão: {novo.Id}");
+    
+            await _repository.Cadastrar(new PlantaoHistoricoModel
             {
-                PlantaoId = novo.Id,
+                Plantao = novo,
                 Evento = EventoPlantaoHistoricoEnum.Criada,
                 UsuarioId = userId,
                 Observacao = "Plantao criado"
             });
 
-            return response1 && response2;
+            return await _unit.Commit();
         }
 
         public async Task<bool> Editar(RequestPlantaoRegisterJson plantao)
@@ -79,7 +84,8 @@ namespace MeuPlantao.Application.Services.Plantao
                 Fim = plantao.Fim,
             };
 
-            return await _repository.Editar(novo);
+            await _repository.Editar(novo);
+            return await _unit.Commit();
         }
 
         public async Task<PlantaoModel?> Deletar(long id)
@@ -89,6 +95,7 @@ namespace MeuPlantao.Application.Services.Plantao
                 return null;
 
             await _repository.Excluir(existente);
+            await _unit.Commit();
             return existente;
         }
 
@@ -96,29 +103,31 @@ namespace MeuPlantao.Application.Services.Plantao
         {
             var plantao = await _repository
                 .ConsultarPorId<PlantaoModel>(id);
-            var user = await _repository
-                .ConsultarPorId<UserModel>(userId);
 
-            if (plantao == null || user == null)
-                throw new Exception("plantao ou usuarion não existe");
+            var prof = await _profRepository.ConsultarPorUserId(userId);
+
+            if (plantao is null)
+                throw new Exception("plantao não existe");
+            if (prof is null)
+                throw new Exception("É necessario estar logado como um profissional");
 
             if (plantao.Status != StatusPlantaoEnum.AguardandoProfissional)
                 throw new Exception("plantao nao esta em estado de aguardando usuario");
 
             plantao.Status = StatusPlantaoEnum.AguardandoRespostaSolicitacao;
-            plantao.SolicitanteId = userId;
+            plantao.SolicitanteId = prof.Id;
 
-            var response1 = await _repository.Editar(plantao);
+            await _repository.Editar(plantao);
 
-            var response2 = await _historicoService.Cadastrar(new RequestPlantaoHistoricoRegisterJson
+            await _repository.Cadastrar(new PlantaoHistoricoModel
             {
-                PlantaoId = plantao.Id,
+                Plantao = plantao,
                 Evento = EventoPlantaoHistoricoEnum.AguardandoRespostaSolicitacao,
                 UsuarioId = userId,
-                Observacao = "Usuario agora deve aguardar resposta"
+                Observacao = "Solicitacao criado"
             });
 
-            return response1 && response2;
+            return await _unit.Commit();
         }
 
         public async Task<bool> AceitarSolicitacao(long id, long userId)
@@ -126,50 +135,44 @@ namespace MeuPlantao.Application.Services.Plantao
             var plantao = await _repository
                 .ConsultarPorId<PlantaoModel>(id);
 
-            var user = await _repository
-                .ConsultarPorId<UserModel>(userId);
-
-            if (plantao == null || user == null)
+            if (plantao is null)
                 return false;
             
             var setor = await _repository
                 .ConsultarPorId<SetorModel>(plantao.SetorId);
 
             // checa se setor existe, se sim checa se o usuario que estiver logado no momento é o responsavel pelo setor
-            if (setor == null)
-                return false;
-            if (setor.RepresentanteId != userId)
+            if (setor is null)
                 return false;
 
+            if (setor.RepresentanteId != userId)
+                throw new Exception("Apenas o representante pode aceitar solicitacoes");
 
             if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
-                return false;
+                throw new Exception("Plantao não esta aguardando repostas de solicitacao");
 
             plantao.Status = StatusPlantaoEnum.Ativo;
             plantao.ProfissionalResponsavelId = plantao.SolicitanteId;
             plantao.SolicitanteId = null;
 
-            var response1 = await _repository.Editar(plantao);
+            await _repository.Editar<PlantaoModel>(plantao);
 
-            var response2 = await _historicoService.Cadastrar(new RequestPlantaoHistoricoRegisterJson
+            await _repository.Cadastrar(new PlantaoHistoricoModel
             {
-                PlantaoId = plantao.Id,
+                Plantao = plantao,
                 Evento = EventoPlantaoHistoricoEnum.Aceito,
                 UsuarioId = userId,
-                Observacao = "Usuario foi aceito"
+                Observacao = "Solicitacao aceita"
             });
 
-            return response1 && response2;
+            return await _unit.Commit();
         }
         public async Task<bool> RecusarSolicitacao(long id, long userId)
         {
             var plantao = await _repository
                 .ConsultarPorId<PlantaoModel>(id);
 
-            var user = await _repository
-                .ConsultarPorId<UserModel>(userId);
-
-            if (plantao == null || user == null)
+            if (plantao is null)
                 return false;
             
             var setor = await _repository
@@ -178,26 +181,27 @@ namespace MeuPlantao.Application.Services.Plantao
             // checa se setor existe, se sim checa se o usuario que estiver logado no momento é o responsavel pelo setor
             if (setor == null)
                 return false;
+
             if (setor.RepresentanteId != userId)
-                return false;
+                throw new Exception("Apenas o representante pode recusar solicitacoes");
 
             if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
-                return false;
+                throw new Exception("Plantao não esta aguardando repostas de solicitacao");
 
             plantao.Status = StatusPlantaoEnum.AguardandoProfissional;
             plantao.SolicitanteId = null;
 
-            var response1 = await _repository.Editar(plantao);
+            await _repository.Editar(plantao);
 
-            var response2 = await _historicoService.Cadastrar(new RequestPlantaoHistoricoRegisterJson
+            await _repository.Cadastrar(new PlantaoHistoricoModel
             {
-                PlantaoId = plantao.Id,
+                Plantao = plantao,
                 Evento = EventoPlantaoHistoricoEnum.Recusado,
                 UsuarioId = userId,
-                Observacao = "Usuario foi recusado"
+                Observacao = "Solicita recusada"
             });
 
-            return response1 && response2;
+            return await _unit.Commit();
         }
     }
 }

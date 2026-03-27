@@ -21,7 +21,6 @@ namespace MeuPlantao.Controllers
 
         [HttpGet("usuarios")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))]
         public async Task<IActionResult> GetUser()
         {
             var response = await _service.Consultar();

@@ -8,10 +8,12 @@ namespace MeuPlantao.Application.Services.User
     public class UserService : IUserService
     {
         private readonly IRepository _repository;
+        private readonly IUnitOfWork _unit;
 
-        public UserService(IRepository repository)
+        public UserService(IRepository repository, IUnitOfWork unit)
         {
             _repository = repository;
+            _unit = unit;
         }
 
         public async Task<List<UserModel>> Consultar()
@@ -37,7 +39,8 @@ namespace MeuPlantao.Application.Services.User
                 Active = user.Active
             };
 
-            return await _repository.Cadastrar(novo);
+            await _repository.Cadastrar(novo);
+            return await _unit.Commit();
         }
 
         public async Task<bool> Editar(RequestUserRegisterJson user)
@@ -51,7 +54,8 @@ namespace MeuPlantao.Application.Services.User
                 Active = user.Active
             };
 
-            return await _repository.Editar(novo);
+            await _repository.Editar(novo);
+            return await _unit.Commit();
         }
 
         public async Task<UserModel?> Deletar(long id)
@@ -61,6 +65,7 @@ namespace MeuPlantao.Application.Services.User
                 return null;
 
             await _repository.Excluir(existente);
+            await _unit.Commit();
             return existente;
         }
     }

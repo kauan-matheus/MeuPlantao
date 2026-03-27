@@ -10,7 +10,6 @@ namespace MeuPlantao.Communication.Dto.Requests
     public class RequestTrocaPlantaoRegisterJson
     {
         public long PlantaoId { get; set; }
-        public long DestinatarioId { get; set; }
         public StatusTrocaPlantaoEnum Status { get; set; }
         [MaxLength(100)]
         public string Motivo { get; set; } = string.Empty;

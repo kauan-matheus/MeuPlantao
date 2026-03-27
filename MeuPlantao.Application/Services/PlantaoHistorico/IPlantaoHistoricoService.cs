@@ -11,8 +11,8 @@ namespace MeuPlantao.Application.Services.PlantaoHistorico
     {
         Task<List<PlantaoHistoricoModel>> Consultar();
         Task<PlantaoHistoricoModel?> ConsultarId(long id);
-        Task<bool> Cadastrar(RequestPlantaoHistoricoRegisterJson troca);
-        Task<bool> Editar(RequestPlantaoHistoricoRegisterJson troca);
+        Task<bool> Cadastrar(RequestPlantaoHistoricoRegisterJson plantao);
+        Task<bool> Editar(RequestPlantaoHistoricoRegisterJson plantao);
         Task<PlantaoHistoricoModel?> Deletar(long id);
     }
 }

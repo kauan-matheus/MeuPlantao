@@ -7,11 +7,13 @@ namespace MeuPlantao.Application.Services.Profissional
 {
     public class ProfissionalService : IProfissionalService
     {
-        private readonly IRepository _repository;
+        private readonly IProfRepository _repository;
+        private readonly IUnitOfWork _unit;
 
-        public ProfissionalService(IRepository repository)
+        public ProfissionalService(IProfRepository repository, IUnitOfWork unit)
         {
             _repository = repository;
+            _unit = unit;
         }
 
         public async Task<List<ProfissionalModel>> Consultar()
@@ -24,6 +26,11 @@ namespace MeuPlantao.Application.Services.Profissional
         public async Task<ProfissionalModel?> ConsultarId(long id)
         {
             return await _repository.ConsultarPorId<ProfissionalModel>(id);
+        }
+
+        public async Task<ProfissionalModel?> ConsultarUserId(long id)
+        {
+            return await _repository.ConsultarPorUserId(id);
         }
 
         public async Task<bool> Cadastrar(RequestProfissionalRegisterJson profissional)
@@ -42,7 +49,8 @@ namespace MeuPlantao.Application.Services.Profissional
                 User = existente,
             };
 
-            return await _repository.Cadastrar(novo);
+            await _repository.Cadastrar(novo);
+            return await _unit.Commit();
         }
 
         public async Task<bool> Editar(RequestProfissionalRegisterJson profissional)
@@ -62,7 +70,8 @@ namespace MeuPlantao.Application.Services.Profissional
                 User = existente,
             };
 
-            return await _repository.Editar(novo);
+            await _repository.Editar(novo);
+            return await _unit.Commit();
         }
 
         public async Task<ProfissionalModel?> Deletar(long id)
@@ -72,6 +81,7 @@ namespace MeuPlantao.Application.Services.Profissional
                 return null;
 
             await _repository.Excluir(existente);
+            await _unit.Commit();
             return existente;
         }
     }

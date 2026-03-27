@@ -22,7 +22,6 @@ namespace MeuPlantao.Controllers
         }
 
         [HttpGet("trocasHistorico")]
-        [Authorize(Roles = nameof(RoleEnum.Admin) + "," + nameof(RoleEnum.Profissional))] // Leitura para ambos os roles
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTrocas()
         {

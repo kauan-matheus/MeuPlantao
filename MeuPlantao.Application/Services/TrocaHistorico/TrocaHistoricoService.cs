@@ -12,12 +12,13 @@ namespace MeuPlantao.Application.Services.TrocaHistorico
     public class TrocaHistoricoService : ITrocaHistoricoService
     {
         private readonly IRepository _repository;
+        private readonly IUnitOfWork _unit;
 
-        public TrocaHistoricoService(IRepository repository)
+        public TrocaHistoricoService(IRepository repository, IUnitOfWork unit)
         {
             _repository = repository;
+            _unit = unit;
         }
-
         public async Task<List<TrocaHistoricoModel>> Consultar()
         {
             return await _repository.Consultar<TrocaHistoricoModel>()
@@ -41,7 +42,8 @@ namespace MeuPlantao.Application.Services.TrocaHistorico
                 Observacao = troca.Observacao
             };
 
-            return await _repository.Cadastrar(novo);
+            await _repository.Cadastrar(novo);
+            return await _unit.Commit();
         }
 
         public async Task<bool> Editar(RequestTrocaHistoricoRegisterJson troca)
@@ -55,7 +57,8 @@ namespace MeuPlantao.Application.Services.TrocaHistorico
                 Observacao = troca.Observacao
             };
 
-            return await _repository.Editar(novo);
+            await _repository.Editar(novo);
+            return await _unit.Commit();
         }
 
         public async Task<TrocaHistoricoModel?> Deletar(long id)
@@ -65,6 +68,7 @@ namespace MeuPlantao.Application.Services.TrocaHistorico
                 return null;
 
             await _repository.Excluir(existente);
+            await _unit.Commit();
             return existente;
         }
     }
