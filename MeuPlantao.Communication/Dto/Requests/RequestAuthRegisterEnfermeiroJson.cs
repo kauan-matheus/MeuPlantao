@@ -2,7 +2,7 @@
 
 namespace MeuPlantao.Communication.Dto.Requests;
 
-public class RequestAuthRegisterJson
+public class RequestAuthRegisterEnfermeiroJson
 {
     [Required(ErrorMessage = "Email é obrigatório")]
     [EmailAddress(ErrorMessage = "Email inválido")]
@@ -17,9 +17,9 @@ public class RequestAuthRegisterJson
     [MaxLength(100)]
     public string Nome { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "CRM é obrigatório")]
+    [Required(ErrorMessage = "Coren é obrigatório")]
     [MaxLength(10)]
-    public string Crm { get; set; } = string.Empty;
+    public string Coren { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Telefone é obrigatório")]
     [MaxLength(9)]

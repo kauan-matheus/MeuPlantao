@@ -36,16 +36,33 @@ public class AuthController : ControllerBase
         return StatusCode(response.StatusCode, response.Message);
     }
 
-    [HttpPost("/auth/register")]
+    [HttpPost("/auth/register-medico")]
     [AllowAnonymous] // Registro padrão é público e cria usuário profissional
     [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromBody] RequestAuthRegisterJson request)
+    public async Task<IActionResult> RegisterMedico([FromBody] RequestAuthRegisterMedicoJson request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var response = await _authService.Register(request);
+        var response = await _authService.RegisterMedico(request);
+
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+    
+    [HttpPost("/auth/register-enfermeiro")]
+    [AllowAnonymous] // Registro padrão é público e cria usuário profissional
+    [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RegisterEnfermeiro([FromBody] RequestAuthRegisterEnfermeiroJson request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _authService.RegisterEnfermeiro(request);
 
         if (response.Success)
             return StatusCode(response.StatusCode, response.Data);

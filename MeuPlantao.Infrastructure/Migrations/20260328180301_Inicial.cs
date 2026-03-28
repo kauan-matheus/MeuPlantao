@@ -35,7 +35,9 @@ namespace MeuPlantao.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Crm = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    Crm = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    Coren = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
                     Telefone = table.Column<string>(type: "character varying(9)", maxLength: 9, nullable: false),
                     UserId = table.Column<long>(type: "bigint", nullable: false)
                 },

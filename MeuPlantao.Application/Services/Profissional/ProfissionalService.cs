@@ -1,4 +1,5 @@
 using MeuPlantao.Communication.Dto.Requests;
+using MeuPlantao.Communication.Enums;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -43,7 +44,9 @@ namespace MeuPlantao.Application.Services.Profissional
             var novo = new ProfissionalModel
             {
                 Nome = profissional.Nome,
+                Role = profissional.Role,
                 Crm = profissional.Crm,
+                Coren = profissional.Crm,
                 Telefone = profissional.Telefone,
                 UserId = profissional.UserId,
                 User = existente,
@@ -64,7 +67,9 @@ namespace MeuPlantao.Application.Services.Profissional
             {
                 Id = profissional.Id,
                 Nome = profissional.Nome,
+                Role = profissional.Role,
                 Crm = profissional.Crm,
+                Coren = profissional.Crm,
                 Telefone = profissional.Telefone,
                 UserId = profissional.UserId,
                 User = existente,

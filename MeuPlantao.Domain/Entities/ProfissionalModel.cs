@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MeuPlantao.Communication.Enums;
 
 namespace MeuPlantao.Domain.Entities;
 
@@ -9,10 +10,12 @@ public class ProfissionalModel
 
     [MaxLength(100)]
     public string Nome { get; set; } = string.Empty;
+    public ProfissionalRoleEnum Role { get; set; }
 
     [MaxLength(10)]
-    public string Crm { get; set; } = string.Empty;
-
+    public string? Crm { get; set; }
+    [MaxLength(10)]
+    public string? Coren { get; set; }
     [MaxLength(9)]
     public string Telefone { get; set; } = string.Empty;
 
