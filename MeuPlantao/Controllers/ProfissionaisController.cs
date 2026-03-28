@@ -38,6 +38,17 @@ public class ProfissionaisController : ControllerBase
 
         return NotFound("Profissional não existente ou não encontrado");
     }
+    [HttpGet("profissionais/user{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
+    public async Task<IActionResult> GetProfissionalIUserd(long id)
+    {
+        var response = await _service.ConsultarUserId(id);
+        if (response is not null)
+            return Ok(response);
+
+        return NotFound("Profissional não existente ou não encontrado");
+    }
 
     [HttpPost("profissionais")]
     [Authorize(Roles = nameof(RoleEnum.Admin))] // Escrita restrita ao admin

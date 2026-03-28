@@ -9,6 +9,7 @@ namespace MeuPlantao.Application.Services.Profissional
 
         // Nullable pois o profissional pode não ser encontrado
         Task<ProfissionalModel?> ConsultarId(long id);
+        Task<ProfissionalModel?> ConsultarUserId(long id);
 
         Task<bool> Cadastrar(RequestProfissionalRegisterJson profissional);
         Task<bool> Editar(RequestProfissionalRegisterJson profissional);
