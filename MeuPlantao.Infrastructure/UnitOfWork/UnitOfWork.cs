@@ -4,21 +4,44 @@ using System.Linq;
 using System.Threading.Tasks;
 using MeuPlantao.Domain.Interfaces;
 using MeuPlantao.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace MeuPlantao.Infrastructure.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
+        private IDbContextTransaction? _transaction;
 
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
         }
 
+        public async Task BeginTransaction()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+        }
+
         public async Task<bool> Commit()
         {
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task CommitTransaction()
+        {
+            if (_transaction is null)
+                throw new Exception("Nenhuma transação ativa");
+
+            await _transaction.CommitAsync();
+        }
+
+        public async Task RollbackTransaction()
+        {
+            if (_transaction is null)
+                return;
+
+            await _transaction.RollbackAsync();
         }
     }
 

@@ -40,190 +40,268 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
 
         public async Task<bool> Cadastrar(RequestTrocaPlantaoRegisterJson troca, long userId)
         {
-            var plantao = await _repository
-                .ConsultarPorId<PlantaoModel>(troca.PlantaoId);
-        
-            var prof = await _profRepository.ConsultarPorUserId(userId);
+            await _unit.BeginTransaction();
 
-            if (plantao is null)
-                throw new Exception("plantao não existe");
-            if (prof is null)
-                throw new Exception("É necessario estar logado como um profissional");
-
-            if (plantao.ProfissionalResponsavelId is null)
-                throw new Exception("Plantao não possui responsavel para que possa ocorrer uma troca");
-            if (prof.Id == plantao.ProfissionalResponsavelId)
-                throw new Exception("Destinatario é mesmo usuario que solicitante");
-
-            // Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
-            var novo = new TrocaPlantaoModel
+            try
             {
-                PlantaoId = troca.PlantaoId,
-                SolicitanteId = prof.Id,
-                DestinatarioId = (long)plantao.ProfissionalResponsavelId,
-                Status = troca.Status,
-                Motivo = troca.Motivo,
-                CreatedAt = troca.CreatedAt
-            };
-
-            await _repository.Cadastrar(novo);
+                var plantao = await _repository
+                    .ConsultarPorId<PlantaoModel>(troca.PlantaoId);
             
-            await _repository.Cadastrar(new TrocaHistoricoModel
+                var prof = await _profRepository.ConsultarPorUserId(userId);
+
+                if (plantao is null)
+                    throw new Exception("plantao não existe");
+                if (prof is null)
+                    throw new Exception("É necessario estar logado como um profissional");
+
+                if (plantao.ProfissionalResponsavelId is null)
+                    throw new Exception("Plantao não possui responsavel para que possa ocorrer uma troca");
+                if (prof.Id == plantao.ProfissionalResponsavelId)
+                    throw new Exception("Destinatario é mesmo usuario que solicitante");
+
+                // Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
+                var novo = new TrocaPlantaoModel
+                {
+                    PlantaoId = troca.PlantaoId,
+                    SolicitanteId = prof.Id,
+                    DestinatarioId = (long)plantao.ProfissionalResponsavelId,
+                    Status = troca.Status,
+                    Motivo = troca.Motivo,
+                    CreatedAt = troca.CreatedAt
+                };
+                
+                var novoHistorico = new TrocaHistoricoModel
+                {
+                    Evento = EventoHistoricoEnum.Criada,
+                    UsuarioId = userId,
+                    Observacao = "Troca criada"
+                };
+
+                await _repository.CadastrarComHistorico(novo, novoHistorico);
+
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
             {
-                TrocaPlantao = novo,
-                Evento = EventoHistoricoEnum.Criada,
-                UsuarioId = userId,
-                Observacao = "Troca criada"
-            });
-
-
-            return await _unit.Commit();
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<bool> Aceitar(long id, long userId)
         {
-            var troca = await _repository
-                .ConsultarPorId<TrocaPlantaoModel>(id);
+            await _unit.BeginTransaction();
 
-            if (troca is null)
-                return false;
+            try
+                {
+                var troca = await _repository
+                    .ConsultarPorId<TrocaPlantaoModel>(id);
+                var prof = await _profRepository.ConsultarPorUserId(userId);
 
-            if (userId != troca.DestinatarioId)
-                throw new Exception("Apenas o destinatário pode aceitar");
+                if (troca is null)
+                    throw new Exception("Troca não existe");
+                if (prof is null)
+                    throw new Exception("É necessario estar logado como um profissional");
 
-            if (troca.Status != StatusTrocaPlantaoEnum.Pendente)
-                throw new Exception("Troca não pode ser aceita");
+                if (prof.Id != troca.DestinatarioId)
+                    throw new Exception("Apenas o destinatário pode aceitar");
 
-            troca.Status = StatusTrocaPlantaoEnum.Aceita;
+                if (troca.Status != StatusTrocaPlantaoEnum.Pendente)
+                    throw new Exception("Troca não pode ser aceita");
 
-            await _repository.Editar(troca);
+                troca.Status = StatusTrocaPlantaoEnum.Aceita;
 
-            await _repository.Cadastrar(new TrocaHistoricoModel
+                var novoHistorico = new TrocaHistoricoModel
+                {
+                    Evento = EventoHistoricoEnum.Aceita,
+                    UsuarioId = userId,
+                    Observacao = "Destinatário aceitou"
+                };
+
+                await _repository.EditarComHistorico(troca, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
             {
-                TrocaPlantao = troca,
-                Evento = EventoHistoricoEnum.Aceita,
-                UsuarioId = userId,
-                Observacao = "Destinatário aceitou"
-            });
-
-            return await _unit.Commit();
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<bool> Recusar(long id, long userId)
         {
-            var troca = await _repository
-                .ConsultarPorId<TrocaPlantaoModel>(id);
+            await _unit.BeginTransaction();
 
-            if (troca is null)
-                return false;
-
-            if (userId != troca.DestinatarioId)
-                throw new Exception("Apenas o destinatário pode recusar");
-
-            if (troca.Status != StatusTrocaPlantaoEnum.Pendente)
-                throw new Exception("Troca não pode ser recusada");
-
-            troca.Status = StatusTrocaPlantaoEnum.Recusada;
-
-            await _repository.Editar(troca);
-
-            await _repository.Cadastrar(new TrocaHistoricoModel
+            try
             {
-                TrocaPlantao = troca,
-                Evento = EventoHistoricoEnum.Recusada,
-                UsuarioId = userId,
-                Observacao = "Destinatário recusou"
-            });
+                var troca = await _repository
+                    .ConsultarPorId<TrocaPlantaoModel>(id);
+                var prof = await _profRepository.ConsultarPorUserId(userId);
 
-            return await _unit.Commit();
+                if (troca is null)
+                    throw new Exception("Troca não existe");
+                if (prof is null)
+                    throw new Exception("É necessario estar logado como um profissional");
+                
+
+                if (prof.Id != troca.DestinatarioId)
+                    throw new Exception("Apenas o destinatário pode recusar");
+
+                if (troca.Status != StatusTrocaPlantaoEnum.Pendente)
+                    throw new Exception("Troca não pode ser recusada");
+
+                troca.Status = StatusTrocaPlantaoEnum.Recusada;
+
+                var novoHistorico = new TrocaHistoricoModel
+                {
+                    Evento = EventoHistoricoEnum.Recusada,
+                    UsuarioId = userId,
+                    Observacao = "Destinatário recusou"
+                };
+
+                await _repository.EditarComHistorico(troca, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
+            {
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<bool> EnviarParaAprovacao(long id, long userId)
         {
-            var troca = await _repository.ConsultarTrocaCompleta(id);
+            await _unit.BeginTransaction();
 
-            if (troca is null)
-                throw new Exception("Precisa ser uma troca existente");
-
-            if (troca.Plantao.Setor.RepresentanteId != userId)
-                throw new Exception("Apenas o representante pode enviar para aprovação");
-
-            if (troca.Status != StatusTrocaPlantaoEnum.Aceita)
-                throw new Exception("Troca precisa estar aceita");
-
-
-            troca.Status = StatusTrocaPlantaoEnum.AguardandoAprovacao;
-
-            await _repository.Editar(troca);
-
-            await _repository.Cadastrar(new TrocaHistoricoModel
+            try
             {
-                TrocaPlantao = troca,
-                Evento = EventoHistoricoEnum.AguardandoAprovacao,
-                UsuarioId = userId,
-                Observacao = "Enviado para aprovação"
-            });
+                var troca = await _repository.ConsultarTrocaCompleta(id);
 
-            return await _unit.Commit();
+                if (troca is null)
+                    throw new Exception("Precisa ser uma troca existente");
+
+                if (troca.Plantao.Setor.RepresentanteId != userId)
+                    throw new Exception("Apenas o representante pode enviar para aprovação");
+
+                if (troca.Status != StatusTrocaPlantaoEnum.Aceita)
+                    throw new Exception("Troca precisa estar aceita");
+
+
+                troca.Status = StatusTrocaPlantaoEnum.AguardandoAprovacao;
+
+                var novoHistorico = new TrocaHistoricoModel
+                {
+                    Evento = EventoHistoricoEnum.AguardandoAprovacao,
+                    UsuarioId = userId,
+                    Observacao = "Enviado para aprovação"
+                };
+
+                await _repository.EditarComHistorico(troca, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
+            {
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<bool> Aprovar(long id, long userId)
         {
-            var troca = await _repository.ConsultarTrocaCompleta(id);
+            await _unit.BeginTransaction();
 
-            if (troca is null)
-                throw new Exception("Precisa ser uma troca existente");
+            try{
+                var troca = await _repository.ConsultarTrocaCompleta(id);
 
-            if (troca.Plantao.Setor.RepresentanteId != userId)
-                throw new Exception("Apenas o representante pode aprovar");
+                if (troca is null)
+                    throw new Exception("Precisa ser uma troca existente");
 
-            if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
-                throw new Exception("Troca não está aguardando aprovação");
+                if (troca.Plantao.Setor.RepresentanteId != userId)
+                    throw new Exception("Apenas o representante pode aprovar");
+
+                if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
+                    throw new Exception("Troca não está aguardando aprovação");
 
 
-            troca.Status = StatusTrocaPlantaoEnum.Aprovada;
-            troca.Plantao.ProfissionalResponsavelId = troca.SolicitanteId;
+                troca.Status = StatusTrocaPlantaoEnum.Aprovada;
+                troca.Plantao.ProfissionalResponsavelId = troca.SolicitanteId;
 
-            await _repository.Editar(troca);
-            await _repository.Editar(troca.Plantao);
+                await _repository.Editar(troca.Plantao);
 
-            await _repository.Cadastrar(new TrocaHistoricoModel
+                var novoHistorico = new TrocaHistoricoModel
+                {
+                    Evento = EventoHistoricoEnum.Aprovada,
+                    UsuarioId = userId,
+                    Observacao = "Aprovada"
+                };
+
+                await _repository.EditarComHistorico(troca, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
             {
-                TrocaPlantao = troca,
-                Evento = EventoHistoricoEnum.Aprovada,
-                UsuarioId = userId,
-                Observacao = "Aprovada"
-            });
-
-            return await _unit.Commit();
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<bool> Reprovar(long id, long userId)
-        {
-            var troca = await _repository.ConsultarTrocaCompleta(id);
+        {   
+            await _unit.BeginTransaction();
 
-            if (troca is null)
-                throw new Exception("Precisa ser uma troca existente");
-
-            if (troca.Plantao.Setor.RepresentanteId != userId)
-                throw new Exception("Apenas o representante pode reprovar");
-
-            if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
-                throw new Exception("Troca não está aguardando aprovação");
-
-            troca.Status = StatusTrocaPlantaoEnum.Reprovada;
-
-            await _repository.Editar(troca);
-
-            await _repository.Cadastrar(new TrocaHistoricoModel
+            try
             {
-                TrocaPlantao = troca,
-                Evento = EventoHistoricoEnum.Reprovada,
-                UsuarioId = userId,
-                Observacao = "Reprovada"
-            });
+                var troca = await _repository.ConsultarTrocaCompleta(id);
 
-            return await _unit.Commit();
+                if (troca is null)
+                    throw new Exception("Precisa ser uma troca existente");
+
+                if (troca.Plantao.Setor.RepresentanteId != userId)
+                    throw new Exception("Apenas o representante pode reprovar");
+
+                if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
+                    throw new Exception("Troca não está aguardando aprovação");
+
+                troca.Status = StatusTrocaPlantaoEnum.Reprovada;
+
+                var novoHistorico = new TrocaHistoricoModel
+                {
+                    Evento = EventoHistoricoEnum.Reprovada,
+                    UsuarioId = userId,
+                    Observacao = "Reprovada"
+                };
+
+                await _repository.EditarComHistorico(troca, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
+            {
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<TrocaPlantaoModel?> Deletar(long id)

@@ -8,5 +8,8 @@ namespace MeuPlantao.Domain.Interfaces
     public interface IUnitOfWork
     {
         Task<bool> Commit();
+        Task BeginTransaction();
+        Task CommitTransaction();
+        Task RollbackTransaction();
     }
 }

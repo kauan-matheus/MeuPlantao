@@ -27,6 +27,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IPlantaoRepository, PlantaoRepository>();
 builder.Services.AddScoped<ITrocaRepository, TrocaRepository>();
 builder.Services.AddScoped<IProfRepository, ProfRepository>();
 

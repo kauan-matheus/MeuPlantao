@@ -11,11 +11,11 @@ namespace MeuPlantao.Application.Services.Plantao
 {
     public class PlantaoService : IPlantaoService
     {
-        private readonly IRepository _repository;
+        private readonly IPlantaoRepository _repository;
         private readonly IUnitOfWork _unit;
         private readonly IProfRepository _profRepository;
 
-        public PlantaoService(IRepository repository, IUnitOfWork unit, IProfRepository profRepository)
+        public PlantaoService(IPlantaoRepository repository, IUnitOfWork unit, IProfRepository profRepository)
         {
             _repository = repository;
             _unit = unit;
@@ -37,34 +37,45 @@ namespace MeuPlantao.Application.Services.Plantao
 
         public async Task<bool> Cadastrar(RequestPlantaoRegisterJson plantao, long userId)
         {
-            // Valida se o setor e o profissional existem antes de criar o plantão
-            var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
+            await _unit.BeginTransaction();
 
-            if (setorExistente is null)
-                throw new Exception("setor não existe");
+            try{
+                // Valida se o setor e o profissional existem antes de criar o plantão
+                var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
 
-            var novo = new PlantaoModel
+                if (setorExistente is null)
+                    throw new Exception("setor não existe");
+                if (setorExistente.RepresentanteId != userId)
+                    throw new Exception("Apenas o representate do setor é capaz de registrar plantoes para o respectivo setor");
+
+                var novo = new PlantaoModel
+                {
+                    SetorId = plantao.SetorId,
+                    Setor = setorExistente,
+                    Inicio = plantao.Inicio,
+                    Fim = plantao.Fim,
+                    Status = StatusPlantaoEnum.AguardandoProfissional
+                };
+        
+                var novoHistorico = new PlantaoHistoricoModel
+                {
+                    Evento = EventoPlantaoHistoricoEnum.Criada,
+                    UsuarioId = userId,
+                    Observacao = "Plantao criado"
+                };
+
+                await _repository.CadastrarComHistorico(novo, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
             {
-                SetorId = plantao.SetorId,
-                Setor = setorExistente,
-                Inicio = plantao.Inicio,
-                Fim = plantao.Fim,
-                Status = StatusPlantaoEnum.AguardandoProfissional
-            };
-
-            await _repository.Cadastrar(novo);
-
-            Console.WriteLine($"ID do plantão: {novo.Id}");
-    
-            await _repository.Cadastrar(new PlantaoHistoricoModel
-            {
-                Plantao = novo,
-                Evento = EventoPlantaoHistoricoEnum.Criada,
-                UsuarioId = userId,
-                Observacao = "Plantao criado"
-            });
-
-            return await _unit.Commit();
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<bool> Editar(RequestPlantaoRegisterJson plantao)
@@ -85,7 +96,7 @@ namespace MeuPlantao.Application.Services.Plantao
             };
 
             await _repository.Editar(novo);
-            return await _unit.Commit();
+            return await _unit.Commit(); 
         }
 
         public async Task<PlantaoModel?> Deletar(long id)
@@ -101,107 +112,125 @@ namespace MeuPlantao.Application.Services.Plantao
 
         public async Task<bool> Solicitar(long id, long userId)
         {
-            var plantao = await _repository
-                .ConsultarPorId<PlantaoModel>(id);
+            await _unit.BeginTransaction();
 
-            var prof = await _profRepository.ConsultarPorUserId(userId);
-
-            if (plantao is null)
-                throw new Exception("plantao não existe");
-            if (prof is null)
-                throw new Exception("É necessario estar logado como um profissional");
-
-            if (plantao.Status != StatusPlantaoEnum.AguardandoProfissional)
-                throw new Exception("plantao nao esta em estado de aguardando usuario");
-
-            plantao.Status = StatusPlantaoEnum.AguardandoRespostaSolicitacao;
-            plantao.SolicitanteId = prof.Id;
-
-            await _repository.Editar(plantao);
-
-            await _repository.Cadastrar(new PlantaoHistoricoModel
+            try
             {
-                Plantao = plantao,
-                Evento = EventoPlantaoHistoricoEnum.AguardandoRespostaSolicitacao,
-                UsuarioId = userId,
-                Observacao = "Solicitacao criado"
-            });
+                var plantao = await _repository
+                    .ConsultarPorId<PlantaoModel>(id);
 
-            return await _unit.Commit();
+                var prof = await _profRepository.ConsultarPorUserId(userId);
+
+                if (plantao is null)
+                    throw new Exception("plantao não existe");
+                if (prof is null)
+                    throw new Exception("É necessario estar logado como um profissional");
+
+                if (plantao.Status != StatusPlantaoEnum.AguardandoProfissional)
+                    throw new Exception("plantao nao esta em estado de aguardando usuario");
+
+                plantao.Status = StatusPlantaoEnum.AguardandoRespostaSolicitacao;
+                plantao.SolicitanteId = prof.Id;
+
+                var novoHistorico = new PlantaoHistoricoModel
+                {
+                    Evento = EventoPlantaoHistoricoEnum.AguardandoRespostaSolicitacao,
+                    UsuarioId = userId,
+                    Observacao = "Solicitacao criado"
+                };
+
+                await _repository.EditarComHistorico(plantao, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
+            {
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
 
         public async Task<bool> AceitarSolicitacao(long id, long userId)
         {
-            var plantao = await _repository
-                .ConsultarPorId<PlantaoModel>(id);
+            await _unit.BeginTransaction();
 
-            if (plantao is null)
-                return false;
-            
-            var setor = await _repository
-                .ConsultarPorId<SetorModel>(plantao.SetorId);
+            try{
+                var plantao = await _repository.ConsultarPlantaoCompleto(id);
 
-            // checa se setor existe, se sim checa se o usuario que estiver logado no momento é o responsavel pelo setor
-            if (setor is null)
-                return false;
+                if (plantao is null)
+                    throw new Exception("Plantao nao existe");
 
-            if (setor.RepresentanteId != userId)
-                throw new Exception("Apenas o representante pode aceitar solicitacoes");
+                if (plantao.Setor.RepresentanteId != userId)
+                    throw new Exception("Apenas o representante pode aceitar solicitacoes");
 
-            if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
-                throw new Exception("Plantao não esta aguardando repostas de solicitacao");
+                if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
+                    throw new Exception("Plantao não esta aguardando repostas de solicitacao");
 
-            plantao.Status = StatusPlantaoEnum.Ativo;
-            plantao.ProfissionalResponsavelId = plantao.SolicitanteId;
-            plantao.SolicitanteId = null;
+                plantao.Status = StatusPlantaoEnum.Ativo;
+                plantao.ProfissionalResponsavelId = plantao.SolicitanteId;
+                plantao.SolicitanteId = null;
 
-            await _repository.Editar<PlantaoModel>(plantao);
+                var novoHistorico = new PlantaoHistoricoModel
+                {
+                    Evento = EventoPlantaoHistoricoEnum.Aceito,
+                    UsuarioId = userId,
+                    Observacao = "Solicitacao aceita"
+                };
 
-            await _repository.Cadastrar(new PlantaoHistoricoModel
+                await _repository.EditarComHistorico(plantao, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
             {
-                Plantao = plantao,
-                Evento = EventoPlantaoHistoricoEnum.Aceito,
-                UsuarioId = userId,
-                Observacao = "Solicitacao aceita"
-            });
-
-            return await _unit.Commit();
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
         public async Task<bool> RecusarSolicitacao(long id, long userId)
         {
-            var plantao = await _repository
-                .ConsultarPorId<PlantaoModel>(id);
-
-            if (plantao is null)
-                return false;
-            
-            var setor = await _repository
-                .ConsultarPorId<SetorModel>(plantao.SetorId);
-
-            // checa se setor existe, se sim checa se o usuario que estiver logado no momento é o responsavel pelo setor
-            if (setor == null)
-                return false;
-
-            if (setor.RepresentanteId != userId)
-                throw new Exception("Apenas o representante pode recusar solicitacoes");
-
-            if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
-                throw new Exception("Plantao não esta aguardando repostas de solicitacao");
-
-            plantao.Status = StatusPlantaoEnum.AguardandoProfissional;
-            plantao.SolicitanteId = null;
-
-            await _repository.Editar(plantao);
-
-            await _repository.Cadastrar(new PlantaoHistoricoModel
+            await _unit.BeginTransaction();
+            try
             {
-                Plantao = plantao,
-                Evento = EventoPlantaoHistoricoEnum.Recusado,
-                UsuarioId = userId,
-                Observacao = "Solicita recusada"
-            });
+                var plantao = await _repository.ConsultarPlantaoCompleto(id);
 
-            return await _unit.Commit();
+                if (plantao is null)
+                    throw new Exception("Plantao nao existe");
+
+                if (plantao.Setor.RepresentanteId != userId)
+                    throw new Exception("Apenas o representante pode recusar solicitacoes");
+
+                if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
+                    throw new Exception("Plantao não esta aguardando repostas de solicitacao");
+
+                plantao.Status = StatusPlantaoEnum.AguardandoProfissional;
+                plantao.SolicitanteId = null;
+
+                var novoHistorico = new PlantaoHistoricoModel
+                {
+                    Evento = EventoPlantaoHistoricoEnum.Recusado,
+                    UsuarioId = userId,
+                    Observacao = "Solicita recusada"
+                };
+
+                await _repository.EditarComHistorico(plantao, novoHistorico);
+                
+                await _unit.Commit();              // salva no banco
+                await _unit.CommitTransaction();   // confirma transação
+                
+                return true;
+            }
+            catch
+            {
+                await _unit.RollbackTransaction();
+                throw;
+            }
         }
     }
 }

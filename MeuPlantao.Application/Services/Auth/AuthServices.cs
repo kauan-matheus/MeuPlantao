@@ -82,10 +82,17 @@ public class AuthService : IAuthService
         try
         {
             // Cadastra usuário e profissional dentro de uma transaction (atômico)
+            await _unit.BeginTransaction(); // começa transação
+
             await _repository.CadastrarUsuarioComProfissional(usuario, profissional);
+
+            await _unit.Commit();              // salva tudo
+            await _unit.CommitTransaction();   // confirma
         }
         catch (Exception ex)
         {
+            await _unit.RollbackTransaction();
+
             // Loga o erro real para debug, mas retorna mensagem genérica ao cliente
             _logger.LogError(ex, "Erro ao registrar usuário: {Email}", request.Email);
             return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
@@ -135,10 +142,17 @@ public class AuthService : IAuthService
         try
         {
             // Cadastra usuário e profissional dentro de uma transaction (atômico)
+            await _unit.BeginTransaction(); // começa transação
+
             await _repository.CadastrarUsuarioComProfissional(usuario, profissional);
+
+            await _unit.Commit();              // salva tudo
+            await _unit.CommitTransaction();   // confirma
         }
         catch (Exception ex)
         {
+            await _unit.RollbackTransaction();
+            
             // Loga o erro real para debug, mas retorna mensagem genérica ao cliente
             _logger.LogError(ex, "Erro ao registrar usuário: {Email}", request.Email);
             return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
