@@ -55,6 +55,7 @@ O hospital já utiliza um sistema de terceiros para gestão de plantões, o que 
 |---|---|---|
 | [ASP.NET Core](https://dotnet.microsoft.com/) | .NET 8.0 | API REST |
 | [Entity Framework Core](https://learn.microsoft.com/ef/core/) | 8.0 | ORM |
+| [FluentValidation](https://github.com/FluentValidation/FluentValidation) | 11.3.0 | Validação |
 | [Npgsql](https://www.npgsql.org/) | 8.0 | Provider PostgreSQL para EF |
 | [JWT Bearer](https://learn.microsoft.com/aspnet/core/security/authentication/jwt-authn) | 8.0 | Autenticação via token |
 | [BCrypt.Net](https://github.com/BcryptNet/bcrypt.net) | 4.1 | Hash de senhas |
