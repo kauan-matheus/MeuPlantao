@@ -18,5 +18,5 @@ public class TrocaPlantaoModel
     public StatusTrocaPlantaoEnum Status { get; set; }
     [MaxLength(100)]
     public string Motivo { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

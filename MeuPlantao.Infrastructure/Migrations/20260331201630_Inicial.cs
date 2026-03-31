@@ -244,8 +244,7 @@ namespace MeuPlantao.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Setores_RepresentanteId",
                 table: "Setores",
-                column: "RepresentanteId",
-                unique: true);
+                column: "RepresentanteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrocaPlantoes_DestinatarioId",

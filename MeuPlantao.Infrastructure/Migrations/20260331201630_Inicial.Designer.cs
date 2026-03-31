@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeuPlantao.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260328180301_Inicial")]
+    [Migration("20260331201630_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -154,8 +154,7 @@ namespace MeuPlantao.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RepresentanteId")
-                        .IsUnique();
+                    b.HasIndex("RepresentanteId");
 
                     b.ToTable("Setores");
                 });
@@ -318,8 +317,8 @@ namespace MeuPlantao.Infrastructure.Migrations
             modelBuilder.Entity("MeuPlantao.Domain.Entities.SetorModel", b =>
                 {
                     b.HasOne("MeuPlantao.Domain.Entities.UserModel", "Representante")
-                        .WithOne()
-                        .HasForeignKey("MeuPlantao.Domain.Entities.SetorModel", "RepresentanteId")
+                        .WithMany()
+                        .HasForeignKey("RepresentanteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

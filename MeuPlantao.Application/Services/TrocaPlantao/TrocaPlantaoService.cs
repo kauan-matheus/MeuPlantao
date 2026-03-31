@@ -65,9 +65,8 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                     PlantaoId = troca.PlantaoId,
                     SolicitanteId = prof.Id,
                     DestinatarioId = (long)plantao.ProfissionalResponsavelId,
-                    Status = troca.Status,
+                    Status = StatusTrocaPlantaoEnum.Pendente,
                     Motivo = troca.Motivo,
-                    CreatedAt = troca.CreatedAt
                 };
                 
                 var novoHistorico = new TrocaHistoricoModel

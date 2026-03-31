@@ -46,8 +46,9 @@ public class AppDbContext : DbContext
         //Builder pro FK do setor 
         modelBuilder.Entity<SetorModel>()
             .HasOne(p => p.Representante)
-            .WithOne()
-            .HasForeignKey<SetorModel>(p => p.RepresentanteId);
+            .WithMany()
+            .HasForeignKey(p => p.RepresentanteId)
+            .IsRequired(true);
         
         //Builder pras FK de troca plantao
         modelBuilder.Entity<TrocaPlantaoModel>()

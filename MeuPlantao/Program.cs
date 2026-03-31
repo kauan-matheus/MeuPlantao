@@ -18,12 +18,17 @@ using MeuPlantao.Application.Services.TrocaPlantao;
 using System.IdentityModel.Tokens.Jwt;
 using MeuPlantao.Application.Services.PlantaoHistorico;
 using MeuPlantao.Infrastructure.UnitOfWork;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using MeuPlantao.Application.Validators;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -40,9 +45,11 @@ builder.Services.AddScoped<ITrocaHistoricoService, TrocaHistoricoService>();
 builder.Services.AddScoped<ITrocaPlantaoService, TrocaPlantaoService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
 builder.Services.AddScoped<TokenService>();
+
+builder.Services.AddValidatorsFromAssembly(typeof(AuthLoginValidator).Assembly);
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddEndpointsApiExplorer();
 

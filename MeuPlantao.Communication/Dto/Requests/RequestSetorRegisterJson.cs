@@ -7,10 +7,6 @@ namespace MeuPlantao.Communication.Dto.Requests;
 public class RequestSetorRegisterJson
 {
     public long Id { get; set; }
-
-    [Required(ErrorMessage = "Nome é obrigatório")]
-    [MaxLength(100)]
     public string Nome { get; set; } = string.Empty;
-    [Required(ErrorMessage = "Representante é obrigatória")]
     public long RepresentanteId { get; set; }
 }

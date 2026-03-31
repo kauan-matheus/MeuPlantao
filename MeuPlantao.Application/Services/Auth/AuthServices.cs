@@ -134,7 +134,7 @@ public class AuthService : IAuthService
         var profissional = new ProfissionalModel
         {
             Nome = request.Nome,
-            Role = ProfissionalRoleEnum.enfermeiro,
+            Role = ProfissionalRoleEnum.Enfermeiro,
             Coren = request.Coren,
             Telefone = request.Telefone
         };
