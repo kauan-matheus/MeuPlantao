@@ -23,5 +23,17 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: "bold",
         color: colors.gray[200]
+    },
+    listContent: {
+        width: "100%",
+        borderTopColor: colors.gray[400],
+        borderTopWidth: 1,
+    },
+    textListEmpty: {
+        textAlign: "center",
+        fontWeight: "bold",
+        color: colors.gray[300],
+        fontSize: 17,
+        padding: 20
     }
 })
