@@ -67,13 +67,12 @@ export function ScreenCalendar() {
                 dayTextColor: colors.gray[300],
                 textDisabledColor: colors.gray[500],
                 arrowColor: colors.gray[300],
-                monthTextColor: colors.gray[200],
+                monthTextColor: colors.blue[400],
                 textMonthFontWeight: 'bold',
             }}
             />
 
             <View style={styles.list}>
-                <Text style={styles.listTitle}>Plantões disponíveis</Text>
                 <FlatList
                 data={plantao}
                 keyExtractor={(item) => item.id}
@@ -84,13 +83,17 @@ export function ScreenCalendar() {
                     duration={item.duration}
                     locale={item.locale}
                     sector={item.sector}
+                    oncall={item.oncall}
                     />
                 )}
                 style={styles.listContent}
-
                 ListEmptyComponent={() => (
                     <Text style={styles.textListEmpty}>Nenhum plantão disponível</Text>
                 )}
+                ListFooterComponent={() => (
+                    <View style={styles.footer}></View>
+                )}
+                showsVerticalScrollIndicator={false}
                 />
             </View>
         </View>

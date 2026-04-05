@@ -16,18 +16,12 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.gray[600],
         borderRadius: 25,
         alignItems: "center",
-        padding: 15,
+        paddingHorizontal: 15,
         gap: 10
-    },
-    listTitle: {
-        fontSize: 16,
-        fontWeight: "bold",
-        color: colors.gray[200]
     },
     listContent: {
         width: "100%",
-        borderTopColor: colors.gray[400],
-        borderTopWidth: 1,
+        marginBottom: 25
     },
     textListEmpty: {
         textAlign: "center",
@@ -35,5 +29,8 @@ export const styles = StyleSheet.create({
         color: colors.gray[300],
         fontSize: 17,
         padding: 20
+    },
+    footer: {
+        height: 75
     }
 })

@@ -23,5 +23,18 @@ export const styles = StyleSheet.create({
     },
     textInfo: {
         fontSize: 13
+    },
+    nav: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+    status: {
+        fontSize: 10,
+        fontWeight: "bold",
+        paddingVertical: 2,
+        paddingHorizontal: 6,
+        borderRadius: 10,
+        color: colors.gray[700]
     }
 })
