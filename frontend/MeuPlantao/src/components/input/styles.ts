@@ -12,14 +12,9 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center"
     },
-    group: {
-        width: "85%",
-        flexDirection: "row",
-        alignItems: "center"
-    },
     input: {
         fontSize: 15,
         fontFamily: "Poppins-Regular",
-        width: "100%",
+        width: "90%"
     }
 })

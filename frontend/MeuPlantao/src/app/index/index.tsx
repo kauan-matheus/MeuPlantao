@@ -2,6 +2,7 @@ import { Text, View, TouchableOpacity, ImageBackground, Modal } from "react-nati
 import { Ionicons } from "@expo/vector-icons"
 import { useState } from "react"
 import { router } from "expo-router"
+import { useFonts } from "expo-font"
 
 import { styles } from "./styles"
 import { colors } from "@/styles/colors"
@@ -13,6 +14,15 @@ import { Button } from "@/components/button"
 export default function Index() {
 
     const [showModal, setShowModal] = useState(false)
+
+    const [fonts] = useFonts({
+        'Poppins-Regular': require('@/assets/fonts/Poppins-Regular.ttf'),
+        'Poppins-Bold': require('@/assets/fonts/Poppins-Bold.ttf'),
+    })
+
+    if (!fonts) {
+        return null;
+    }
 
     return (
         <ImageBackground 

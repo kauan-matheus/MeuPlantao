@@ -14,16 +14,14 @@ export function Input({ type, ...rest }: Props) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.group}>
-                <TextInput
-                style={styles.input}
-                placeholderTextColor={colors.gray[200]}
-                secureTextEntry={type === "password" ? !showPassword : false}
-                autoCorrect={false}
-                autoCapitalize="none"
-                {...rest}
-                />
-            </View>
+            <TextInput
+            style={styles.input}
+            placeholderTextColor={colors.gray[200]}
+            secureTextEntry={type === "password" ? !showPassword : false}
+            autoCorrect={false}
+            autoCapitalize="none"
+            {...rest}
+            />
 
             {type === "password" && (
                 <TouchableOpacity onPress={() => {showPassword ? setShowPassword(false) : setShowPassword(true)}} activeOpacity={0.8}>

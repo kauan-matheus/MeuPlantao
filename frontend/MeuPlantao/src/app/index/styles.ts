@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     },
     titleModal: {
         fontSize: 40,
-        color: colors.gray[100],
+        color: colors.blue[400],
         fontFamily: "Poppins-Bold"
     },
     logo: {
@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
         position: "absolute"
     },
     link: {
-        color: colors.blue[300],
+        color: colors.blue[400],
         textDecorationLine: "underline",
         fontFamily: "Poppins-Regular"
     },
