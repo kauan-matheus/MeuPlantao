@@ -14,16 +14,12 @@ export const colors = {
         400: "#D9D9D9",
         500: "#BFBFBF",
         600: "#F5F5F5",
-        700: "#FFFFFF"
+        700: "#FFFFFF",
+        800: "#E0E0E0"
     },
 
     red: {
         100: "#F06A6A",
         200: "#E74C3C"
-    },
-    
-    purple: {
-        100: "#6A5ACD",
-        200: "#7B68EE"
     }
 }

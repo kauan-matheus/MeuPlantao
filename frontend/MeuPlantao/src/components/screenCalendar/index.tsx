@@ -1,6 +1,7 @@
 import { View, Text, FlatList } from "react-native";
 import { LocaleConfig, Calendar} from 'react-native-calendars';
 import { useCallback, useState } from "react";
+import dayjs from "dayjs"
 
 import { styles } from "./styles";
 import { colors } from "@/styles/colors";
@@ -31,11 +32,11 @@ LocaleConfig.defaultLocale = 'pt-br'
 
 export function ScreenCalendar() {
 
-    const [daySelected, setDaySelected] = useState(new Date().toISOString().substring(0, 10))
+    const [daySelected, setDaySelected] = useState(dayjs().format("YYYY-MM-DD"))
     const [plantao, setPlantao] = useState<Plantao[]>([])
 
     function getPlantao() {
-        const filtered = plantoes.filter(p => p.date === new Date(daySelected).toLocaleDateString("pt-br"))
+        const filtered = plantoes.filter(p => p.date === dayjs(daySelected).format("DD/MM/YYYY"))
 
         setPlantao(filtered)
     }
@@ -66,9 +67,11 @@ export function ScreenCalendar() {
                 todayTextColor: colors.blue[500],
                 dayTextColor: colors.gray[300],
                 textDisabledColor: colors.gray[500],
-                arrowColor: colors.gray[300],
                 monthTextColor: colors.blue[400],
-                textMonthFontWeight: 'bold',
+                arrowColor: colors.gray[300],
+                textDayFontFamily: "Poppins-Regular",
+                textMonthFontFamily: "Poppins-Bold",
+                textDayHeaderFontFamily: "Poppins-Regular",
             }}
             />
 

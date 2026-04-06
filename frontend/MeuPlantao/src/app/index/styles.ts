@@ -27,11 +27,8 @@ export const styles = StyleSheet.create({
     },
     titleModal: {
         fontSize: 40,
-        // textShadowColor: colors.gray[100],
-        // textShadowOffset: { width: 1, height: 1 },
-        // textShadowRadius: 5,
         color: colors.gray[100],
-        fontWeight: "bold"
+        fontFamily: "Poppins-Bold"
     },
     logo: {
         width: 50,
@@ -49,6 +46,7 @@ export const styles = StyleSheet.create({
     link: {
         color: colors.blue[300],
         textDecorationLine: "underline",
+        fontFamily: "Poppins-Regular"
     },
     close: {
         left: "47%"

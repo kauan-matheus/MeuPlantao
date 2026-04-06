@@ -10,19 +10,21 @@ export const styles = StyleSheet.create({
         gap: 6
     },
     title: {
-        fontWeight: "bold",
+        fontFamily: "Poppins-Bold",
         fontSize: 15,
         color: colors.blue[400]
     },
     subTitle: {
-        fontSize: 12
+        fontFamily: "Poppins-Regular",
+        fontSize: 11
     },
     info: {
         flexDirection: "row",
         justifyContent: "space-between"
     },
     textInfo: {
-        fontSize: 13
+        fontSize: 12,
+        fontFamily: "Poppins-Regular"
     },
     nav: {
         flexDirection: "row",
@@ -30,8 +32,8 @@ export const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     status: {
-        fontSize: 10,
-        fontWeight: "bold",
+        fontSize: 9,
+        fontFamily: "Poppins-Bold",
         paddingVertical: 2,
         paddingHorizontal: 6,
         borderRadius: 10,

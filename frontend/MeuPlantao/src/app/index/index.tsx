@@ -48,14 +48,12 @@ export default function Index() {
                         <View style={styles.form}>
                             <Input
                             type="text"
-                            icon="person"
                             placeholder="Nome de Usuário"
                             placeholderTextColor={colors.gray[200]}
                             onChangeText={console.log}
                             />
                             <Input
                             type="password"
-                            icon="pencil"
                             placeholder="Senha"
                             placeholderTextColor={colors.gray[200]}
                             onChangeText={console.log}

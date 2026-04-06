@@ -18,7 +18,7 @@ export const styles = StyleSheet.create({
     },
     topText: {
         fontSize: 17,
-        fontWeight: "bold",
+        fontFamily: "Poppins-Bold",
         color: colors.gray[700]
     },
     content: {

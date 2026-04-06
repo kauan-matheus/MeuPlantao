@@ -6,22 +6,15 @@ import { styles } from "./styles";
 
 type Props = TextInputProps & {
     type: "text" | "password"
-    icon: keyof typeof Ionicons.glyphMap
 }
 
-export function Input({ type, icon, ...rest }: Props) {
+export function Input({ type, ...rest }: Props) {
 
     const [showPassword, setShowPassword] = useState(false)
 
     return (
         <View style={styles.container}>
             <View style={styles.group}>
-                <Ionicons
-                name={icon}
-                size={20}
-                color={colors.gray[200]}
-                />
-
                 <TextInput
                 style={styles.input}
                 placeholderTextColor={colors.gray[200]}
