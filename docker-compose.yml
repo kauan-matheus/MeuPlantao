@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
   postgres:
     image: postgres:16-alpine
     container_name: meuplantao-db
@@ -22,7 +21,6 @@ services:
       - meuplantao-network
     restart: unless-stopped
 
-  # Backend API
   backend:
     build:
       context: .
@@ -32,7 +30,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8082
       ConnectionStrings__Default: Host=postgres;Port=5432;Database=MeuPlantaoDB;Username=postgres;Password=8643
-      Jwt__Key: X7k#mP9$qR2@nL5&wJ8!vD4^hF6*yA3z
+      Jwt__Key: ThisIsAMuchLongerSecretKeyForJWTAuthenticationWithMoreThan256Bits123456789
       Jwt__Issuer: MeuPlantao
       Jwt__Audience: MeuPlantaoUsers
       Jwt__ExpiresInHours: 8
@@ -47,12 +45,10 @@ services:
       - meuplantao-network
     restart: unless-stopped
 
-# Volumes
 volumes:
   postgres_data:
     driver: local
 
-# Networks
 networks:
   meuplantao-network:
     driver: bridge
