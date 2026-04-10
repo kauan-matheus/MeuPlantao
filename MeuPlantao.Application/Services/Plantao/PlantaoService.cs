@@ -21,15 +21,16 @@ namespace MeuPlantao.Application.Services.Plantao
             _repository = repository;
             _unit = unit;
             _profRepository = profRepository;
-
         }
 
         public async Task<ServiceResponse<List<ResponsePlantaoJson>>> Consultar()
         {
-            var query = _repository.Consultar<PlantaoModel>()
-                .OrderBy(p => p.Id);
+            try
+            {
+                var query = _repository.Consultar<PlantaoModel>()
+                    .OrderBy(p => p.Id);
 
-            var plantoes = await query.Select(p => new ResponsePlantaoJson
+                var plantoes = await query.Select(p => new ResponsePlantaoJson
                 {
                     Valor = p.Valor,
                     SetorId = p.SetorId,
@@ -37,44 +38,58 @@ namespace MeuPlantao.Application.Services.Plantao
                     Fim = p.Fim
                 }).ToListAsync();
 
-            return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
+                return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<List<ResponsePlantaoJson>>.Error(ex.Message);
+            }
         }
 
         public async Task<ServiceResponse<ResponsePlantaoJson>> ConsultarId(long id)
         {
-            var result = await _repository.ConsultarPorId<PlantaoModel>(id);
+            try
+            {
+                var result = await _repository.ConsultarPorId<PlantaoModel>(id);
 
-            if (result is null)
-                return ServiceResponse<ResponsePlantaoJson>.BadRequest("Plantao nao existe");
-            if (result.ProfissionalResponsavelId is null)
+                if (result is null)
+                    return ServiceResponse<ResponsePlantaoJson>.BadRequest("Plantao nao existe");
+
+                if (result.ProfissionalResponsavelId is null)
+                    return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
+                    {
+                        Valor = result.Valor,
+                        SetorId = result.SetorId,
+                        Inicio = result.Inicio,
+                        Fim = result.Fim,
+                    });
+
                 return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
                 {
                     Valor = result.Valor,
                     SetorId = result.SetorId,
                     Inicio = result.Inicio,
                     Fim = result.Fim,
+                    ProfissionalResponsavelId = (long)result.ProfissionalResponsavelId
                 });
-
-            return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
+            }
+            catch (Exception ex)
             {
-                Valor = result.Valor,
-                SetorId = result.SetorId,
-                Inicio = result.Inicio,
-                Fim = result.Fim,
-                ProfissionalResponsavelId = (long)result.ProfissionalResponsavelId
-            });
+                return ServiceResponse<ResponsePlantaoJson>.Error(ex.Message);
+            }
         }
 
         public async Task<ServiceResponse<bool>> Cadastrar(RequestPlantaoRegisterJson plantao, long userId)
         {
             await _unit.BeginTransaction();
 
-            try{
-                // Valida se o setor e o profissional existem antes de criar o plantão
+            try
+            {
                 var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
 
                 if (setorExistente is null)
                     return ServiceResponse<bool>.BadRequest("setor não existe");
+
                 if (setorExistente.RepresentanteId != userId)
                     return ServiceResponse<bool>.BadRequest("Apenas o representate do setor é capaz de registrar plantoes para o respectivo setor");
 
@@ -86,7 +101,7 @@ namespace MeuPlantao.Application.Services.Plantao
                     Fim = plantao.Fim,
                     Status = StatusPlantaoEnum.AguardandoProfissional
                 };
-        
+
                 var novoHistorico = new PlantaoHistoricoModel
                 {
                     Evento = EventoPlantaoHistoricoEnum.Criada,
@@ -95,10 +110,10 @@ namespace MeuPlantao.Application.Services.Plantao
                 };
 
                 await _repository.CadastrarComHistorico(novo, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
                 return ServiceResponse<bool>.Ok(true);
             }
             catch
@@ -110,60 +125,78 @@ namespace MeuPlantao.Application.Services.Plantao
 
         public async Task<ServiceResponse<bool>> Editar(RequestPlantaoRegisterJson plantao, long userId)
         {
-            // Valida se o setor existem antes de editar o plantão
-            var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
-
-            if (setorExistente is null)
-                return ServiceResponse<bool>.BadRequest("Setor nao existe");
-            if (setorExistente.RepresentanteId != userId)
-                return ServiceResponse<bool>.BadRequest("Plantao apenas pode ser editado pelo representante do setor");
-
-            var novo = new PlantaoModel
+            try
             {
-                Id = plantao.Id,
-                SetorId = plantao.SetorId,
-                Setor = setorExistente,
-                Inicio = plantao.Inicio,
-                Fim = plantao.Fim,
-            };
+                var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
 
-            await _repository.Editar(novo);
-            var saved = await _unit.Commit(); 
-            if (saved)
-                return ServiceResponse<bool>.Ok(true);
+                if (setorExistente is null)
+                    return ServiceResponse<bool>.BadRequest("Setor nao existe");
 
-            return ServiceResponse<bool>.Error("Nao foi possivel editar esse plantao");
+                if (setorExistente.RepresentanteId != userId)
+                    return ServiceResponse<bool>.BadRequest("Plantao apenas pode ser editado pelo representante do setor");
+
+                var novo = new PlantaoModel
+                {
+                    Id = plantao.Id,
+                    SetorId = plantao.SetorId,
+                    Setor = setorExistente,
+                    Inicio = plantao.Inicio,
+                    Fim = plantao.Fim,
+                };
+
+                await _repository.Editar(novo);
+                var saved = await _unit.Commit();
+
+                if (saved)
+                    return ServiceResponse<bool>.Ok(true);
+
+                return ServiceResponse<bool>.Error("Nao foi possivel editar esse plantao");
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
         }
 
         public async Task<ServiceResponse<ResponsePlantaoJson>> Deletar(long id)
         {
-            var existente = await _repository.ConsultarPorId<PlantaoModel>(id);
-            if (existente is null)
-                return ServiceResponse<ResponsePlantaoJson>.BadRequest("Plantao nao existe");
+            try
+            {
+                var existente = await _repository.ConsultarPorId<PlantaoModel>(id);
 
-            await _repository.Excluir(existente);
-            var saved = await _unit.Commit();
-            if (saved){
-                if (existente.ProfissionalResponsavelId is null)
+                if (existente is null)
+                    return ServiceResponse<ResponsePlantaoJson>.BadRequest("Plantao nao existe");
+
+                await _repository.Excluir(existente);
+                var saved = await _unit.Commit();
+
+                if (saved)
+                {
+                    if (existente.ProfissionalResponsavelId is null)
+                        return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
+                        {
+                            Valor = existente.Valor,
+                            SetorId = existente.SetorId,
+                            Inicio = existente.Inicio,
+                            Fim = existente.Fim,
+                        });
+
                     return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
                     {
                         Valor = existente.Valor,
                         SetorId = existente.SetorId,
                         Inicio = existente.Inicio,
                         Fim = existente.Fim,
+                        ProfissionalResponsavelId = (long)existente.ProfissionalResponsavelId
                     });
+                }
 
-                return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
-                {
-                    Valor = existente.Valor,
-                    SetorId = existente.SetorId,
-                    Inicio = existente.Inicio,
-                    Fim = existente.Fim,
-                    ProfissionalResponsavelId = (long)existente.ProfissionalResponsavelId
-                });
+                return ServiceResponse<ResponsePlantaoJson>.Error("Nao foi possivel deletar esse plantao");
             }
-
-            return ServiceResponse<ResponsePlantaoJson>.Error("Nao foi possivel deletar esse plantao");
+            catch (Exception ex)
+            {
+                return ServiceResponse<ResponsePlantaoJson>.Error(ex.Message);
+            }
         }
 
         public async Task<ServiceResponse<bool>> Solicitar(long id, long userId)
@@ -172,13 +205,12 @@ namespace MeuPlantao.Application.Services.Plantao
 
             try
             {
-                var plantao = await _repository
-                    .ConsultarPorId<PlantaoModel>(id);
-
+                var plantao = await _repository.ConsultarPorId<PlantaoModel>(id);
                 var prof = await _profRepository.ConsultarPorUserId(userId);
 
                 if (plantao is null)
                     return ServiceResponse<bool>.BadRequest("plantao não existe");
+
                 if (prof is null)
                     return ServiceResponse<bool>.BadRequest("É necessario estar logado como um profissional");
 
@@ -196,10 +228,10 @@ namespace MeuPlantao.Application.Services.Plantao
                 };
 
                 await _repository.EditarComHistorico(plantao, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
                 return ServiceResponse<bool>.Ok(true);
             }
             catch
@@ -213,7 +245,8 @@ namespace MeuPlantao.Application.Services.Plantao
         {
             await _unit.BeginTransaction();
 
-            try{
+            try
+            {
                 var plantao = await _repository.ConsultarPlantaoCompleto(id);
 
                 if (plantao is null)
@@ -237,10 +270,10 @@ namespace MeuPlantao.Application.Services.Plantao
                 };
 
                 await _repository.EditarComHistorico(plantao, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
                 return ServiceResponse<bool>.Ok(true);
             }
             catch
@@ -249,9 +282,11 @@ namespace MeuPlantao.Application.Services.Plantao
                 return ServiceResponse<bool>.Error("Nao foi possivel aceitar essa solicitacao");
             }
         }
+
         public async Task<ServiceResponse<bool>> RecusarSolicitacao(long id, long userId)
         {
             await _unit.BeginTransaction();
+
             try
             {
                 var plantao = await _repository.ConsultarPlantaoCompleto(id);
@@ -276,10 +311,10 @@ namespace MeuPlantao.Application.Services.Plantao
                 };
 
                 await _repository.EditarComHistorico(plantao, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
                 return ServiceResponse<bool>.Ok(true);
             }
             catch

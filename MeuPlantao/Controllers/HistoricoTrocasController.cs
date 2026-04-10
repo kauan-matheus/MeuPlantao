@@ -23,10 +23,13 @@ namespace MeuPlantao.Controllers
 
         [HttpGet("trocasHistorico")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetTrocas()
+        public async Task<IActionResult> GetTrocasHistorico()
         {
             var response = await _service.Consultar();
-            return Ok(response);
+            if (response.Success)
+                return StatusCode(response.StatusCode, response.Data);
+
+            return StatusCode(response.StatusCode, response.Message);
         }
     }
 }

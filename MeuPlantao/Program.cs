@@ -21,12 +21,22 @@ using MeuPlantao.Infrastructure.UnitOfWork;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MeuPlantao.Application.Validators;
+using MeuPlantao.Filters;
+using Microsoft.AspNetCore.Mvc;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 builder.Services.AddFluentValidationAutoValidation();
 
@@ -110,8 +120,6 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-
-Console.WriteLine(builder.Configuration.GetConnectionString("Default"));
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -6,44 +6,27 @@ public class ServiceResponse<T>
     public int StatusCode { get; set; }
     public string? Message { get; set; }
     public T? Data { get; set; }
+    public List<string>? Errors { get; set; }
 
-    public static ServiceResponse<T> Ok(T data)
-    {
-        return new ServiceResponse<T>
+        private static ServiceResponse<T> Create(bool success, int statusCode, string? message = null, T? data = default, List<string>? errors = null)
         {
-            Success = true,
-            StatusCode = 200,
-            Data = data
-        };
-    }
+            return new ServiceResponse<T>
+            {
+                Success = success,
+                StatusCode = statusCode,
+                Message = message,
+                Data = data,
+                Errors = errors
+            };
+        }
 
-    public static ServiceResponse<T> BadRequest(string message)
-    {
-        return new ServiceResponse<T>
-        {
-            Success = false,
-            StatusCode = 400,
-            Message = message
-        };
-    }
+        public static ServiceResponse<T> Ok(T data) => Create(true, 200, data: data);
 
-    public static ServiceResponse<T> Unauthorized(string message)
-    {
-        return new ServiceResponse<T>
-        {
-            Success = false,
-            StatusCode = 401,
-            Message = message
-        };
-    }
+        public static ServiceResponse<T> BadRequest(string message) => Create(false, 400, message: message);
 
-    public static ServiceResponse<T> Error(string message)
-    {
-        return new ServiceResponse<T>
-        {
-            Success = false,
-            StatusCode = 500,
-            Message = message
-        };
-    }
+        public static ServiceResponse<T> ValidationError(List<string> errors) => Create(false, 400, errors: errors);
+
+        public static ServiceResponse<T> Unauthorized(string message) => Create(false, 401, message: message);
+
+        public static ServiceResponse<T> Error(string message) => Create(false, 500, message: message);
 }

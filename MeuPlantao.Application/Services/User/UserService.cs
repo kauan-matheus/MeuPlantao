@@ -1,4 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using MeuPlantao.Communication.Dto.Requests;
+using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -16,57 +21,104 @@ namespace MeuPlantao.Application.Services.User
             _unit = unit;
         }
 
-        public async Task<List<UserModel>> Consultar()
+        public async Task<ServiceResponse<List<UserModel>>> Consultar()
         {
-            return await _repository.Consultar<UserModel>()
-                .OrderBy(p => p.Id)
-                .ToListAsync();
-        }
-
-        public async Task<UserModel?> ConsultarId(long id)
-        {
-            return await _repository.ConsultarPorId<UserModel>(id);
-        }
-
-        public async Task<bool> Cadastrar(RequestUserRegisterJson user)
-        {
-            // Mapeia DTO para entidade — hash da senha deve ser feito aqui antes de salvar
-            var novo = new UserModel
+            try
             {
-                Email = user.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password),
-                Role = user.Role,
-                Active = user.Active
-            };
+                var data = await _repository.Consultar<UserModel>()
+                    .OrderBy(p => p.Id)
+                    .ToListAsync();
 
-            await _repository.Cadastrar(novo);
-            return await _unit.Commit();
-        }
-
-        public async Task<bool> Editar(RequestUserRegisterJson user)
-        {
-            var novo = new UserModel
+                return ServiceResponse<List<UserModel>>.Ok(data);
+            }
+            catch (Exception ex)
             {
-                Id = user.Id,
-                Email = user.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password),
-                Role = user.Role,
-                Active = user.Active
-            };
-
-            await _repository.Editar(novo);
-            return await _unit.Commit();
+                return ServiceResponse<List<UserModel>>.Error(ex.Message);
+            }
         }
 
-        public async Task<UserModel?> Deletar(long id)
+        public async Task<ServiceResponse<UserModel>> ConsultarId(long id)
         {
-            var existente = await ConsultarId(id);
-            if (existente is null)
-                return null;
+            try
+            {
+                var data = await _repository.ConsultarPorId<UserModel>(id);
 
-            await _repository.Excluir(existente);
-            await _unit.Commit();
-            return existente;
+                if (data is null)
+                    return ServiceResponse<UserModel>.BadRequest("Usuário não encontrado");
+
+                return ServiceResponse<UserModel>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<UserModel>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Cadastrar(RequestUserRegisterJson user)
+        {
+            try
+            {
+                var novo = new UserModel
+                {
+                    Email = user.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                    Role = user.Role,
+                    Active = user.Active
+                };
+
+                await _repository.Cadastrar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Editar(RequestUserRegisterJson user)
+        {
+            try
+            {
+                var novo = new UserModel
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                    Role = user.Role,
+                    Active = user.Active
+                };
+
+                await _repository.Editar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<UserModel>> Deletar(long id)
+        {
+            try
+            {
+                var existente = await _repository.ConsultarPorId<UserModel>(id);
+
+                if (existente is null)
+                    return ServiceResponse<UserModel>.BadRequest("Usuário não encontrado");
+
+                await _repository.Excluir(existente);
+                await _unit.Commit();
+
+                return ServiceResponse<UserModel>.Ok(existente);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<UserModel>.Error(ex.Message);
+            }
         }
     }
 }

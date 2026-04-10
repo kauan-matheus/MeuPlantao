@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MeuPlantao.Communication.Dto.Requests;
+using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,57 +20,105 @@ namespace MeuPlantao.Application.Services.TrocaHistorico
             _repository = repository;
             _unit = unit;
         }
-        public async Task<List<TrocaHistoricoModel>> Consultar()
-        {
-            return await _repository.Consultar<TrocaHistoricoModel>()
-                .OrderBy(p => p.Id)
-                .ToListAsync();
-        }
 
-        public async Task<TrocaHistoricoModel?> ConsultarId(long id)
+        public async Task<ServiceResponse<List<TrocaHistoricoModel>>> Consultar()
         {
-            return await _repository.ConsultarPorId<TrocaHistoricoModel>(id);
-        }
-
-        public async Task<bool> Cadastrar(RequestTrocaHistoricoRegisterJson troca)
-        {
-            // Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
-            var novo = new TrocaHistoricoModel
+            try
             {
-                TrocaPlantaoId = troca.TrocaPlantaoId,
-                Evento = troca.Evento,
-                UsuarioId = troca.UsuarioId,
-                Observacao = troca.Observacao
-            };
+                var data = await _repository.Consultar<TrocaHistoricoModel>()
+                    .OrderBy(p => p.Id)
+                    .ToListAsync();
 
-            await _repository.Cadastrar(novo);
-            return await _unit.Commit();
-        }
-
-        public async Task<bool> Editar(RequestTrocaHistoricoRegisterJson troca)
-        {
-            var novo = new TrocaHistoricoModel
+                return ServiceResponse<List<TrocaHistoricoModel>>.Ok(data);
+            }
+            catch (Exception ex)
             {
-                Id = troca.Id,
-                TrocaPlantaoId = troca.TrocaPlantaoId,
-                Evento = troca.Evento,
-                UsuarioId = troca.UsuarioId,
-                Observacao = troca.Observacao
-            };
-
-            await _repository.Editar(novo);
-            return await _unit.Commit();
+                return ServiceResponse<List<TrocaHistoricoModel>>.Error(ex.Message);
+            }
         }
 
-        public async Task<TrocaHistoricoModel?> Deletar(long id)
+        public async Task<ServiceResponse<TrocaHistoricoModel>> ConsultarId(long id)
         {
-            var existente = await ConsultarId(id);
-            if (existente is null)
-                return null;
+            try
+            {
+                var data = await _repository.ConsultarPorId<TrocaHistoricoModel>(id);
 
-            await _repository.Excluir(existente);
-            await _unit.Commit();
-            return existente;
+                if (data is null)
+                    return ServiceResponse<TrocaHistoricoModel>.BadRequest("Registro não encontrado");
+
+                return ServiceResponse<TrocaHistoricoModel>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<TrocaHistoricoModel>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Cadastrar(RequestTrocaHistoricoRegisterJson troca)
+        {
+            try
+            {
+                var novo = new TrocaHistoricoModel
+                {
+                    TrocaPlantaoId = troca.TrocaPlantaoId,
+                    Evento = troca.Evento,
+                    UsuarioId = troca.UsuarioId,
+                    Observacao = troca.Observacao
+                };
+
+                await _repository.Cadastrar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Editar(RequestTrocaHistoricoRegisterJson troca)
+        {
+            try
+            {
+                var novo = new TrocaHistoricoModel
+                {
+                    Id = troca.Id,
+                    TrocaPlantaoId = troca.TrocaPlantaoId,
+                    Evento = troca.Evento,
+                    UsuarioId = troca.UsuarioId,
+                    Observacao = troca.Observacao
+                };
+
+                await _repository.Editar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<TrocaHistoricoModel>> Deletar(long id)
+        {
+            try
+            {
+                var existente = await _repository.ConsultarPorId<TrocaHistoricoModel>(id);
+
+                if (existente is null)
+                    return ServiceResponse<TrocaHistoricoModel>.BadRequest("Registro não encontrado");
+
+                await _repository.Excluir(existente);
+                await _unit.Commit();
+
+                return ServiceResponse<TrocaHistoricoModel>.Ok(existente);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<TrocaHistoricoModel>.Error(ex.Message);
+            }
         }
     }
 }

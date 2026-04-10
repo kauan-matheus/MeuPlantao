@@ -21,7 +21,10 @@ public class SetorController : ControllerBase
     public async Task<IActionResult> GetSetores()
     {
         var response = await _service.Consultar();
-        return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpGet("setores/{id}")]
@@ -30,10 +33,10 @@ public class SetorController : ControllerBase
     public async Task<IActionResult> GetSetorId(long id)
     {
         var response = await _service.ConsultarId(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Setor não existente ou não encontrado");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("setores")]
@@ -46,10 +49,10 @@ public class SetorController : ControllerBase
             return BadRequest(ModelState);
 
         var response = await _service.Cadastrar(setor);
-        if (response)
-            return Created("Setor adicionado", setor);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível criar esse setor");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPut("setores")]
@@ -61,10 +64,10 @@ public class SetorController : ControllerBase
             return BadRequest(ModelState);
 
         var response = await _service.Editar(setor);
-        if (response)
-            return Ok(setor);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível alterar esse setor");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpDelete("setores/{id}")]
@@ -73,9 +76,9 @@ public class SetorController : ControllerBase
     public async Task<IActionResult> DeleteSetores(long id)
     {
         var response = await _service.Deletar(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Não foi possível deletar esse setor");
+        return StatusCode(response.StatusCode, response.Message);
     }
 }
