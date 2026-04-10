@@ -4,12 +4,12 @@ services:
   postgres:
     image: postgres:16-alpine
     container_name: meuplantao-db
+    ports:
+    - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 8643
       POSTGRES_DB: MeuPlantaoDB
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,9 +22,7 @@ services:
     restart: unless-stopped
 
   backend:
-    build:
-      context: .
-      dockerfile: dockerfile
+    image: zhunixy/meuplantao:1.5
     container_name: meuplantao-api
     environment:
       ASPNETCORE_ENVIRONMENT: Production
@@ -35,12 +33,10 @@ services:
       Jwt__Audience: MeuPlantaoUsers
       Jwt__ExpiresInHours: 8
     ports:
-      - "8082:8082"
+      - "80:8082"
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./MeuPlantao:/app/source
     networks:
       - meuplantao-network
     restart: unless-stopped
