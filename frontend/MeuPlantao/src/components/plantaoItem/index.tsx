@@ -9,11 +9,12 @@ type Props = TouchableOpacityProps & {
     locale: string
     sector: string
     oncall?: string
+    onDetails: () => void
 }
 
-export function PlantaoItem({date, start, duration, locale, sector, oncall, ...rest}: Props) {
+export function PlantaoItem({date, start, duration, locale, sector, oncall, onDetails, ...rest}: Props) {
     return (
-        <TouchableOpacity style={styles.container} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.container} activeOpacity={0.7} onPress={onDetails}>
             <View style={styles.nav}>
                 <View>
                     <Text style={styles.title}>{locale}</Text>

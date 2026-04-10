@@ -11,7 +11,6 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-end",
         bottom: 90
-
     },
     modalContent: {
         width: "100%",

@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using MeuPlantao.Application.Services.PlantaoHistorico;
 using MeuPlantao.Application.Services.TrocaHistorico;
 using MeuPlantao.Communication.Dto.Requests;
+using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Communication.Enums;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
@@ -23,19 +24,48 @@ namespace MeuPlantao.Application.Services.Plantao
 
         }
 
-        public async Task<List<PlantaoModel>> Consultar()
+        public async Task<ServiceResponse<List<ResponsePlantaoJson>>> Consultar()
         {
-            return await _repository.Consultar<PlantaoModel>()
-                .OrderBy(p => p.Id)
-                .ToListAsync();
+            var query = _repository.Consultar<PlantaoModel>()
+                .OrderBy(p => p.Id);
+
+            var plantoes = await query.Select(p => new ResponsePlantaoJson
+                {
+                    Valor = p.Valor,
+                    SetorId = p.SetorId,
+                    Inicio = p.Fim,
+                    Fim = p.Fim
+                }).ToListAsync();
+
+            return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
         }
 
-        public async Task<PlantaoModel?> ConsultarId(long id)
+        public async Task<ServiceResponse<ResponsePlantaoJson>> ConsultarId(long id)
         {
-            return await _repository.ConsultarPorId<PlantaoModel>(id);
+            var result = await _repository.ConsultarPorId<PlantaoModel>(id);
+
+            if (result is null)
+                return ServiceResponse<ResponsePlantaoJson>.BadRequest("Plantao nao existe");
+            if (result.ProfissionalResponsavelId is null)
+                return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
+                {
+                    Valor = result.Valor,
+                    SetorId = result.SetorId,
+                    Inicio = result.Inicio,
+                    Fim = result.Fim,
+                });
+
+            return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
+            {
+                Valor = result.Valor,
+                SetorId = result.SetorId,
+                Inicio = result.Inicio,
+                Fim = result.Fim,
+                ProfissionalResponsavelId = (long)result.ProfissionalResponsavelId
+            });
         }
 
-        public async Task<bool> Cadastrar(RequestPlantaoRegisterJson plantao, long userId)
+        public async Task<ServiceResponse<bool>> Cadastrar(RequestPlantaoRegisterJson plantao, long userId)
         {
             await _unit.BeginTransaction();
 
@@ -44,14 +74,14 @@ namespace MeuPlantao.Application.Services.Plantao
                 var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
 
                 if (setorExistente is null)
-                    throw new Exception("setor não existe");
+                    return ServiceResponse<bool>.BadRequest("setor não existe");
                 if (setorExistente.RepresentanteId != userId)
-                    throw new Exception("Apenas o representate do setor é capaz de registrar plantoes para o respectivo setor");
+                    return ServiceResponse<bool>.BadRequest("Apenas o representate do setor é capaz de registrar plantoes para o respectivo setor");
 
                 var novo = new PlantaoModel
                 {
                     SetorId = plantao.SetorId,
-                    Setor = setorExistente,
+                    Valor = plantao.Valor,
                     Inicio = plantao.Inicio,
                     Fim = plantao.Fim,
                     Status = StatusPlantaoEnum.AguardandoProfissional
@@ -69,22 +99,24 @@ namespace MeuPlantao.Application.Services.Plantao
                 await _unit.Commit();              // salva no banco
                 await _unit.CommitTransaction();   // confirma transação
                 
-                return true;
+                return ServiceResponse<bool>.Ok(true);
             }
             catch
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error("Nao foi possivel cadastrar esse plantao");
             }
         }
 
-        public async Task<bool> Editar(RequestPlantaoRegisterJson plantao)
+        public async Task<ServiceResponse<bool>> Editar(RequestPlantaoRegisterJson plantao, long userId)
         {
-            // Valida se o setor e o profissional existem antes de editar o plantão
+            // Valida se o setor existem antes de editar o plantão
             var setorExistente = await _repository.ConsultarPorId<SetorModel>(plantao.SetorId);
 
             if (setorExistente is null)
-                return false;
+                return ServiceResponse<bool>.BadRequest("Setor nao existe");
+            if (setorExistente.RepresentanteId != userId)
+                return ServiceResponse<bool>.BadRequest("Plantao apenas pode ser editado pelo representante do setor");
 
             var novo = new PlantaoModel
             {
@@ -96,21 +128,45 @@ namespace MeuPlantao.Application.Services.Plantao
             };
 
             await _repository.Editar(novo);
-            return await _unit.Commit(); 
+            var saved = await _unit.Commit(); 
+            if (saved)
+                return ServiceResponse<bool>.Ok(true);
+
+            return ServiceResponse<bool>.Error("Nao foi possivel editar esse plantao");
         }
 
-        public async Task<PlantaoModel?> Deletar(long id)
+        public async Task<ServiceResponse<ResponsePlantaoJson>> Deletar(long id)
         {
-            var existente = await ConsultarId(id);
+            var existente = await _repository.ConsultarPorId<PlantaoModel>(id);
             if (existente is null)
-                return null;
+                return ServiceResponse<ResponsePlantaoJson>.BadRequest("Plantao nao existe");
 
             await _repository.Excluir(existente);
-            await _unit.Commit();
-            return existente;
+            var saved = await _unit.Commit();
+            if (saved){
+                if (existente.ProfissionalResponsavelId is null)
+                    return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
+                    {
+                        Valor = existente.Valor,
+                        SetorId = existente.SetorId,
+                        Inicio = existente.Inicio,
+                        Fim = existente.Fim,
+                    });
+
+                return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
+                {
+                    Valor = existente.Valor,
+                    SetorId = existente.SetorId,
+                    Inicio = existente.Inicio,
+                    Fim = existente.Fim,
+                    ProfissionalResponsavelId = (long)existente.ProfissionalResponsavelId
+                });
+            }
+
+            return ServiceResponse<ResponsePlantaoJson>.Error("Nao foi possivel deletar esse plantao");
         }
 
-        public async Task<bool> Solicitar(long id, long userId)
+        public async Task<ServiceResponse<bool>> Solicitar(long id, long userId)
         {
             await _unit.BeginTransaction();
 
@@ -122,12 +178,12 @@ namespace MeuPlantao.Application.Services.Plantao
                 var prof = await _profRepository.ConsultarPorUserId(userId);
 
                 if (plantao is null)
-                    throw new Exception("plantao não existe");
+                    return ServiceResponse<bool>.BadRequest("plantao não existe");
                 if (prof is null)
-                    throw new Exception("É necessario estar logado como um profissional");
+                    return ServiceResponse<bool>.BadRequest("É necessario estar logado como um profissional");
 
                 if (plantao.Status != StatusPlantaoEnum.AguardandoProfissional)
-                    throw new Exception("plantao nao esta em estado de aguardando usuario");
+                    return ServiceResponse<bool>.BadRequest("plantao nao esta em estado de aguardando usuario");
 
                 plantao.Status = StatusPlantaoEnum.AguardandoRespostaSolicitacao;
                 plantao.SolicitanteId = prof.Id;
@@ -144,16 +200,16 @@ namespace MeuPlantao.Application.Services.Plantao
                 await _unit.Commit();              // salva no banco
                 await _unit.CommitTransaction();   // confirma transação
                 
-                return true;
+                return ServiceResponse<bool>.Ok(true);
             }
             catch
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error("Nao foi possivel socilitar esse plantao");
             }
         }
 
-        public async Task<bool> AceitarSolicitacao(long id, long userId)
+        public async Task<ServiceResponse<bool>> AceitarSolicitacao(long id, long userId)
         {
             await _unit.BeginTransaction();
 
@@ -161,13 +217,13 @@ namespace MeuPlantao.Application.Services.Plantao
                 var plantao = await _repository.ConsultarPlantaoCompleto(id);
 
                 if (plantao is null)
-                    throw new Exception("Plantao nao existe");
+                    return ServiceResponse<bool>.BadRequest("Plantao nao existe");
 
                 if (plantao.Setor.RepresentanteId != userId)
-                    throw new Exception("Apenas o representante pode aceitar solicitacoes");
+                    return ServiceResponse<bool>.BadRequest("Apenas o representante pode aceitar solicitacoes");
 
                 if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
-                    throw new Exception("Plantao não esta aguardando repostas de solicitacao");
+                    return ServiceResponse<bool>.BadRequest("Plantao não esta aguardando repostas de solicitacao");
 
                 plantao.Status = StatusPlantaoEnum.Ativo;
                 plantao.ProfissionalResponsavelId = plantao.SolicitanteId;
@@ -185,15 +241,15 @@ namespace MeuPlantao.Application.Services.Plantao
                 await _unit.Commit();              // salva no banco
                 await _unit.CommitTransaction();   // confirma transação
                 
-                return true;
+                return ServiceResponse<bool>.Ok(true);
             }
             catch
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error("Nao foi possivel aceitar essa solicitacao");
             }
         }
-        public async Task<bool> RecusarSolicitacao(long id, long userId)
+        public async Task<ServiceResponse<bool>> RecusarSolicitacao(long id, long userId)
         {
             await _unit.BeginTransaction();
             try
@@ -201,13 +257,13 @@ namespace MeuPlantao.Application.Services.Plantao
                 var plantao = await _repository.ConsultarPlantaoCompleto(id);
 
                 if (plantao is null)
-                    throw new Exception("Plantao nao existe");
+                    return ServiceResponse<bool>.BadRequest("Plantao nao existe");
 
                 if (plantao.Setor.RepresentanteId != userId)
-                    throw new Exception("Apenas o representante pode recusar solicitacoes");
+                    return ServiceResponse<bool>.BadRequest("Apenas o representante pode recusar solicitacoes");
 
                 if (plantao.Status != StatusPlantaoEnum.AguardandoRespostaSolicitacao)
-                    throw new Exception("Plantao não esta aguardando repostas de solicitacao");
+                    return ServiceResponse<bool>.BadRequest("Plantao não esta aguardando repostas de solicitacao");
 
                 plantao.Status = StatusPlantaoEnum.AguardandoProfissional;
                 plantao.SolicitanteId = null;
@@ -224,12 +280,12 @@ namespace MeuPlantao.Application.Services.Plantao
                 await _unit.Commit();              // salva no banco
                 await _unit.CommitTransaction();   // confirma transação
                 
-                return true;
+                return ServiceResponse<bool>.Ok(true);
             }
             catch
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error("Nao foi possivel recusar essa solicitacao");
             }
         }
     }

@@ -1,8 +1,10 @@
-import { FlatList, View, Text, Image } from "react-native";
+import { FlatList, View, Text, Image, Modal, TouchableOpacity } from "react-native";
 import { useState } from "react";
+import { Ionicons } from "@expo/vector-icons"
 
 import { styles } from "./styles";
 import { options } from "@/utils/options";
+import { colors } from "@/styles/colors";
 
 import { NavLink } from "@/components/navLink";
 import { ScreenHome } from "@/components/screenHome";
@@ -45,7 +47,6 @@ export default function InterfaceUser() {
             style={styles.navBar}
             contentContainerStyle={styles.navBarContent}
             />
-                    
         </View>
     )
 }

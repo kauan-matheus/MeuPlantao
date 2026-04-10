@@ -11,6 +11,7 @@ public class PlantaoModel
     public ProfissionalModel? ProfissionalResponsavel { get; set; }
     public long? SolicitanteId { get; set; }
     public ProfissionalModel? Solicitante { get; set; }
+    public float Valor { get; set; }
     public DateTime Inicio { get; set; }
     public DateTime Fim { get; set; }
     public StatusPlantaoEnum Status { get; set; }
