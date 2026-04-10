@@ -59,13 +59,11 @@ export default function Index() {
                             <Input
                             type="text"
                             placeholder="Nome de Usuário"
-                            placeholderTextColor={colors.gray[200]}
                             onChangeText={console.log}
                             />
                             <Input
                             type="password"
                             placeholder="Senha"
-                            placeholderTextColor={colors.gray[200]}
                             onChangeText={console.log}
                             />
                             <Button 
