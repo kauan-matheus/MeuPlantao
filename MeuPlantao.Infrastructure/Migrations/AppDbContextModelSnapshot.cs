@@ -82,6 +82,9 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<float>("Valor")
+                        .HasColumnType("real");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProfissionalResponsavelId");

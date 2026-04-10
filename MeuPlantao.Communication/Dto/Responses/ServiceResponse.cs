@@ -1,15 +1,15 @@
 namespace MeuPlantao.Communication.Dto.Responses;
 
-public class AuthServiceResponse<T>
+public class ServiceResponse<T>
 {
     public bool Success { get; set; }
     public int StatusCode { get; set; }
     public string? Message { get; set; }
     public T? Data { get; set; }
 
-    public static AuthServiceResponse<T> Ok(T data)
+    public static ServiceResponse<T> Ok(T data)
     {
-        return new AuthServiceResponse<T>
+        return new ServiceResponse<T>
         {
             Success = true,
             StatusCode = 200,
@@ -17,9 +17,9 @@ public class AuthServiceResponse<T>
         };
     }
 
-    public static AuthServiceResponse<T> BadRequest(string message)
+    public static ServiceResponse<T> BadRequest(string message)
     {
-        return new AuthServiceResponse<T>
+        return new ServiceResponse<T>
         {
             Success = false,
             StatusCode = 400,
@@ -27,9 +27,9 @@ public class AuthServiceResponse<T>
         };
     }
 
-    public static AuthServiceResponse<T> Unauthorized(string message)
+    public static ServiceResponse<T> Unauthorized(string message)
     {
-        return new AuthServiceResponse<T>
+        return new ServiceResponse<T>
         {
             Success = false,
             StatusCode = 401,
@@ -37,9 +37,9 @@ public class AuthServiceResponse<T>
         };
     }
 
-    public static AuthServiceResponse<T> Error(string message)
+    public static ServiceResponse<T> Error(string message)
     {
-        return new AuthServiceResponse<T>
+        return new ServiceResponse<T>
         {
             Success = false,
             StatusCode = 500,
