@@ -1,10 +1,9 @@
-import { FlatList, View, Text, Image, Modal, TouchableOpacity } from "react-native";
+import { FlatList, View, Text, Image } from "react-native";
 import { useState } from "react";
-import { Ionicons } from "@expo/vector-icons"
+import { useFonts } from "expo-font";
 
 import { styles } from "./styles";
 import { options } from "@/utils/options";
-import { colors } from "@/styles/colors";
 
 import { NavLink } from "@/components/navLink";
 import { ScreenHome } from "@/components/screenHome";
@@ -15,6 +14,15 @@ import { ScreenProfile } from "@/components/screenProfile";
 export default function InterfaceUser() {
 
     const [option, setOption] = useState(options[0].name)
+    
+    const [fonts] = useFonts({
+        'Poppins-Regular': require('@/assets/fonts/Poppins-Regular.ttf'),
+        'Poppins-Bold': require('@/assets/fonts/Poppins-Bold.ttf'),
+    })
+
+    if (!fonts) {
+        return null;
+    }
 
     return (
         <View style={styles.container}>

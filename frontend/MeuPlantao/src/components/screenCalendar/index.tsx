@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from "react-native";
+import { View } from "react-native";
 import { LocaleConfig, Calendar} from 'react-native-calendars';
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
@@ -81,7 +81,7 @@ export function ScreenCalendar() {
                 <Input 
                 type="text"
                 icon="search-sharp"
-                placeholder="Procure pelo local..."
+                placeholder="Pesquisar"
                 onChangeText={setSearch}
                 />
                 <ListPlantao plantao={plantao} />
