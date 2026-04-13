@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeuPlantao.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260410114628_Initial")]
+    [Migration("20260413180314_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -79,9 +79,6 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.Property<long>("SetorId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("SolicitanteId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -93,8 +90,6 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.HasIndex("ProfissionalResponsavelId");
 
                     b.HasIndex("SetorId");
-
-                    b.HasIndex("SolicitanteId");
 
                     b.ToTable("Plantoes");
                 });
@@ -160,6 +155,33 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.HasIndex("RepresentanteId");
 
                     b.ToTable("Setores");
+                });
+
+            modelBuilder.Entity("MeuPlantao.Domain.Entities.SolicitacaoModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<long>("PlantaoId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProfissionalId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfissionalId");
+
+                    b.HasIndex("PlantaoId", "ProfissionalId")
+                        .IsUnique();
+
+                    b.ToTable("SolicitacaoModel");
                 });
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.TrocaHistoricoModel", b =>
@@ -295,15 +317,9 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MeuPlantao.Domain.Entities.ProfissionalModel", "Solicitante")
-                        .WithMany()
-                        .HasForeignKey("SolicitanteId");
-
                     b.Navigation("ProfissionalResponsavel");
 
                     b.Navigation("Setor");
-
-                    b.Navigation("Solicitante");
                 });
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.ProfissionalModel", b =>
@@ -326,6 +342,25 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Representante");
+                });
+
+            modelBuilder.Entity("MeuPlantao.Domain.Entities.SolicitacaoModel", b =>
+                {
+                    b.HasOne("MeuPlantao.Domain.Entities.PlantaoModel", "Plantao")
+                        .WithMany("Solicitacoes")
+                        .HasForeignKey("PlantaoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MeuPlantao.Domain.Entities.ProfissionalModel", "Profissional")
+                        .WithMany()
+                        .HasForeignKey("ProfissionalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Plantao");
+
+                    b.Navigation("Profissional");
                 });
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.TrocaHistoricoModel", b =>
@@ -372,6 +407,11 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.Navigation("Plantao");
 
                     b.Navigation("Solicitante");
+                });
+
+            modelBuilder.Entity("MeuPlantao.Domain.Entities.PlantaoModel", b =>
+                {
+                    b.Navigation("Solicitacoes");
                 });
 #pragma warning restore 612, 618
         }
