@@ -43,7 +43,7 @@ export function ScreenHistory() {
                 placeholder="Pesquisar"
                 onChangeText={setSearch}
                 />
-                <ListPlantao plantao={plantao} />
+                <ListPlantao plantao={plantao} showFooter={true} isEmpty="Sem histórico de plantões" />
             </View>
         </View>
     )

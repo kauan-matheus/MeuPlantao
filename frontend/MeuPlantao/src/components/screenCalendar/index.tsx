@@ -84,7 +84,7 @@ export function ScreenCalendar() {
                 placeholder="Pesquisar"
                 onChangeText={setSearch}
                 />
-                <ListPlantao plantao={plantao} />
+                <ListPlantao plantao={plantao} showFooter={true} isEmpty="Não há plantões para solicitar" />
             </View>
         </View>
     )

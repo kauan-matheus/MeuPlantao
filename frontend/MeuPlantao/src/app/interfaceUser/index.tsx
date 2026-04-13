@@ -26,14 +26,16 @@ export default function InterfaceUser() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.top}>
-                <View style={styles.topDiv}>
-                    <Image source={require("@/assets/images/profile.jpg")} style={styles.imageProfile} />
+            {option !== "Profile" && (
+                <View style={styles.top}>
+                    <View style={styles.topDiv}>
+                        <Image source={require("@/assets/images/profile.jpg")} style={styles.imageProfile} />
+                    </View>
+                    <View style={styles.topDiv}>
+                        <Text style={styles.topText}>Olá, User da Silva 👋</Text>
+                    </View>
                 </View>
-                <View style={styles.topDiv}>
-                    <Text style={styles.topText}>Olá, User da Silva 👋</Text>
-                </View>
-            </View>
+            )}
             <View style={styles.content}>
                 {option === "Home" ? <ScreenHome /> :
                 option === "Calendar" ? <ScreenCalendar /> :
