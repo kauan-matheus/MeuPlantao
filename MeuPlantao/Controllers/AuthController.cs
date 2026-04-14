@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
         return StatusCode(response.StatusCode, response.Message);
     }
 
-    [HttpPost("/auth/register-medico")]
+    [HttpPost("/auth/register-medico/testandooo")]
     [AllowAnonymous] // Registro padrão é público e cria usuário profissional
     [ProducesResponseType(typeof(ResponseAuthRegisterJson), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
