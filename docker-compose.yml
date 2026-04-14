@@ -22,10 +22,10 @@ services:
     restart: unless-stopped
 
   backend:
-    image: zhunixy/meuplantao:1.5
+    image: zhunixy/meuplantao:1.5.3
     container_name: meuplantao-api
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8082
       ConnectionStrings__Default: Host=postgres;Port=5432;Database=MeuPlantaoDB;Username=postgres;Password=8643
       Jwt__Key: ThisIsAMuchLongerSecretKeyForJWTAuthenticationWithMoreThan256Bits123456789
