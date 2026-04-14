@@ -1,5 +1,5 @@
 import { FlatList, View, Text, Image } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 
 import { styles } from "./styles";
@@ -11,9 +11,15 @@ import { ScreenCalendar } from "@/components/screenCalendar";
 import { ScreenHistory } from "@/components/screenHistory";
 import { ScreenProfile } from "@/components/screenProfile";
 
+import { getPlantoes } from "@/services/plantao";
+
 export default function InterfaceUser() {
 
     const [option, setOption] = useState(options[0].name)
+
+    useEffect(() => {
+        getPlantoes()
+    }, [])
     
     const [fonts] = useFonts({
         'Poppins-Regular': require('@/assets/fonts/Poppins-Regular.ttf'),

@@ -11,6 +11,8 @@ import { colors } from "@/styles/colors"
 import { Input } from "@/components/input/input"
 import { Button } from "@/components/button"
 
+import { login } from "@/services/user"
+
 export default function Index() {
 
     const [showModal, setShowModal] = useState(false)
@@ -70,7 +72,10 @@ export default function Index() {
                             text="Entrar"
                             color={colors.blue[500]}
                             textColor={colors.gray[700]}
-                            onPress={() => router.navigate("./interfaceUser")}
+                            onPress={() => {
+                                // login()
+                                router.navigate("./interfaceUser")
+                            }}
                             />
                         </View>
 
