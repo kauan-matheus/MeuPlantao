@@ -23,7 +23,7 @@ jobs:
         with:
           context: .
           # Importante: Garanta que o Dockerfile do backend esteja na raiz ou aponte o caminho correto
-          file: ./Dockerfile 
+          file: ./dockerfile 
           push: true
           tags: zhunixy/meuplantao:latest
 
