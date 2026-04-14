@@ -46,21 +46,21 @@ namespace MeuPlantao.Application.Services.Plantao
             }
         }
 
-        public async Task<ServiceResponse<List<ProfissionalModel>>> ConsultarSolicitacoes(long id)
+        public async Task<ServiceResponse<List<SolicitacaoModel>>> ConsultarSolicitacoes(long id)
         {
             try
             {
                 var plantao = await _repository.ConsultarPorId<PlantaoModel>(id);
                 if (plantao is null)
-                    return ServiceResponse<List<ProfissionalModel>>.BadRequest("Plantao nao existe");
+                    return ServiceResponse<List<SolicitacaoModel>>.BadRequest("Plantao nao existe");
 
                 var solicitacoes = await _repository.ConsultarSolicitacoes(id).ToListAsync();
 
-                return ServiceResponse<List<ProfissionalModel>>.Ok(solicitacoes);
+                return ServiceResponse<List<SolicitacaoModel>>.Ok(solicitacoes);
             }
             catch (Exception ex)
             {
-                return ServiceResponse<List<ProfissionalModel>>.Error(ex.Message);
+                return ServiceResponse<List<SolicitacaoModel>>.Error(ex.Message);
             }
         }
 
@@ -275,7 +275,8 @@ namespace MeuPlantao.Application.Services.Plantao
                 if (plantao is null)
                     return ServiceResponse<bool>.BadRequest("Plantao nao existe");
 
-                var solicitacao = plantao.Solicitacoes.FirstOrDefault(s => s.ProfissionalId == solicitanteId);
+                var solicitacoes = await _repository.ConsultarSolicitacoes(id).ToListAsync();
+                var solicitacao = solicitacoes.FirstOrDefault(s => s.ProfissionalId == solicitanteId);
 
                 if (plantao.Setor.RepresentanteId != userId)
                     return ServiceResponse<bool>.BadRequest("Apenas o representante pode aceitar solicitacoes");

@@ -178,7 +178,7 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.HasIndex("PlantaoId", "ProfissionalId")
                         .IsUnique();
 
-                    b.ToTable("SolicitacaoModel");
+                    b.ToTable("Solicitacoes");
                 });
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.TrocaHistoricoModel", b =>

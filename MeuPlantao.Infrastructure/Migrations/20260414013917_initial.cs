@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeuPlantao.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Inicial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,7 +80,7 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SetorId = table.Column<long>(type: "bigint", nullable: false),
                     ProfissionalResponsavelId = table.Column<long>(type: "bigint", nullable: true),
-                    SolicitanteId = table.Column<long>(type: "bigint", nullable: true),
+                    Valor = table.Column<float>(type: "real", nullable: false),
                     Inicio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Fim = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false)
@@ -91,11 +91,6 @@ namespace MeuPlantao.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_Plantoes_Profissionais_ProfissionalResponsavelId",
                         column: x => x.ProfissionalResponsavelId,
-                        principalTable: "Profissionais",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Plantoes_Profissionais_SolicitanteId",
-                        column: x => x.SolicitanteId,
                         principalTable: "Profissionais",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -131,6 +126,33 @@ namespace MeuPlantao.Infrastructure.Migrations
                         name: "FK_HistoricoPlantao_Usuarios_UsuarioId",
                         column: x => x.UsuarioId,
                         principalTable: "Usuarios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Solicitacoes",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PlantaoId = table.Column<long>(type: "bigint", nullable: false),
+                    ProfissionalId = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Solicitacoes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Solicitacoes_Plantoes_PlantaoId",
+                        column: x => x.PlantaoId,
+                        principalTable: "Plantoes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Solicitacoes_Profissionais_ProfissionalId",
+                        column: x => x.ProfissionalId,
+                        principalTable: "Profissionais",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -231,11 +253,6 @@ namespace MeuPlantao.Infrastructure.Migrations
                 column: "SetorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Plantoes_SolicitanteId",
-                table: "Plantoes",
-                column: "SolicitanteId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Profissionais_UserId",
                 table: "Profissionais",
                 column: "UserId",
@@ -245,6 +262,17 @@ namespace MeuPlantao.Infrastructure.Migrations
                 name: "IX_Setores_RepresentanteId",
                 table: "Setores",
                 column: "RepresentanteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Solicitacoes_PlantaoId_ProfissionalId",
+                table: "Solicitacoes",
+                columns: new[] { "PlantaoId", "ProfissionalId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Solicitacoes_ProfissionalId",
+                table: "Solicitacoes",
+                column: "ProfissionalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TrocaPlantoes_DestinatarioId",
@@ -270,6 +298,9 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "HistoricoPlantao");
+
+            migrationBuilder.DropTable(
+                name: "Solicitacoes");
 
             migrationBuilder.DropTable(
                 name: "TrocaPlantoes");

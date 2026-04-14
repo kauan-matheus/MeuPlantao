@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeuPlantao.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260413180314_Initial")]
-    partial class Initial
+    [Migration("20260414013917_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -181,7 +181,7 @@ namespace MeuPlantao.Infrastructure.Migrations
                     b.HasIndex("PlantaoId", "ProfissionalId")
                         .IsUnique();
 
-                    b.ToTable("SolicitacaoModel");
+                    b.ToTable("Solicitacoes");
                 });
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.TrocaHistoricoModel", b =>

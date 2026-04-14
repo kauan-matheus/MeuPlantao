@@ -48,11 +48,11 @@ namespace MeuPlantao.Infrastructure.Repository
             
         }
 
-        public IQueryable<ProfissionalModel> ConsultarSolicitacoes(long id)
+        public IQueryable<SolicitacaoModel> ConsultarSolicitacoes(long id)
         {
             return _appDbContext.Solicitacoes
                 .Where(m => m.PlantaoId == id)
-                .Select(m => m.Profissional)
+                .Include(m => m.Profissional)
                 .OrderByDescending(m => m.Id);
 
         }
