@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using MeuPlantao.Domain.Entities;
 using MeuPlantao.Application.Services.TrocaHistorico;
 using MeuPlantao.Application.Services.TrocaPlantao;
 using System.IdentityModel.Tokens.Jwt;

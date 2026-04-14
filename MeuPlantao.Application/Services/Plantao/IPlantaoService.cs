@@ -7,7 +7,7 @@ namespace MeuPlantao.Application.Services.Plantao
     public interface IPlantaoService
     {
         Task<ServiceResponse<List<PlantaoModel>>> Consultar();
-        Task<ServiceResponse<List<SolicitacaoModel>>> ConsultarSolicitacoes(long id);
+        Task<ServiceResponse<List<ResponseSolicitacoesJson>>> ConsultarSolicitacoes(long id);
         // Nullable pois o plantão pode não ser encontrado
         Task<ServiceResponse<PlantaoModel>> ConsultarId(long id);
 
