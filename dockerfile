@@ -20,9 +20,6 @@ RUN dotnet publish "MeuPlantao/MeuPlantao.csproj" \
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-RUN apk add --no-cache icu-libs tzdata curl
-
 WORKDIR /app
 
 EXPOSE 8082
