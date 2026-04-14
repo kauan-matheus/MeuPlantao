@@ -2,7 +2,9 @@ name: Deploy Backend to EC2
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+    - main
+    - master
 
 jobs:
   build-and-push:
@@ -35,11 +37,11 @@ jobs:
       - name: SSH and Update EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-        host: ${{ vars.EC2_HOST }}
-        username: ${{ vars.EC2_USER }}
-        key: ${{ vars.EC2_SSH_KEY }}
+          host: ${{ vars.EC2_HOST }}
+          username: ${{ vars.EC2_USER }}
+          key: ${{ vars.EC2_SSH_KEY }}
           script: |
-            cd ~/meuplantao
-            docker compose pull backend
-            docker compose up -d
-            docker image prune -f
+              cd ~/meuplantao
+              docker compose pull backend
+              docker compose up -d
+              docker image prune -f
