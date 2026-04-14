@@ -1,54 +1,100 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MeuPlantao.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using MeuPlantao.Application.Services.Profissional;
 using MeuPlantao.Communication.Dto.Requests;
-using MeuPlantao.Entities;
+using MeuPlantao.Communication.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MeuPlantao.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]
+[Authorize] // Todos os endpoints exigem autenticação por padrão
 public class ProfissionaisController : ControllerBase
 {
-    private readonly AppDbContext _appDbContext;
+    // Injeta a interface, não a classe concreta — segue Clean Architecture
+    private readonly IProfissionalService _service;
 
-    public ProfissionaisController(AppDbContext appDbContext)
+    public ProfissionaisController(IProfissionalService service)
     {
-        _appDbContext = appDbContext;
+        _service = service;
     }
 
     [HttpGet("profissionais")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetProfissionais()
     {
-        var resultado = await _appDbContext.Profissionais.ToListAsync();
-        return Ok(resultado);
+        var response = await _service.Consultar();
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+
+    [HttpGet("profissionais/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
+    public async Task<IActionResult> GetProfissionalId(long id)
+    {
+        var response = await _service.ConsultarId(id);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+    [HttpGet("profissionais/user{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
+    public async Task<IActionResult> GetProfissionalIUserd(long id)
+    {
+        var response = await _service.ConsultarUserId(id);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("profissionais")]
-    public async Task<IActionResult> PostProfissional([FromBody]  RequestProfissionalRegisterJson profissional)
+    [Authorize(Roles = nameof(RoleEnum.Admin))] // Escrita restrita ao admin
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PostProfissional([FromBody] RequestProfissionalRegisterJson profissional)
     {
         if (!ModelState.IsValid)
-        {
             return BadRequest(ModelState);
-        }
 
-        var UserExiste = await _appDbContext.Usuarios
-            .FindAsync(profissional.UserId);
+        var response = await _service.Cadastrar(profissional);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        if (UserExiste == null)
-            return BadRequest("Usuario não encontrado");
-
-        var novo = new ProfissionalModel
-        {
-            Nome = profissional.Nome,
-            Crm = profissional.Crm,
-            Telefone = profissional.Telefone,
-            UserId = profissional.UserId,
-            User = UserExiste
-        };
-
-        _appDbContext.Profissionais.Add(novo);
-        await _appDbContext.SaveChangesAsync();
-
-        return Created("Profissional adcionado", profissional);
+        return StatusCode(response.StatusCode, response.Message);
     }
-    
+
+    [HttpPut("profissionais")]
+    [Authorize(Roles = nameof(RoleEnum.Admin))] // Edição restrita ao admin
+    [ProducesResponseType(StatusCodes.Status200OK)] // PUT bem-sucedido retorna 200, não 201
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> PutProfissionais([FromBody] RequestProfissionalRegisterJson profissional)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var response = await _service.Editar(profissional);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+
+    [HttpDelete("profissionais/{id}")]
+    [Authorize(Roles = nameof(RoleEnum.Admin))] // Exclusão restrita ao admin
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado
+    public async Task<IActionResult> DeleteProfissionais(long id)
+    {
+        var response = await _service.Deletar(id);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
 }

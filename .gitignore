@@ -5,3 +5,13 @@ riderModule.iml
 /_ReSharper.Caches/
 /.vs
 *.user
+
+.fake
+
+# Docker & Local Development
+DOCKER_GUIDE.md
+DOCKER_ARCHITECTURE.md
+docker-helper.ps1
+.env
+.env.local
+.env.*.local

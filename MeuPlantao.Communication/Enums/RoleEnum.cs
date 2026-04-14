@@ -3,7 +3,7 @@
 public enum RoleEnum
 {
     Admin = 0,
-    Medico = 1,
-    Enfermeiro = 2
+    Gestor = 1,
+    Profissional = 2
 
 };
