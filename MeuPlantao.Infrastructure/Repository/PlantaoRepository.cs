@@ -47,5 +47,14 @@ namespace MeuPlantao.Infrastructure.Repository
             return true;
             
         }
+
+        public IQueryable<SolicitacaoModel> ConsultarSolicitacoes(long id)
+        {
+            return _appDbContext.Solicitacoes
+                .Where(m => m.PlantaoId == id)
+                .Include(m => m.Profissional)
+                .OrderByDescending(m => m.Id);
+
+        }
     }
 }

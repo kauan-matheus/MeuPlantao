@@ -21,7 +21,7 @@ export function PlantaoItem({date, start, duration, locale, sector, oncall, onDe
                     <Text style={styles.subTitle}>{sector}</Text>
                 </View>
                 <View>
-                    <Text style={[styles.status, {backgroundColor: oncall ? colors.red[100] : colors.blue[500]}]}>
+                    <Text style={[styles.status, {backgroundColor: oncall ? colors.red[300] : colors.blue[500]}]}>
                         {oncall ? "Reservado" : "Disponível"}
                     </Text>
                 </View>

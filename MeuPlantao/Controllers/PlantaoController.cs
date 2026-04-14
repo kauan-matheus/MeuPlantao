@@ -29,6 +29,18 @@ public class PlantaoController : ControllerBase
         return StatusCode(response.StatusCode, response.Message);
     }
 
+    [HttpGet("plantoes/{id}/solicitacoes")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSolicitacoes(long id)
+    {
+        var response = await _service.ConsultarSolicitacoes(id);
+
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+
     [HttpGet("plantoes/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
@@ -109,14 +121,14 @@ public class PlantaoController : ControllerBase
     [HttpPut("plantoes/{id}/aceitar")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AceitarSolicitacao(long id)
+    public async Task<IActionResult> AceitarSolicitacao(long id, long solicitanteId)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var userId = GetUserId();
 
-        var response = await _service.AceitarSolicitacao(id, userId);
+        var response = await _service.AceitarSolicitacao(id, solicitanteId, userId);
         if (response.Success)
             return StatusCode(response.StatusCode, response.Data);
 
@@ -126,14 +138,14 @@ public class PlantaoController : ControllerBase
     [HttpPut("plantoes/{id}/recusar")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> RecusarSolicitacao(long id)
+    public async Task<IActionResult> RecusarSolicitacao(long id, long solicitanteId)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var userId = GetUserId();
 
-        var response = await _service.RecusarSolicitacao(id, userId);
+        var response = await _service.RecusarSolicitacao(id, solicitanteId, userId);
         if (response.Success)
             return StatusCode(response.StatusCode, response.Data);
 

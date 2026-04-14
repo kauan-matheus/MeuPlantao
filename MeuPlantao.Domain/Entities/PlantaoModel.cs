@@ -9,8 +9,9 @@ public class PlantaoModel
     public SetorModel Setor { get; set; } = null!;
     public long? ProfissionalResponsavelId { get; set; }
     public ProfissionalModel? ProfissionalResponsavel { get; set; }
-    public long? SolicitanteId { get; set; }
-    public ProfissionalModel? Solicitante { get; set; }
+    //public long? SolicitanteId { get; set; }
+    //public ProfissionalModel? Solicitante { get; set; }
+    public ICollection<SolicitacaoModel> Solicitacoes { get; set; } = new List<SolicitacaoModel>();
     public float Valor { get; set; }
     public DateTime Inicio { get; set; }
     public DateTime Fim { get; set; }

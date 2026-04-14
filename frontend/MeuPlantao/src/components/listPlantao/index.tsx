@@ -9,10 +9,12 @@ import { PlantaoItem } from "../plantaoItem"
 import { Plantao } from "@/utils/plantoes"
 
 type Props = {
-    plantao: Plantao[]
+    plantao: Plantao[],
+    showFooter: boolean,
+    isEmpty: string
 }
 
-export function ListPlantao({plantao}: Props) {
+export function ListPlantao({plantao, showFooter, isEmpty}: Props) {
 
     const [showModal, setShowModal] = useState(false)
 
@@ -34,9 +36,9 @@ export function ListPlantao({plantao}: Props) {
             )}
             style={styles.listContent}
             ListEmptyComponent={() => (
-                <Text style={styles.textListEmpty}>Nenhum plantão disponível</Text>
+                <Text style={styles.textListEmpty}>{isEmpty}</Text>
             )}
-            ListFooterComponent={() => (
+            ListFooterComponent={() => showFooter && (
                 <View style={styles.footer}></View>
             )}
             showsVerticalScrollIndicator={false}
