@@ -2,8 +2,8 @@ import { api } from "./api";
 
 export const getPlantoes = async () => {
     try {
-        const response = await api.get("/Plantao/plantoes")
-        console.log(response)
+        const response = await api.get("api/Plantao/plantoes")
+        console.log(response.data)
     } catch (error) {
         console.error(error)
     }
