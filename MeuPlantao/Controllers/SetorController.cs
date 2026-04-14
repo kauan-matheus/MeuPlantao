@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-using MeuPlantao.Data;
-using MeuPlantao.Entities;
-=======
-﻿using MeuPlantao.Application.Services.Setor;
+using MeuPlantao.Application.Services.Setor;
 using MeuPlantao.Communication.Dto.Requests;
->>>>>>> development
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeuPlantao.Controllers;
