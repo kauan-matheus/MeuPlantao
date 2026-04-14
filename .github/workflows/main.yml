@@ -30,13 +30,14 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    environment: .env
     steps:
       - name: SSH and Update EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ vars.EC2_HOST }}
-          username: ${{ vars.EC2_USER }}
-          key: ${{ vars.EC2_SSH_KEY }}
+        host: ${{ vars.EC2_HOST }}
+        username: ${{ vars.EC2_USER }}
+        key: ${{ vars.EC2_SSH_KEY }}
           script: |
             cd ~/meuplantao
             docker compose pull backend
