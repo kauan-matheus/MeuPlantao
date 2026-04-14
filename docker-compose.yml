@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
 
   backend:
-    image: zhunixy/meuplantao:1.5.3
+    image: zhunixy/meuplantao:latest
     container_name: meuplantao-api
     environment:
       ASPNETCORE_ENVIRONMENT: Development
