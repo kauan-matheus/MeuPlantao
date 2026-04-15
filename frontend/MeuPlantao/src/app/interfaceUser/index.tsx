@@ -13,8 +13,26 @@ import { ScreenProfile } from "@/components/screenProfile";
 
 import { router } from "expo-router";
 import { getAuth } from "@/services/user";
+import { getProfessional } from "@/services/professional";
 
 export default function InterfaceUser() {
+
+    useEffect(() => {
+        async function load() {
+            const auth = await getAuth()
+
+            if (!auth) {
+                router.navigate("./index")
+            }
+
+            const data = await getProfessional(auth.user.id)
+            setName(data.nome)
+        }
+
+        load()
+    }, [])
+
+    const [name, setName] = useState("")
 
     const [option, setOption] = useState(options[0].name)
 
@@ -26,18 +44,6 @@ export default function InterfaceUser() {
     if (!fonts) {
         return null;
     }
-    
-    useEffect(() => {
-        async function load() {
-            const auth = await getAuth()
-
-            if (!auth) {
-                router.navigate("./index")
-            }
-        }
-
-        load()
-    }, [])
 
     return (
         <View style={styles.container}>
@@ -47,7 +53,7 @@ export default function InterfaceUser() {
                         <Image source={require("@/assets/images/profile.jpg")} style={styles.imageProfile} />
                     </View>
                     <View style={styles.topDiv}>
-                        <Text style={styles.topText}>Olá, User da Silva 👋</Text>
+                        <Text style={styles.topText}>Olá, {name} 👋</Text>
                     </View>
                 </View>
             )}

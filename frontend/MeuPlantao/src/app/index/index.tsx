@@ -15,6 +15,18 @@ import { login, getAuth } from "@/services/user"
 
 export default function Index() {
 
+    useEffect(() => {
+        async function load() {
+            const auth = await getAuth()
+    
+            if (auth) {
+                router.navigate("./interfaceUser")
+            }
+        }
+    
+        load()
+    }, [])
+
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -29,18 +41,6 @@ export default function Index() {
     if (!fonts) {
         return null;
     }
-
-    useEffect(() => {
-        async function load() {
-            const auth = await getAuth()
-
-            if (auth) {
-                router.navigate("./interfaceUser")
-            }
-        }
-
-        load()
-    }, [])
 
     return (
         <ImageBackground 

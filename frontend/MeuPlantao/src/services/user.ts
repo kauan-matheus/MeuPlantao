@@ -1,17 +1,6 @@
 import { api } from "./api";
 import * as SecureStore from "expo-secure-store"
 
-api.interceptors.request.use(async (config) => {
-    const auth = await SecureStore.getItemAsync("auth")
-
-    if (auth) {
-        const { token } = JSON.parse(auth)
-        config.headers.Authorization = `Bearer ${token}`
-    }
-
-    return config
-})
-
 export const login = async (email: string, password: string) => {
     try {
         const response = await api.post("/auth/login",{
@@ -25,15 +14,15 @@ export const login = async (email: string, password: string) => {
             "auth",
             JSON.stringify({
                 token: data.token,
-                user: data.user,
+                user: data.usuario,
                 expiresIn: data.expiresIn
             })
         )
 
-        console.log(data)
+        // console.log(data)
         return {type: "success", message: ["Login efetuado com sucesso"]}
     } catch (error: any) {
-        console.log(error.response?.status)
+        // console.log(error.response?.status)
         return {type: "error", message: error.response?.data}
     }
 }
