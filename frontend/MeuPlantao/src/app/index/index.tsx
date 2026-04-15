@@ -1,6 +1,6 @@
-import { Text, View, TouchableOpacity, ImageBackground, Modal } from "react-native"
+import { Text, View, TouchableOpacity, ImageBackground, Modal, Alert } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { router } from "expo-router"
 import { useFonts } from "expo-font"
 
@@ -11,11 +11,15 @@ import { colors } from "@/styles/colors"
 import { Input } from "@/components/input/input"
 import { Button } from "@/components/button"
 
-import { login } from "@/services/user"
+import { login, getAuth } from "@/services/user"
 
 export default function Index() {
 
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+
     const [showModal, setShowModal] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const [fonts] = useFonts({
         'Poppins-Regular': require('@/assets/fonts/Poppins-Regular.ttf'),
@@ -26,6 +30,18 @@ export default function Index() {
         return null;
     }
 
+    useEffect(() => {
+        async function load() {
+            const auth = await getAuth()
+
+            if (auth) {
+                router.navigate("./interfaceUser")
+            }
+        }
+
+        load()
+    }, [])
+
     return (
         <ImageBackground 
         source={require("@/assets/images/background.png")} 
@@ -33,7 +49,6 @@ export default function Index() {
         resizeMode="cover"
         >
             <View style={styles.container}>
-                {/* <Text style={styles.title}>MEU PLANTÃO</Text> */}
                 <Button 
                 text="Acessar "
                 text2="Meu Plantão"
@@ -47,7 +62,7 @@ export default function Index() {
             <Modal transparent visible={showModal} animationType="slide">
                 <View style={styles.modal}>
                     <View style={styles.modalContent}>
-                        <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => setShowModal(false)}>
+                        <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => [setShowModal(false), setEmail(""), setPassword("")]}>
                             <Ionicons
                             name="close"
                             size={20}
@@ -55,26 +70,34 @@ export default function Index() {
                         />
                         </TouchableOpacity>
                         <Text style={styles.titleModal}>LOGIN</Text>
-                        {/* <Image source={require("@/assets/images/logo.png")} style={styles.logo} /> */}
 
                         <View style={styles.form}>
                             <Input
                             type="text"
-                            placeholder="Nome de Usuário"
-                            onChangeText={console.log}
+                            placeholder="Email"
+                            onChangeText={setEmail}
                             />
                             <Input
                             type="password"
                             placeholder="Senha"
-                            onChangeText={console.log}
+                            onChangeText={setPassword}
                             />
                             <Button 
                             text="Entrar"
                             color={colors.blue[500]}
                             textColor={colors.gray[700]}
-                            onPress={() => {
-                                // login()
-                                router.navigate("./interfaceUser")
+                            onPress={async () => {
+                                if (loading) return
+
+                                setLoading(true)
+                                const data = await login(email, password)
+                                setLoading(false)
+
+                                if (data.type === "success")
+                                    router.navigate("./interfaceUser")
+                                else {
+                                    Alert.alert("Falha no login:", data.message.join("\n"))
+                                }
                             }}
                             />
                         </View>

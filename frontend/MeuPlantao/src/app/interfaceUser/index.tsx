@@ -11,24 +11,33 @@ import { ScreenCalendar } from "@/components/screenCalendar";
 import { ScreenHistory } from "@/components/screenHistory";
 import { ScreenProfile } from "@/components/screenProfile";
 
-import { getPlantoes } from "@/services/plantao";
+import { router } from "expo-router";
+import { getAuth } from "@/services/user";
 
 export default function InterfaceUser() {
 
     const [option, setOption] = useState(options[0].name)
 
-    useEffect(() => {
-        getPlantoes()
-    }, [])
-    
     const [fonts] = useFonts({
         'Poppins-Regular': require('@/assets/fonts/Poppins-Regular.ttf'),
         'Poppins-Bold': require('@/assets/fonts/Poppins-Bold.ttf'),
     })
-
+    
     if (!fonts) {
         return null;
     }
+    
+    useEffect(() => {
+        async function load() {
+            const auth = await getAuth()
+
+            if (!auth) {
+                router.navigate("./index")
+            }
+        }
+
+        load()
+    }, [])
 
     return (
         <View style={styles.container}>
