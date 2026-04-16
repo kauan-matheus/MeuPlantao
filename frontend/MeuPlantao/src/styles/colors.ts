@@ -17,7 +17,8 @@ export const colors = {
     red: {
         100: "#F06A6A",
         200: "#E74C3C",
-        300: "#BD2A2E"
+        300: "#BD2A2E",
+        400: "rgba(200, 0, 0, 0.2)"
     },
     yellow: {
         100: "#f8d64b",

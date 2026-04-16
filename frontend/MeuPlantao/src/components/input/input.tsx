@@ -29,7 +29,7 @@ export function Input({ type, icon, ...rest }: Props) {
                     <Ionicons
                     name={showPassword ? "eye" : "eye-off"}
                     size={20}
-                    color={colors.gray[200]}
+                    color={colors.gray[300]}
                     />
                 </TouchableOpacity>
             )}

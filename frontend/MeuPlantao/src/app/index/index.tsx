@@ -1,6 +1,6 @@
-import { Text, View, TouchableOpacity, ImageBackground, Modal, Alert } from "react-native"
+import { Text, View, TouchableOpacity, ImageBackground, Modal, Animated } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { router } from "expo-router"
 import { useFonts } from "expo-font"
 
@@ -32,6 +32,9 @@ export default function Index() {
 
     const [showModal, setShowModal] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
+
+    const opacity = useRef(new Animated.Value(0)).current;
 
     const [fonts] = useFonts({
         'Poppins-Regular': require('@/assets/fonts/Poppins-Regular.ttf'),
@@ -40,6 +43,24 @@ export default function Index() {
 
     if (!fonts) {
         return null;
+    }
+
+    const showError = (message: string) => {
+        setError(message)
+
+        Animated.timing(opacity, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+        }).start()
+
+        setTimeout(() => {
+            Animated.timing(opacity, {
+                toValue: 0,
+                duration: 100,
+                useNativeDriver: true,
+            }).start(() => setError(""));
+        }, 8000)
     }
 
     return (
@@ -62,7 +83,12 @@ export default function Index() {
             <Modal transparent visible={showModal} animationType="slide">
                 <View style={styles.modal}>
                     <View style={styles.modalContent}>
-                        <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => [setShowModal(false), setEmail(""), setPassword("")]}>
+                        <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => 
+                            [setShowModal(false), 
+                            setEmail(""), 
+                            setPassword(""), 
+                            setError("")]}
+                            >
                             <Ionicons
                             name="close"
                             size={20}
@@ -72,6 +98,18 @@ export default function Index() {
                         <Text style={styles.titleModal}>LOGIN</Text>
 
                         <View style={styles.form}>
+                            <View style={{height: 28}}>
+                                {error !== "" && (
+                                    <Animated.View style={[styles.error, {opacity}]}>
+                                        <Ionicons
+                                        name="alert-circle-outline"
+                                        size={20}
+                                        color={colors.red[300]}
+                                        />
+                                        <Text style={styles.textError}>{error}</Text>
+                                    </Animated.View>
+                                )}
+                            </View>
                             <Input
                             type="text"
                             placeholder="Email"
@@ -97,7 +135,7 @@ export default function Index() {
                                     router.navigate("./interfaceUser")
                                 else {
                                     const type = typeof data.message
-                                    Alert.alert("Falha no login:", type === "string" ? data.message : data.message.join("\n"))
+                                    showError(type === "string" ? data.message : data.message[0])
                                 }
                             }}
                             />

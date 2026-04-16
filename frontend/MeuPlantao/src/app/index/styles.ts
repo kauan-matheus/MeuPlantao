@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         padding: 24,
         paddingVertical: 20,
-        gap: 50
+        gap: 25
     },
     titleModal: {
         fontSize: 40,
@@ -39,13 +39,11 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 30,
         alignItems: "center"
     },
-    viewPass: {
-        position: "absolute"
-    },
     link: {
         color: colors.blue[400],
         textDecorationLine: "underline",
-        fontFamily: "Poppins-Regular"
+        fontFamily: "Poppins-Regular",
+        marginTop: 20
     },
     close: {
         left: "47%"
@@ -53,5 +51,17 @@ export const styles = StyleSheet.create({
     modal: {
         flex: 1,
         justifyContent: "flex-end"
+    },
+    error: {
+        backgroundColor: colors.red[400],
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 10,
+        gap: 5,
+        flexDirection: "row"
+    },
+    textError: {
+        fontFamily: "Poppins-Regular",
+        color: colors.red[300],
     }
 })
