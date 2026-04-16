@@ -96,7 +96,8 @@ export default function Index() {
                                 if (data.type === "success")
                                     router.navigate("./interfaceUser")
                                 else {
-                                    Alert.alert("Falha no login:", data.message.join("\n"))
+                                    const type = typeof data.message
+                                    Alert.alert("Falha no login:", type === "string" ? data.message : data.message.join("\n"))
                                 }
                             }}
                             />

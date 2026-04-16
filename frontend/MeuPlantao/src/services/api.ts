@@ -2,8 +2,8 @@ import axios from "axios"
 import * as SecureStore from "expo-secure-store"
 
 export const api = axios.create({
-    // baseURL: "http://13.220.183.67"
-    baseURL: "http://10.0.2.2:5269"
+    baseURL: "https://meuplantao.eu1.netbird.services"
+    // baseURL: "http://10.0.2.2:5269"
 })
 
 api.interceptors.request.use(async (config) => {
