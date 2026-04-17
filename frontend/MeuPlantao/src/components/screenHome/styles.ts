@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     title: {
         fontFamily: "Poppins-Bold",
         fontSize: 12,
-        color: colors.gray[200],
+        color: colors.blue[400],
         paddingHorizontal: 10
     },
     list: {

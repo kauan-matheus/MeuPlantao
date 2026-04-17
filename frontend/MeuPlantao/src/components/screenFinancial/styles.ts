@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "@/styles/colors";
+import { LineChart } from "react-native-gifted-charts";
 
 export const styles = StyleSheet.create({
     container: {
@@ -10,21 +11,22 @@ export const styles = StyleSheet.create({
     card: {
         backgroundColor: colors.gray[600],
         borderRadius: 15,
-        paddingTop: 10,
+        paddingVertical: 10,
         paddingHorizontal: 10,
-        gap: 5
+        gap: 10
     },
     title: {
         fontFamily: "Poppins-Bold",
         fontSize: 12,
-        color: colors.gray[200],
+        color: colors.blue[400],
         paddingHorizontal: 10
     },
     row: {
         flexDirection: "row",
         width: "100%",
         justifyContent: "space-around",
-        gap: 5
+        gap: 5,
+        alignItems: "center"
     },
     col: {
         flexDirection: "column",
@@ -39,4 +41,8 @@ export const styles = StyleSheet.create({
         fontFamily: "Poppins-Regular",
         fontSize: 17
     },
+    lineChart: {
+        flex: 1,
+        gap: 5
+    }
 })
