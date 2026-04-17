@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, ImageBackground, Modal, Animated } from "react-native"
+import { Text, View, TouchableOpacity, ImageBackground, Modal, Animated, ActivityIndicator, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useEffect, useRef, useState } from "react"
 import { router } from "expo-router"
@@ -82,69 +82,71 @@ export default function Index() {
             
             <Modal transparent visible={showModal} animationType="slide">
                 <View style={styles.modal}>
-                    <View style={styles.modalContent}>
-                        <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => 
-                            [setShowModal(false), 
-                            setEmail(""), 
-                            setPassword(""), 
-                            setError("")]}
-                            >
-                            <Ionicons
-                            name="close"
-                            size={20}
-                            color={colors.gray[500]}
-                        />
-                        </TouchableOpacity>
-                        <Text style={styles.titleModal}>LOGIN</Text>
+                    <TouchableWithoutFeedback onPress={() => 
+                        [setShowModal(false),
+                        setEmail(""),
+                        setPassword(""),
+                        setError(""),
+                        ]}
+                        >
+                        <View style={{flex: 1}}></View>
+                    </TouchableWithoutFeedback>
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.modalContent}>
+                            <Text style={styles.titleModal}>LOGIN</Text>
 
-                        <View style={styles.form}>
-                            <View style={{height: 28}}>
-                                {error !== "" && (
-                                    <Animated.View style={[styles.error, {opacity}]}>
-                                        <Ionicons
-                                        name="alert-circle-outline"
-                                        size={20}
-                                        color={colors.red[300]}
-                                        />
-                                        <Text style={styles.textError}>{error}</Text>
-                                    </Animated.View>
-                                )}
+                            <View style={styles.form}>
+                                <View style={{height: 28}}>
+                                    {loading && error === "" && (
+                                        <ActivityIndicator size="small" color={colors.gray[300]} />
+                                    )}
+                                    {error !== "" && (
+                                        <Animated.View style={[styles.error, {opacity}]}>
+                                            <Ionicons
+                                            name="alert-circle-outline"
+                                            size={20}
+                                            color={colors.red[300]}
+                                            />
+                                            <Text style={styles.textError}>{error}</Text>
+                                        </Animated.View>
+                                    )}
+                                </View>
+                                <Input
+                                type="text"
+                                placeholder="Email"
+                                onChangeText={setEmail}
+                                />
+                                <Input
+                                type="password"
+                                placeholder="Senha"
+                                onChangeText={setPassword}
+                                />
+                                <Button 
+                                text="Entrar"
+                                color={colors.blue[500]}
+                                textColor={colors.gray[700]}
+                                onPress={async () => {
+                                    if (loading) return
+
+                                    setLoading(true)
+                                    const data = await login(email, password)
+                                    setLoading(false)
+
+                                    if (data.type === "success")
+                                        router.navigate("./interfaceUser")
+                                    else {
+                                        const type = typeof data.message
+                                        showError(type === "string" ? data.message : data.message[0])
+                                    }
+                                }}
+                                />
                             </View>
-                            <Input
-                            type="text"
-                            placeholder="Email"
-                            onChangeText={setEmail}
-                            />
-                            <Input
-                            type="password"
-                            placeholder="Senha"
-                            onChangeText={setPassword}
-                            />
-                            <Button 
-                            text="Entrar"
-                            color={colors.blue[500]}
-                            textColor={colors.gray[700]}
-                            onPress={async () => {
-                                if (loading) return
 
-                                setLoading(true)
-                                const data = await login(email, password)
-                                setLoading(false)
-
-                                if (data.type === "success")
-                                    router.navigate("./interfaceUser")
-                                else {
-                                    const type = typeof data.message
-                                    showError(type === "string" ? data.message : data.message[0])
-                                }
-                            }}
-                            />
-                        </View>
-
-                        <TouchableOpacity activeOpacity={0.9}>
-                            <Text style={styles.link}>Não tem uma conta? Cadastre-se</Text>
-                        </TouchableOpacity>
-                    </View>
+                            <TouchableOpacity activeOpacity={0.9}>
+                                <Text style={styles.link}>Não tem uma conta? Cadastre-se</Text>
+                            </TouchableOpacity>
+                        </KeyboardAvoidingView>
+                    </TouchableWithoutFeedback>
                 </View>
             </Modal>
         </ImageBackground>

@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, KeyboardAvoidingView, Platform } from "react-native";
 import { LocaleConfig, Calendar} from 'react-native-calendars';
 import { useCallback, useState } from "react";
 import { useFocusEffect } from "expo-router";
@@ -50,7 +50,7 @@ export function ScreenCalendar() {
     )
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
             <Calendar
             style={styles.calendar}
             onDayPress={(day) => {
@@ -86,6 +86,6 @@ export function ScreenCalendar() {
                 />
                 <ListPlantao plantao={plantao} showFooter={true} isEmpty="Não há plantões para solicitar" />
             </View>
-        </View>
+        </KeyboardAvoidingView>
     )
 }

@@ -1,11 +1,11 @@
-import { colors } from "@/styles/colors";
 import { StyleSheet } from "react-native";
+import { colors } from "@/styles/colors";
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        gap: 10
+        gap: 5
     },
     card: {
         backgroundColor: colors.gray[600],
@@ -20,19 +20,23 @@ export const styles = StyleSheet.create({
         color: colors.gray[200],
         paddingHorizontal: 10
     },
-    list: {
-        flex: 1,
-        backgroundColor: colors.gray[600],
-        borderRadius: 20,
-        alignItems: "center",
-        paddingHorizontal: 15,
-        paddingTop: 10
-    },
-    kpis: {
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        gap: 5,
+    row: {
         flexDirection: "row",
-        justifyContent: "center"
-    }
+        width: "100%",
+        justifyContent: "space-around",
+        gap: 5
+    },
+    col: {
+        flexDirection: "column",
+        width: "50%",
+        backgroundColor: colors.gray[800],
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 10,
+        alignItems: "center"
+    },
+    textValue: {
+        fontFamily: "Poppins-Regular",
+        fontSize: 17
+    },
 })

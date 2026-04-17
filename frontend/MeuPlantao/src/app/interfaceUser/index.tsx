@@ -1,4 +1,4 @@
-import { FlatList, View, Text, Image } from "react-native";
+import { FlatList, View, Text, Image, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 
@@ -8,7 +8,7 @@ import { options } from "@/utils/options";
 import { NavLink } from "@/components/navLink";
 import { ScreenHome } from "@/components/screenHome";
 import { ScreenCalendar } from "@/components/screenCalendar";
-import { ScreenHistory } from "@/components/screenHistory";
+import { ScreenFinancial } from "@/components/screenFinancial";
 import { ScreenProfile } from "@/components/screenProfile";
 
 import { router } from "expo-router";
@@ -46,38 +46,40 @@ export default function InterfaceUser() {
     }
 
     return (
-        <View style={styles.container}>
-            {option !== "Profile" && (
-                <View style={styles.top}>
-                    <View style={styles.topDiv}>
-                        <Image source={require("@/assets/images/profile.jpg")} style={styles.imageProfile} />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                {option !== "Profile" && (
+                    <View style={styles.top}>
+                        <View style={styles.topDiv}>
+                            <Image source={require("@/assets/images/profile.jpg")} style={styles.imageProfile} />
+                        </View>
+                        <View style={styles.topDiv}>
+                            <Text style={styles.topText}>Olá, {name} 👋</Text>
+                        </View>
                     </View>
-                    <View style={styles.topDiv}>
-                        <Text style={styles.topText}>Olá, {name} 👋</Text>
-                    </View>
+                )}
+                <View style={styles.content}>
+                    {option === "Home" ? <ScreenHome /> :
+                    option === "Calendar" ? <ScreenCalendar /> :
+                    option === "Financial" ? <ScreenFinancial /> :
+                    option === "Profile" ? <ScreenProfile /> : 
+                    null}
                 </View>
-            )}
-            <View style={styles.content}>
-                {option === "Home" ? <ScreenHome /> :
-                option === "Calendar" ? <ScreenCalendar /> :
-                option === "History" ? <ScreenHistory /> :
-                option === "Profile" ? <ScreenProfile /> : 
-                null}
-            </View>
-            <FlatList
-            data={options}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-                <NavLink
-                icon={item.icon}
-                isSelected={item.name === option}
-                onPress={() => setOption(item.name)}
+                <FlatList
+                data={options}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <NavLink
+                    icon={item.icon}
+                    isSelected={item.name === option}
+                    onPress={() => setOption(item.name)}
+                    />
+                )}
+                horizontal
+                style={styles.navBar}
+                contentContainerStyle={styles.navBarContent}
                 />
-            )}
-            horizontal
-            style={styles.navBar}
-            contentContainerStyle={styles.navBarContent}
-            />
-        </View>
+            </View>
+        </TouchableWithoutFeedback>
     )
 }

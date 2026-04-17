@@ -20,9 +20,9 @@ export const styles = StyleSheet.create({
         borderTopLeftRadius: 30,
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
         alignItems: "center",
-        padding: 24,
+        paddingTop: 65,
         paddingVertical: 20,
-        gap: 25
+        gap: 10
     },
     titleModal: {
         fontSize: 40,
@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
         color: colors.blue[400],
         textDecorationLine: "underline",
         fontFamily: "Poppins-Regular",
-        marginTop: 20
+        marginTop: 40
     },
     close: {
         left: "47%"
