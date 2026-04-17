@@ -4,11 +4,11 @@
     "slug": "MeuPlantao",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo_p_icon.png",
     "scheme": "meuplantao",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/logo_p_icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#F5F5F5"
     },
@@ -18,7 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#F5F5F5",
-        "foregroundImage": "./assets/images/icon.png"
+        "foregroundImage": "./assets/images/logo_p_icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.MeuPlantao"
