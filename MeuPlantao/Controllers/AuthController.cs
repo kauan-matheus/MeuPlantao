@@ -1,5 +1,3 @@
-//teste
-
 using MeuPlantao.Application.Services.Auth;
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Dto.Responses;
