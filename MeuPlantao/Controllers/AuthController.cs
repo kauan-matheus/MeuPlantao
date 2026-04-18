@@ -1,4 +1,6 @@
-﻿using MeuPlantao.Application.Services.Auth;
+//teste
+
+using MeuPlantao.Application.Services.Auth;
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Communication.Enums;
