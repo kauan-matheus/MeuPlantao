@@ -73,7 +73,16 @@ O hospital já utiliza um sistema de terceiros para gestão de plantões, o que 
 | Tecnologia | Uso |
 |---|---|
 | Docker | Containerização do projeto via docker compose |
-| AWS (EC2) | Deploy da API em instância EC2 |
+| AWS | Cloud para hospedar a aplicação |
+| EC2 | VM para rodar uma instância pra nossa aplicação |
+| ECR | Repositório para guardar as imagens docker na AWS |
+| ECS | Orquestação dos containeres e imagens na AWS |
+| RDS | Guarda nosso banco de dados PostgreSQL |
+| Grafana | Interface para monitoramento de métricas do servidor |
+| InfluxDB | Banco de dados Temporal para guardar métricas |
+| Telegraf | Captura de métricas em tempo real do servidor |
+| Termius | Cliente SSH para acessar o servidor |
+| Netbird | VPN para reverse proxing da aplicação |
 | GitHub Actions | CI/CD para build e deploy automatizado |
 
 ---
