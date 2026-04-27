@@ -11,9 +11,6 @@
   <img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" />
   <img src="https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white" />
   <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" />
-  <img src="https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" />
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
-  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" />
 </p>
 
 ---
@@ -72,9 +69,8 @@ O hospital já utiliza um sistema de terceiros para gestão de plantões, o que 
 ### Infraestrutura
 | Tecnologia | Uso |
 |---|---|
-| Docker | Containerização do projeto via docker compose |
-| AWS (EC2) | Deploy da API em instância EC2 |
-| GitHub Actions | CI/CD para build e deploy automatizado |
+| [Docker](https://www.docker.com/) | Containerização do projeto via docker compose |
+| [AWS](https://aws.amazon.com/pt/) | Futuro deploy na AWS Web Services |
 
 ---
 

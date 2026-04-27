@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
         justifyContent: "flex-end",
         bottom: 90
     },
-    modalContent: {
+    modalContentLogin: {
         width: "100%",
         height: "75%",
         backgroundColor: colors.gray[700],
@@ -20,9 +20,9 @@ export const styles = StyleSheet.create({
         borderTopLeftRadius: 30,
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
         alignItems: "center",
-        padding: 24,
+        paddingTop: 65,
         paddingVertical: 20,
-        gap: 50
+        gap: 10
     },
     titleModal: {
         fontSize: 40,
@@ -39,19 +39,60 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 30,
         alignItems: "center"
     },
-    viewPass: {
-        position: "absolute"
-    },
     link: {
         color: colors.blue[400],
         textDecorationLine: "underline",
-        fontFamily: "Poppins-Regular"
+        fontFamily: "Poppins-Regular",
+        marginTop: 40
     },
     close: {
-        left: "47%"
+        padding: 10,
+        alignSelf: "flex-end"
     },
-    modal: {
+    modalLogin: {
         flex: 1,
         justifyContent: "flex-end"
+    },
+    error: {
+        backgroundColor: colors.red[400],
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 10,
+        gap: 5,
+        flexDirection: "row"
+    },
+    textError: {
+        fontFamily: "Poppins-Regular",
+        color: colors.red[300],
+    },
+    modalRegister: {
+        flex: 1
+    },
+    modalContentRegister: {
+        flex: 1,
+        width: "100%",
+        backgroundColor: colors.gray[600],
+        alignItems: "center",
+        gap: 20,
+        paddingTop: 5
+    },
+    formGroup: {
+        width: "100%",
+        gap: 10
+    },
+    optionsDocument: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-evenly"
+    },
+    optionText: {
+        fontFamily: "Poppins-Bold",
+        fontSize: 13,
+        color: colors.gray[200]
+    },
+    option: {
+        borderColor: colors.blue[500],
+        width: "25%",
+        alignItems: "center"
     }
 })

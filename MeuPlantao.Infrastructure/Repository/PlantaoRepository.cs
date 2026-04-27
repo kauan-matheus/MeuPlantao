@@ -47,5 +47,19 @@ namespace MeuPlantao.Infrastructure.Repository
             return true;
             
         }
+
+        public IQueryable<SolicitacaoModel> ConsultarSolicitacoesPorPlantao(long id)
+        {
+            return _appDbContext.Solicitacoes
+                .Where(m => m.PlantaoId == id)
+                .Include(m => m.Profissional)
+                .OrderByDescending(m => m.Id);
+
+        }
+
+        public async Task<SolicitacaoModel?> ConsultarSolicitacaoPorPlantaoSolicitante(long plantaoId, long solicitanteId)
+        {
+            return await _appDbContext.Solicitacoes.FirstOrDefaultAsync(s => s.PlantaoId == plantaoId && s.ProfissionalId == solicitanteId);
+        }
     }
 }

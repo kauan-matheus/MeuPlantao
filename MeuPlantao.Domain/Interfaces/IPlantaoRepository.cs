@@ -11,5 +11,8 @@ namespace MeuPlantao.Domain.Interfaces
         Task<PlantaoModel?> ConsultarPlantaoCompleto(long id);
         Task<bool> CadastrarComHistorico(PlantaoModel plantao, PlantaoHistoricoModel historico);
         Task<bool> EditarComHistorico(PlantaoModel plantao, PlantaoHistoricoModel historico);
+
+        IQueryable<SolicitacaoModel> ConsultarSolicitacoesPorPlantao(long id);
+        Task<SolicitacaoModel?> ConsultarSolicitacaoPorPlantaoSolicitante(long plantaoId, long solicitanteId);
     }
 }

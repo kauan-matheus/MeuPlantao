@@ -4,21 +4,21 @@
     "slug": "MeuPlantao",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo_p_icon.png",
     "scheme": "meuplantao",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/logo_p_icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F5F5F5"
+      "backgroundColor": "#009C97"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#F5F5F5",
-        "foregroundImage": "./assets/images/icon.png"
+        "backgroundColor": "#009C97",
+        "foregroundImage": "./assets/images/logo_p_icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.MeuPlantao"
@@ -30,10 +30,17 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7fc52187-3b19-4fe3-ad99-12330dae1b40"
+      }
     }
   }
 }

@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<PlantaoHistoricoModel> HistoricoPlantao { get; set; }
     public DbSet<TrocaPlantaoModel> TrocaPlantoes { get; set; }
     public DbSet<UserModel> Usuarios { get; set; }
+    public DbSet<SolicitacaoModel> Solicitacoes { get; set; }
 
     //OnModelCreating pra definir algumas coisas que são conveção pro EF
     //HasOne -> Profissional tem um user 1-1
@@ -42,6 +43,21 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(p => p.SetorId)
             .IsRequired(true);
+        
+        //Builder pra lista de solicitações de um plantao
+        modelBuilder.Entity<SolicitacaoModel>()
+            .HasOne(s => s.Plantao)
+            .WithMany(p => p.Solicitacoes)
+            .HasForeignKey(s => s.PlantaoId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<SolicitacaoModel>()
+            .HasOne(s => s.Profissional)
+            .WithMany()
+            .HasForeignKey(s => s.ProfissionalId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<SolicitacaoModel>()
+                .HasIndex(s => new { s.PlantaoId, s.ProfissionalId })
+                .IsUnique();
 
         //Builder pro FK do setor 
         modelBuilder.Entity<SetorModel>()
