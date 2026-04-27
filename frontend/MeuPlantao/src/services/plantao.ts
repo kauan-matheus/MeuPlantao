@@ -2,10 +2,11 @@ import { api } from "./api";
 
 export const getPlantoes = async () => {
     try {
-        const response = await api.get("api/Plantao/plantoes")
-        console.log(response.data)
-    } catch (error) {
-        console.error(error)
+        const response = await api.get("/api/Plantao/plantoes")
+        return response.data
+    } catch (error: any) {
+        console.log(error.response?.data)
+        return null
     }
 }
 

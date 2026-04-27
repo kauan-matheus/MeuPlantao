@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity, ImageBackground, Modal, Animated, ActivityIndicator, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform } from "react-native"
+import { Text, View, TouchableOpacity, ImageBackground, Modal, Animated, ActivityIndicator, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, Platform, Touchable } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useEffect, useRef, useState } from "react"
 import { router } from "expo-router"
@@ -29,8 +29,15 @@ export default function Index() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [name, setName] = useState("")
+    const [document, setDocument] = useState("")
+    const [telephone, setTelephone] = useState("")
+    const [confirmEmail, setConfirmEmail] = useState("")
+    const [confirmPassword, setConfirmPassword] = useState("")
+    const [option, setOption] = useState<"CRM" | "Coren">("CRM")
 
-    const [showModal, setShowModal] = useState(false)
+    const [showModalLogin, setShowModalLogin] = useState(false)
+    const [showModalRegister, setShowModalRegister] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
 
@@ -63,6 +70,18 @@ export default function Index() {
         }, 8000)
     }
 
+    function reset() {
+        setError(""),
+        setName(""),
+        setDocument(""),
+        setTelephone(""),
+        setEmail(""),
+        setPassword(""),
+        setConfirmEmail(""),
+        setConfirmPassword(""),
+        setOption("CRM")
+    }
+
     return (
         <ImageBackground 
         source={require("@/assets/images/background.png")} 
@@ -76,29 +95,24 @@ export default function Index() {
                 color={colors.gray[700]}
                 textColor={colors.gray[200]}
                 textColor2={colors.blue[400]}
-                onPress={() => setShowModal(true)}
+                onPress={() => setShowModalLogin(true)}
                 />
             </View>
             
-            <Modal transparent visible={showModal} animationType="slide">
-                <View style={styles.modal}>
-                    <TouchableWithoutFeedback onPress={() => 
-                        [setShowModal(false),
-                        setEmail(""),
-                        setPassword(""),
-                        setError(""),
-                        ]}
+            <Modal transparent visible={showModalLogin} animationType="slide">
+                <View style={styles.modalLogin}>
+                    <TouchableWithoutFeedback onPress={() => (setShowModalLogin(false), reset())}
                         >
                         <View style={{flex: 1}}></View>
                     </TouchableWithoutFeedback>
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.modalContent}>
+                        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.modalContentLogin}>
                             <Text style={styles.titleModal}>LOGIN</Text>
 
                             <View style={styles.form}>
                                 <View style={{height: 28}}>
                                     {loading && error === "" && (
-                                        <ActivityIndicator size="small" color={colors.gray[300]} />
+                                        <ActivityIndicator size="small" color={colors.blue[400]} />
                                     )}
                                     {error !== "" && (
                                         <Animated.View style={[styles.error, {opacity}]}>
@@ -142,13 +156,99 @@ export default function Index() {
                                 />
                             </View>
 
-                            <TouchableOpacity activeOpacity={0.9}>
+                            <TouchableOpacity activeOpacity={0.9} onPress={() => (setShowModalRegister(true), setShowModalLogin(false), reset())}>
                                 <Text style={styles.link}>Não tem uma conta? Cadastre-se</Text>
                             </TouchableOpacity>
                         </KeyboardAvoidingView>
                     </TouchableWithoutFeedback>
                 </View>
             </Modal>
+
+            <Modal transparent visible={showModalRegister} animationType="slide">
+                <View style={styles.modalRegister}>
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.modalContentRegister}>
+                            <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => (setShowModalRegister(false), reset())}>
+                                <Ionicons
+                                name="close"
+                                size={20}
+                                color={colors.gray[500]}
+                            />
+                            </TouchableOpacity>
+                            <Text style={styles.titleModal}>CADASTRE-SE</Text>
+
+                            <View style={styles.form}>
+                                <View style={{height: 28}}>
+                                    {loading && error === "" && (
+                                        <ActivityIndicator size="small" color={colors.blue[400]} />
+                                    )}
+                                    {error !== "" && (
+                                        <Animated.View style={[styles.error, {opacity}]}>
+                                            <Ionicons
+                                            name="alert-circle-outline"
+                                            size={20}
+                                            color={colors.red[300]}
+                                            />
+                                            <Text style={styles.textError}>{error}</Text>
+                                        </Animated.View>
+                                    )}
+                                </View>
+                                <View style={styles.formGroup}>
+                                    <View style={styles.optionsDocument}>
+                                        <TouchableOpacity style={[styles.option, {borderBottomWidth: option === "CRM" ? 3 : 0}]} activeOpacity={0.9} onPress={() => setOption("CRM")}>
+                                            <Text style={styles.optionText}>Médico</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={[styles.option, {borderBottomWidth: option === "Coren" ? 3 : 0}]} activeOpacity={0.9} onPress={() => setOption("Coren")}>
+                                            <Text style={styles.optionText}>Enfermeiro</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <Input
+                                    type="text"
+                                    placeholder="Nome"
+                                    onChangeText={setName}
+                                    />
+                                </View>
+                                <Input
+                                type="text"
+                                placeholder={option}
+                                onChangeText={setDocument}
+                                />
+                                <Input
+                                type="text"
+                                placeholder="Telefone"
+                                onChangeText={setTelephone}
+                                />
+                                <Input
+                                type="text"
+                                placeholder="Email"
+                                onChangeText={setEmail}
+                                />
+                                <Input
+                                type="password"
+                                placeholder="Senha"
+                                onChangeText={setPassword}
+                                />
+                                <Input
+                                type="text"
+                                placeholder="Confirme seu email"
+                                onChangeText={setConfirmEmail}
+                                />
+                                <Input
+                                type="password"
+                                placeholder="Confirm sua senha"
+                                onChangeText={setConfirmPassword}
+                                />
+                                <Button 
+                                text="Enviar"
+                                color={colors.blue[500]}
+                                textColor={colors.gray[700]}
+                                onPress={() => null}
+                                />
+                            </View>
+                        </KeyboardAvoidingView>
+                    </TouchableWithoutFeedback>
+                </View>
+            </Modal>  
         </ImageBackground>
     )
 }

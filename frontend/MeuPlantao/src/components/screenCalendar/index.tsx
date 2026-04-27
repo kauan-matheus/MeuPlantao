@@ -1,6 +1,6 @@
 import { View, KeyboardAvoidingView, Platform } from "react-native";
 import { LocaleConfig, Calendar} from 'react-native-calendars';
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
 import dayjs from "dayjs"
 
@@ -10,6 +10,7 @@ import { plantoes, Plantao } from "@/utils/plantoes";
 
 import { ListPlantao } from "../listPlantao";
 import { Input } from "../input/input";
+import { getPlantoes } from "@/services/plantao";
 
 LocaleConfig.locales['pt-br'] = {
     monthNames: [
@@ -33,9 +34,22 @@ LocaleConfig.defaultLocale = 'pt-br'
 
 export function ScreenCalendar() {
 
+    // useEffect(() => {
+    //     async function load() {
+    //         setLoading(true)
+            
+    //         const data = await getPlantoes()
+    //         console.log(data)
+    //         setLoading(false)
+    //     }
+
+    //     load()
+    // }, [])
+
     const [daySelected, setDaySelected] = useState(dayjs().format("YYYY-MM-DD"))
     const [search, setSearch] = useState("")
     const [plantao, setPlantao] = useState<Plantao[]>([])
+    const [loading, setLoading] = useState(false)
 
     function getPlantao() {
         const filtered = plantoes.filter(p => p.date === dayjs(daySelected).format("DD/MM/YYYY") && (p.locale.toUpperCase().includes(search.toUpperCase()) || p.sector.toUpperCase().includes(search.toUpperCase())))

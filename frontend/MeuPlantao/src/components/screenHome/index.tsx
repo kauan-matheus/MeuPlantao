@@ -32,8 +32,6 @@ export function ScreenHome() {
             <View style={styles.card}>
                 <Text style={styles.title}>Em andamento</Text>
                 <ListPlantao plantao={plantoes.slice(0, 0)} showFooter={false} isEmpty="Não há plantão em andamento" />
-                {/* <Text style={styles.title}>Próximos</Text>
-                <ListPlantao plantao={plantoes.slice(1, 4)} showFooter={false} isEmpty="Não há próximos plantões" /> */}
             </View>
             <View style={styles.kpis}>
                 <Kpi value="3" text="Solicitados" color={colors.red[300]} />
@@ -53,29 +51,6 @@ export function ScreenHome() {
                 />
                 <ListPlantao plantao={plantao} showFooter={true} isEmpty="Sem histórico de plantões" />
             </View>
-            {/* <View style={styles.card}>
-                <Text style={styles.title}>Controle Financeiro</Text>
-                <View style={styles.row}>
-                    <View style={styles.col}>
-                        <Text style={styles.textValue}>R$ 1.000,00</Text>
-                        <Text style={styles.title}>Receita</Text>
-                    </View>
-                    <View style={styles.col}>
-                        <Text style={styles.textValue}>R$ 1.000,00</Text>
-                        <Text style={styles.title}>A receber</Text>
-                    </View>
-                </View>
-                <View style={styles.row}>
-                    <View style={styles.col}>
-                        <Text style={styles.textValue}>R$ 1.000,00</Text>
-                        <Text style={styles.title}>Plantões</Text>
-                    </View>
-                    <View style={styles.col}>
-                        <Text style={styles.textValue}>R$ 1.000,00</Text>
-                        <Text style={styles.title}>Ticket médio</Text>
-                    </View>
-                </View>
-            </View> */}
         </View>
     )
 }

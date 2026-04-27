@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import { colors } from "@/styles/colors";
-import { LineChart } from "react-native-gifted-charts";
 
 export const styles = StyleSheet.create({
     container: {

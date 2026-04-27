@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
         justifyContent: "flex-end",
         bottom: 90
     },
-    modalContent: {
+    modalContentLogin: {
         width: "100%",
         height: "75%",
         backgroundColor: colors.gray[700],
@@ -46,9 +46,10 @@ export const styles = StyleSheet.create({
         marginTop: 40
     },
     close: {
-        left: "47%"
+        padding: 10,
+        alignSelf: "flex-end"
     },
-    modal: {
+    modalLogin: {
         flex: 1,
         justifyContent: "flex-end"
     },
@@ -63,5 +64,35 @@ export const styles = StyleSheet.create({
     textError: {
         fontFamily: "Poppins-Regular",
         color: colors.red[300],
+    },
+    modalRegister: {
+        flex: 1
+    },
+    modalContentRegister: {
+        flex: 1,
+        width: "100%",
+        backgroundColor: colors.gray[600],
+        alignItems: "center",
+        gap: 20,
+        paddingTop: 5
+    },
+    formGroup: {
+        width: "100%",
+        gap: 10
+    },
+    optionsDocument: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-evenly"
+    },
+    optionText: {
+        fontFamily: "Poppins-Bold",
+        fontSize: 13,
+        color: colors.gray[200]
+    },
+    option: {
+        borderColor: colors.blue[500],
+        width: "25%",
+        alignItems: "center"
     }
 })
