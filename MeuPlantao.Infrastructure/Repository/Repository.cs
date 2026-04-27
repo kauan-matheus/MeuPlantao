@@ -16,7 +16,7 @@ namespace MeuPlantao.Infrastructure.Repository
 
         public IQueryable<T> Consultar<T>() where T : class
         {
-            return _appDbContext.Set<T>().AsQueryable();
+            return _appDbContext.Set<T>().AsQueryable(); 
         }
 
         public async Task<T?> ConsultarPorId<T>(long id) where T : class
