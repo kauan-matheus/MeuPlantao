@@ -22,7 +22,23 @@ public class PlantaoController : ControllerBase
     public async Task<IActionResult> GetPlantoes()
     {
         var response = await _service.Consultar();
-        return Ok(response);
+
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+
+    [HttpGet("plantoes/{id}/solicitacoes")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSolicitacoes(long id)
+    {
+        var response = await _service.ConsultarSolicitacoes(id);
+
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpGet("plantoes/{id}")]
@@ -30,11 +46,13 @@ public class PlantaoController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)] // 404 para recurso não encontrado, não 400
     public async Task<IActionResult> GetPlantaoId(long id)
     {
-        var response = await _service.ConsultarId(id);
-        if (response is not null)
-            return Ok(response);
 
-        return NotFound("Plantao não existente ou não encontrado");
+        var response = await _service.ConsultarId(id);
+
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("plantoes")]
@@ -48,10 +66,10 @@ public class PlantaoController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.Cadastrar(plantao, userId);
-        if (response)
-            return Created("Plantao adicionado", plantao);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Nao foi possível criar esse plantao");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPut("plantoes")]
@@ -62,11 +80,13 @@ public class PlantaoController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var response = await _service.Editar(plantao);
-        if (response)
-            return Ok(plantao);
+        var userId = GetUserId();
 
-        return BadRequest("Nao foi possivel alterar esse plantao");
+        var response = await _service.Editar(plantao, userId);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpDelete("plantoes/{id}")]
@@ -75,10 +95,10 @@ public class PlantaoController : ControllerBase
     public async Task<IActionResult> DeletePlantoes(long id)
     {
         var response = await _service.Deletar(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Nao foi possivel deletar esse plantao");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPut("plantoes/{id}/solicitar")]
@@ -92,44 +112,44 @@ public class PlantaoController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.Solicitar(id, userId);
-        if (response)
-            return Ok("Solicitacao criada");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Nao foi possível executar essa solicitacao");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPut("plantoes/{id}/aceitar")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AceitarSolicitacao(long id)
+    public async Task<IActionResult> AceitarSolicitacao(long id, long solicitanteId)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var userId = GetUserId();
 
-        var response = await _service.AceitarSolicitacao(id, userId);
-        if (response)
-            return Ok("Solicitacao aceita");
+        var response = await _service.AceitarSolicitacao(id, solicitanteId, userId);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Nao foi possível aceitar essa solicitacao");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPut("plantoes/{id}/recusar")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> RecusarSolicitacao(long id)
+    public async Task<IActionResult> RecusarSolicitacao(long id, long solicitanteId)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         var userId = GetUserId();
 
-        var response = await _service.RecusarSolicitacao(id, userId);
-        if (response)
-            return Ok("Solicitacao recusada");
+        var response = await _service.RecusarSolicitacao(id, solicitanteId, userId);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Nao foi possível recusar essa solicitacao");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     private long GetUserId()

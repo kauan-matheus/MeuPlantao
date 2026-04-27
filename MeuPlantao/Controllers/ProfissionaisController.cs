@@ -24,7 +24,10 @@ public class ProfissionaisController : ControllerBase
     public async Task<IActionResult> GetProfissionais()
     {
         var response = await _service.Consultar();
-        return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpGet("profissionais/{id}")]
@@ -33,10 +36,10 @@ public class ProfissionaisController : ControllerBase
     public async Task<IActionResult> GetProfissionalId(long id)
     {
         var response = await _service.ConsultarId(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Profissional não existente ou não encontrado");
+        return StatusCode(response.StatusCode, response.Message);
     }
     [HttpGet("profissionais/user{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -44,10 +47,10 @@ public class ProfissionaisController : ControllerBase
     public async Task<IActionResult> GetProfissionalIUserd(long id)
     {
         var response = await _service.ConsultarUserId(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Profissional não existente ou não encontrado");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("profissionais")]
@@ -60,10 +63,10 @@ public class ProfissionaisController : ControllerBase
             return BadRequest(ModelState);
 
         var response = await _service.Cadastrar(profissional);
-        if (response)
-            return Created("Profissional adicionado", profissional);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível criar esse profissional");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPut("profissionais")]
@@ -76,10 +79,10 @@ public class ProfissionaisController : ControllerBase
             return BadRequest(ModelState);
 
         var response = await _service.Editar(profissional);
-        if (response)
-            return Ok(profissional);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível alterar esse profissional");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpDelete("profissionais/{id}")]
@@ -89,9 +92,9 @@ public class ProfissionaisController : ControllerBase
     public async Task<IActionResult> DeleteProfissionais(long id)
     {
         var response = await _service.Deletar(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Não foi possível deletar esse profissional");
+        return StatusCode(response.StatusCode, response.Message);
     }
 }

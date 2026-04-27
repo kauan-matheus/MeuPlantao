@@ -6,7 +6,7 @@ import { styles } from "./styles";
 
 type Props = TextInputProps & {
     type: "text" | "password"
-    icon: keyof typeof Ionicons.glyphMap
+    icon?: keyof typeof Ionicons.glyphMap
 }
 
 export function Input({ type, icon, ...rest }: Props) {
@@ -15,31 +15,30 @@ export function Input({ type, icon, ...rest }: Props) {
 
     return (
         <View style={styles.container}>
-            <View style={styles.group}>
-                <Ionicons
-                name={icon}
-                size={20}
-                color={colors.gray[200]}
-                />
-
-                <TextInput
-                style={styles.input}
-                placeholderTextColor={colors.gray[200]}
-                secureTextEntry={type === "password" ? !showPassword : false}
-                autoCorrect={false}
-                autoCapitalize="none"
-                {...rest}
-                />
-            </View>
+            <TextInput
+            style={styles.input}
+            placeholderTextColor={colors.gray[300]}
+            secureTextEntry={type === "password" ? !showPassword : false}
+            autoCorrect={false}
+            autoCapitalize="none"
+            {...rest}
+            />
 
             {type === "password" && (
                 <TouchableOpacity onPress={() => {showPassword ? setShowPassword(false) : setShowPassword(true)}} activeOpacity={0.8}>
                     <Ionicons
                     name={showPassword ? "eye" : "eye-off"}
                     size={20}
-                    color={colors.gray[200]}
+                    color={colors.gray[300]}
                     />
                 </TouchableOpacity>
+            )}
+            {icon && (
+               <Ionicons
+                name={icon}
+                size={20}
+                color={colors.gray[300]}
+                /> 
             )}
         </View>
     )

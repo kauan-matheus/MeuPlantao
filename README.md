@@ -11,6 +11,15 @@
   <img src="https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" />
   <img src="https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white" />
   <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" />
+  <img src="https://img.shields.io/badge/AWS-EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white" />
+
+  <!-- Novos -->
+  <img src="https://img.shields.io/badge/Grafana-Monitoring-F46800?style=for-the-badge&logo=grafana&logoColor=white" />
+  <img src="https://img.shields.io/badge/InfluxDB-TimeSeries-22ADF6?style=for-the-badge&logo=influxdb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Termius-SSH-2C3E50?style=for-the-badge&logo=gnubash&logoColor=white" />
+  <img src="https://img.shields.io/badge/NetBird-VPN-1F2937?style=for-the-badge&logo=wireguard&logoColor=white" />
 </p>
 
 ---
@@ -70,8 +79,17 @@ O hospital já utiliza um sistema de terceiros para gestão de plantões, o que 
 | Tecnologia | Uso |
 |---|---|
 | [Docker](https://www.docker.com/) | Containerização do projeto via docker compose |
-| [AWS](https://aws.amazon.com/pt/) | Futuro deploy na AWS Web Services |
-
+| [AWS](https://aws.amazon.com/) | Cloud para hospedar a aplicação |
+| [EC2](https://aws.amazon.com/ec2/) | VM para rodar uma instância pra nossa aplicação |
+| [ECR](https://aws.amazon.com/ecr/) | Repositório para guardar as imagens docker na AWS |
+| [ECS](https://aws.amazon.com/ecs/) | Orquestação dos containeres e imagens na AWS |
+| [RDS](https://aws.amazon.com/rds/) | Guarda nosso banco de dados PostgreSQL |
+| [Grafana](https://grafana.com/) | Interface para monitoramento de métricas do servidor |
+| [InfluxDB](https://www.influxdata.com/) | Banco de dados Temporal para guardar métricas |
+| [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) | Captura de métricas em tempo real do servidor |
+| [Termius](https://www.termius.com/) | Cliente SSH para acessar o servidor |
+| [Netbird](https://netbird.io/) | VPN para acesso seguro e exposição de serviços internos, reverse proxy integrado |
+| [GitHub Actions](https://github.com/features/actions) | CI/CD para build e deploy automatizado |   
 ---
 
 ## 📁 Estrutura do projeto
@@ -199,6 +217,14 @@ Com o servidor rodando, você pode:
 | `HistoricoTrocasController` | Histórico de trocas |
 
 > Acesse o Swagger em `/swagger` para ver todos os endpoints com detalhes de requisição e resposta.
+
+---
+
+## ☁️ Deploy
+
+O backend da aplicação foi publicado em uma instância **AWS EC2**, onde a API ASP.NET Core é executada dentro de um ambiente Linux.
+
+O deploy foi automatizado utilizando **GitHub Actions**, realizando build e publicação da aplicação sempre que há atualização na branch principal.
 
 ---
 

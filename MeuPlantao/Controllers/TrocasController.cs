@@ -26,7 +26,10 @@ public class TrocasController : ControllerBase
     public async Task<IActionResult> GetTrocas()
     {
         var response = await _service.Consultar();
-        return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpGet("trocas/{id}")]
@@ -35,10 +38,10 @@ public class TrocasController : ControllerBase
     public async Task<IActionResult> GetTrocasId(long id)
     {
         var response = await _service.ConsultarId(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Troca não existente ou não encontrado");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("trocas")]
@@ -52,10 +55,10 @@ public class TrocasController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.Cadastrar(troca, userId);
-        if (response)
-            return Created("Troca adicionada", troca);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível criar essa troca");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("trocas/{id}/aceitar")]
@@ -69,10 +72,10 @@ public class TrocasController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.Aceitar(id, userId);
-        if (response)
-            return Ok("Troca aceita");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível alterar essa troca");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("trocas/{id}/recusar")]
@@ -86,10 +89,10 @@ public class TrocasController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.Recusar(id, userId);
-        if (response)
-            return Ok("Troca recusada");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível alterar essa troca");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("trocas/{id}/enviar-aprovacao")]
@@ -103,10 +106,10 @@ public class TrocasController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.EnviarParaAprovacao(id, userId);
-        if (response)
-            return Ok("Troca enviada para aprovacao");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível alterar essa troca");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("trocas/{id}/aprovar")]
@@ -120,10 +123,10 @@ public class TrocasController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.Aprovar(id, userId);
-        if (response)
-            return Ok("Troca aprovada");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível alterar essa troca");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpPost("trocas/{id}/reprovar")]
@@ -137,10 +140,10 @@ public class TrocasController : ControllerBase
         var userId = GetUserId();
 
         var response = await _service.Reprovar(id, userId);
-        if (response)
-            return Ok("Troca reprovada");
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return BadRequest("Não foi possível alterar essa troca");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     [HttpDelete("trocas/{id}")]
@@ -150,10 +153,10 @@ public class TrocasController : ControllerBase
     public async Task<IActionResult> DeleteTrocas(long id)
     {
         var response = await _service.Deletar(id);
-        if (response is not null)
-            return Ok(response);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
 
-        return NotFound("Não foi possível deletar essa troca");
+        return StatusCode(response.StatusCode, response.Message);
     }
 
     private long GetUserId()

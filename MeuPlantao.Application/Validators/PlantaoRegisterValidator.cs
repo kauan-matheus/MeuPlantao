@@ -11,6 +11,8 @@ namespace MeuPlantao.Application.Validators
     {
         public PlantaoRegisterValidator()
         {
+            RuleFor(x => x.Valor)
+                .NotEmpty().WithMessage("Valor é obrigatorio");
             RuleFor(x => x.SetorId)
                 .NotEmpty().WithMessage("Setor é obrigatorio");
 

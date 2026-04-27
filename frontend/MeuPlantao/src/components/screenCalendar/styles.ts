@@ -4,24 +4,21 @@ import { colors } from "@/styles/colors";
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        paddingBottom: 20,
         gap: 10
     },
     calendar: {
         borderRadius: 25,
-        padding: 10
+        paddingBottom: 10
     },
     list: {
         flex: 1,
         backgroundColor: colors.gray[600],
         borderRadius: 25,
         alignItems: "center",
-        padding: 15,
-        gap: 10
-    },
-    listTitle: {
-        fontSize: 16,
-        fontWeight: "bold",
-        color: colors.gray[200]
+        paddingHorizontal: 15,
+        paddingTop: 10
     }
 })

@@ -24,7 +24,10 @@ namespace MeuPlantao.Controllers
         public async Task<IActionResult> GetUser()
         {
             var response = await _service.Consultar();
-            return Ok(response);
+            if (response.Success)
+                return StatusCode(response.StatusCode, response.Data);
+
+            return StatusCode(response.StatusCode, response.Message);
         }
 
         [HttpGet("usuarios/{id}")]
@@ -33,10 +36,10 @@ namespace MeuPlantao.Controllers
         public async Task<IActionResult> GetUserId(long id)
         {
             var response = await _service.ConsultarId(id);
-            if (response is not null)
-                return Ok(response);
+            if (response.Success)
+                return StatusCode(response.StatusCode, response.Data);
 
-            return NotFound("Usuário não existente ou não encontrado");
+            return StatusCode(response.StatusCode, response.Message);
         }
 
         [HttpPost("usuarios")]
@@ -50,10 +53,10 @@ namespace MeuPlantao.Controllers
                 return BadRequest(ModelState);
 
             var response = await _service.Cadastrar(user);
-            if (response)
-                return Created("Usuário adicionado", user);
+            if (response.Success)
+                return StatusCode(response.StatusCode, response.Data);
 
-            return BadRequest("Não foi possível criar esse usuário");
+            return StatusCode(response.StatusCode, response.Message);
         }
 
         [HttpPut("usuarios")]
@@ -67,10 +70,10 @@ namespace MeuPlantao.Controllers
                 return BadRequest(ModelState);
 
             var response = await _service.Editar(user);
-            if (response)
-                return Ok(user);
+            if (response.Success)
+                return StatusCode(response.StatusCode, response.Data);
 
-            return BadRequest("Não foi possível alterar esse usuário");
+            return StatusCode(response.StatusCode, response.Message);
         }
 
         [HttpDelete("usuarios/{id}")]
@@ -80,10 +83,10 @@ namespace MeuPlantao.Controllers
         public async Task<IActionResult> DeleteUser(long id)
         {
             var response = await _service.Deletar(id);
-            if (response is not null)
-                return Ok(response);
+            if (response.Success)
+                return StatusCode(response.StatusCode, response.Data);
 
-            return NotFound("Não foi possível deletar esse usuário");
+            return StatusCode(response.StatusCode, response.Message);
         }
     }
 }

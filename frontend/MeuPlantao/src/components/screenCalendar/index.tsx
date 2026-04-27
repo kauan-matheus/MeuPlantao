@@ -1,9 +1,16 @@
-import { View, Text } from "react-native";
+import { View, KeyboardAvoidingView, Platform } from "react-native";
 import { LocaleConfig, Calendar} from 'react-native-calendars';
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import dayjs from "dayjs"
 
 import { styles } from "./styles";
 import { colors } from "@/styles/colors";
+import { plantoes, Plantao } from "@/utils/plantoes";
+
+import { ListPlantao } from "../listPlantao";
+import { Input } from "../input/input";
+import { getPlantoes } from "@/services/plantao";
 
 LocaleConfig.locales['pt-br'] = {
     monthNames: [
@@ -27,10 +34,37 @@ LocaleConfig.defaultLocale = 'pt-br'
 
 export function ScreenCalendar() {
 
-    const [daySelected, setDaySelected] = useState(new Date().toISOString().substring(0, 10));
+    // useEffect(() => {
+    //     async function load() {
+    //         setLoading(true)
+            
+    //         const data = await getPlantoes()
+    //         console.log(data)
+    //         setLoading(false)
+    //     }
+
+    //     load()
+    // }, [])
+
+    const [daySelected, setDaySelected] = useState(dayjs().format("YYYY-MM-DD"))
+    const [search, setSearch] = useState("")
+    const [plantao, setPlantao] = useState<Plantao[]>([])
+    const [loading, setLoading] = useState(false)
+
+    function getPlantao() {
+        const filtered = plantoes.filter(p => p.date === dayjs(daySelected).format("DD/MM/YYYY") && (p.locale.toUpperCase().includes(search.toUpperCase()) || p.sector.toUpperCase().includes(search.toUpperCase())))
+
+        setPlantao(filtered)
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            getPlantao()
+        }, [daySelected, search])
+    )
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
             <Calendar
             style={styles.calendar}
             onDayPress={(day) => {
@@ -49,15 +83,23 @@ export function ScreenCalendar() {
                 todayTextColor: colors.blue[500],
                 dayTextColor: colors.gray[300],
                 textDisabledColor: colors.gray[500],
+                monthTextColor: colors.blue[400],
                 arrowColor: colors.gray[300],
-                monthTextColor: colors.gray[200],
-                textMonthFontWeight: 'bold',
+                textDayFontFamily: "Poppins-Regular",
+                textMonthFontFamily: "Poppins-Bold",
+                textDayHeaderFontFamily: "Poppins-Regular"
             }}
             />
 
             <View style={styles.list}>
-                <Text style={styles.listTitle}>Plantões disponíveis</Text>
+                <Input 
+                type="text"
+                icon="search-sharp"
+                placeholder="Pesquisar"
+                onChangeText={setSearch}
+                />
+                <ListPlantao plantao={plantao} showFooter={true} isEmpty="Não há plantões para solicitar" />
             </View>
-        </View>
+        </KeyboardAvoidingView>
     )
 }

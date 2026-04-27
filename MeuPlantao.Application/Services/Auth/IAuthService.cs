@@ -5,10 +5,10 @@ namespace MeuPlantao.Application.Services.Auth
 {
     public interface IAuthService
     {
-        Task<AuthServiceResponse<ResponseAuthLoginJson>> Login(RequestAuthLoginJson auth);
-        Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterMedico(RequestAuthRegisterMedicoJson request);
-        Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterEnfermeiro(RequestAuthRegisterEnfermeiroJson request);
-        Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterAdmin(RequestAuthRegisterAdminJson request);
-        Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterGestor(RequestAuthRegisterGestorJson request);
+        Task<ServiceResponse<ResponseAuthLoginJson>> Login(RequestAuthLoginJson auth);
+        Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterMedico(RequestAuthRegisterMedicoJson request);
+        Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterEnfermeiro(RequestAuthRegisterEnfermeiroJson request);
+        Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterAdmin(RequestAuthRegisterAdminJson request);
+        Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterGestor(RequestAuthRegisterGestorJson request);
     }
 }

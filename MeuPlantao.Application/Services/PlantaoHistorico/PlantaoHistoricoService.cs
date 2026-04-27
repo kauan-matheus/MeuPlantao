@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MeuPlantao.Communication.Dto.Requests;
+using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -20,56 +21,104 @@ namespace MeuPlantao.Application.Services.PlantaoHistorico
             _unit = unit;
         }
 
-        public async Task<List<PlantaoHistoricoModel>> Consultar()
+        public async Task<ServiceResponse<List<PlantaoHistoricoModel>>> Consultar()
         {
-            return await _repository.Consultar<PlantaoHistoricoModel>()
-                .OrderBy(p => p.Id)
-                .ToListAsync();
-        }
-
-        public async Task<PlantaoHistoricoModel?> ConsultarId(long id)
-        {
-            return await _repository.ConsultarPorId<PlantaoHistoricoModel>(id);
-        }
-
-        public async Task<bool> Cadastrar(RequestPlantaoHistoricoRegisterJson plantao)
-        {
-            //Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
-            var novo = new PlantaoHistoricoModel
+            try
             {
-                PlantaoId = plantao.PlantaoId,
-                Evento = plantao.Evento,
-                UsuarioId = plantao.UsuarioId,
-                Observacao = plantao.Observacao
-            };
+                var data = await _repository.Consultar<PlantaoHistoricoModel>()
+                    .OrderBy(p => p.Id)
+                    .ToListAsync();
 
-            return await _unit.Commit();
-        }
-
-        public async Task<bool> Editar(RequestPlantaoHistoricoRegisterJson plantao)
-        {
-            var novo = new PlantaoHistoricoModel
+                return ServiceResponse<List<PlantaoHistoricoModel>>.Ok(data);
+            }
+            catch (Exception ex)
             {
-                Id = plantao.Id,
-                PlantaoId = plantao.PlantaoId,
-                Evento = plantao.Evento,
-                UsuarioId = plantao.UsuarioId,
-                Observacao = plantao.Observacao
-            };
-
-            await _repository.Editar(plantao);
-            return await _unit.Commit();
+                return ServiceResponse<List<PlantaoHistoricoModel>>.Error(ex.Message);
+            }
         }
 
-        public async Task<PlantaoHistoricoModel?> Deletar(long id)
+        public async Task<ServiceResponse<PlantaoHistoricoModel>> ConsultarId(long id)
         {
-            var existente = await ConsultarId(id);
-            if (existente is null)
-                return null;
+            try
+            {
+                var data = await _repository.ConsultarPorId<PlantaoHistoricoModel>(id);
 
-            await _repository.Excluir(existente);
-            await _unit.Commit();
-            return existente;
+                if (data is null)
+                    return ServiceResponse<PlantaoHistoricoModel>.BadRequest("Registro não encontrado");
+
+                return ServiceResponse<PlantaoHistoricoModel>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<PlantaoHistoricoModel>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Cadastrar(RequestPlantaoHistoricoRegisterJson plantao)
+        {
+            try
+            {
+                var novo = new PlantaoHistoricoModel
+                {
+                    PlantaoId = plantao.PlantaoId,
+                    Evento = plantao.Evento,
+                    UsuarioId = plantao.UsuarioId,
+                    Observacao = plantao.Observacao
+                };
+
+                await _repository.Cadastrar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Editar(RequestPlantaoHistoricoRegisterJson plantao)
+        {
+            try
+            {
+                var novo = new PlantaoHistoricoModel
+                {
+                    Id = plantao.Id,
+                    PlantaoId = plantao.PlantaoId,
+                    Evento = plantao.Evento,
+                    UsuarioId = plantao.UsuarioId,
+                    Observacao = plantao.Observacao
+                };
+
+                await _repository.Editar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<PlantaoHistoricoModel>> Deletar(long id)
+        {
+            try
+            {
+                var existente = await ConsultarId(id);
+
+                if (!existente.Success || existente.Data is null)
+                    return ServiceResponse<PlantaoHistoricoModel>.BadRequest("Registro não encontrado");
+
+                await _repository.Excluir(existente.Data);
+                await _unit.Commit();
+
+                return ServiceResponse<PlantaoHistoricoModel>.Ok(existente.Data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<PlantaoHistoricoModel>.Error(ex.Message);
+            }
         }
     }
 }

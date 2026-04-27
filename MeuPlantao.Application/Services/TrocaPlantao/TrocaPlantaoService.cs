@@ -18,7 +18,6 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
         private readonly IUnitOfWork _unit;
         private readonly IProfRepository _profRepository;
 
-
         public TrocaPlantaoService(ITrocaRepository repository, IUnitOfWork unit, IProfRepository service)
         {
             _repository = repository;
@@ -26,40 +25,60 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
             _profRepository = service;
         }
 
-        public async Task<List<TrocaPlantaoModel>> Consultar()
+        public async Task<ServiceResponse<List<TrocaPlantaoModel>>> Consultar()
         {
-            return await _repository.Consultar<TrocaPlantaoModel>()
-                .OrderBy(p => p.Id)
-                .ToListAsync();
+            try
+            {
+                var data = await _repository.Consultar<TrocaPlantaoModel>()
+                    .OrderBy(p => p.Id)
+                    .ToListAsync();
+
+                return ServiceResponse<List<TrocaPlantaoModel>>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<List<TrocaPlantaoModel>>.Error(ex.Message);
+            }
         }
 
-        public async Task<TrocaPlantaoModel?> ConsultarId(long id)
+        public async Task<ServiceResponse<TrocaPlantaoModel>> ConsultarId(long id)
         {
-            return await _repository.ConsultarPorId<TrocaPlantaoModel>(id);
+            try
+            {
+                var data = await _repository.ConsultarPorId<TrocaPlantaoModel>(id);
+
+                if (data is null)
+                    return ServiceResponse<TrocaPlantaoModel>.BadRequest("Registro não encontrado");
+
+                return ServiceResponse<TrocaPlantaoModel>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<TrocaPlantaoModel>.Error(ex.Message);
+            }
         }
 
-        public async Task<bool> Cadastrar(RequestTrocaPlantaoRegisterJson troca, long userId)
+        public async Task<ServiceResponse<bool>> Cadastrar(RequestTrocaPlantaoRegisterJson troca, long userId)
         {
             await _unit.BeginTransaction();
 
             try
             {
-                var plantao = await _repository
-                    .ConsultarPorId<PlantaoModel>(troca.PlantaoId);
-            
+                var plantao = await _repository.ConsultarPorId<PlantaoModel>(troca.PlantaoId);
                 var prof = await _profRepository.ConsultarPorUserId(userId);
 
                 if (plantao is null)
-                    throw new Exception("plantao não existe");
+                    return ServiceResponse<bool>.BadRequest("plantao não existe");
+
                 if (prof is null)
-                    throw new Exception("É necessario estar logado como um profissional");
+                    return ServiceResponse<bool>.BadRequest("É necessario estar logado como um profissional");
 
                 if (plantao.ProfissionalResponsavelId is null)
-                    throw new Exception("Plantao não possui responsavel para que possa ocorrer uma troca");
-                if (prof.Id == plantao.ProfissionalResponsavelId)
-                    throw new Exception("Destinatario é mesmo usuario que solicitante");
+                    return ServiceResponse<bool>.BadRequest("Plantao não possui responsavel para que possa ocorrer uma troca");
 
-                // Mapeia o DTO para a entidade de domínio — nunca expõe o Model diretamente na API
+                if (prof.Id == plantao.ProfissionalResponsavelId)
+                    return ServiceResponse<bool>.BadRequest("Destinatario é mesmo usuario que solicitante");
+
                 var novo = new TrocaPlantaoModel
                 {
                     PlantaoId = troca.PlantaoId,
@@ -68,7 +87,7 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                     Status = StatusTrocaPlantaoEnum.Pendente,
                     Motivo = troca.Motivo,
                 };
-                
+
                 var novoHistorico = new TrocaHistoricoModel
                 {
                     Evento = EventoHistoricoEnum.Criada,
@@ -78,38 +97,38 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
 
                 await _repository.CadastrarComHistorico(novo, novoHistorico);
 
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
-                return true;
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
+                return ServiceResponse<bool>.Ok(true);
             }
-            catch
+            catch (Exception ex)
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error(ex.Message);
             }
         }
 
-        public async Task<bool> Aceitar(long id, long userId)
+        public async Task<ServiceResponse<bool>> Aceitar(long id, long userId)
         {
             await _unit.BeginTransaction();
 
             try
-                {
-                var troca = await _repository
-                    .ConsultarPorId<TrocaPlantaoModel>(id);
+            {
+                var troca = await _repository.ConsultarPorId<TrocaPlantaoModel>(id);
                 var prof = await _profRepository.ConsultarPorUserId(userId);
 
                 if (troca is null)
-                    throw new Exception("Troca não existe");
+                    return ServiceResponse<bool>.BadRequest("Troca não existe");
+
                 if (prof is null)
-                    throw new Exception("É necessario estar logado como um profissional");
+                    return ServiceResponse<bool>.BadRequest("É necessario estar logado como um profissional");
 
                 if (prof.Id != troca.DestinatarioId)
-                    throw new Exception("Apenas o destinatário pode aceitar");
+                    return ServiceResponse<bool>.BadRequest("Apenas o destinatário pode aceitar");
 
                 if (troca.Status != StatusTrocaPlantaoEnum.Pendente)
-                    throw new Exception("Troca não pode ser aceita");
+                    return ServiceResponse<bool>.BadRequest("Troca não pode ser aceita");
 
                 troca.Status = StatusTrocaPlantaoEnum.Aceita;
 
@@ -121,40 +140,39 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 };
 
                 await _repository.EditarComHistorico(troca, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
-                return true;
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
+                return ServiceResponse<bool>.Ok(true);
             }
-            catch
+            catch (Exception ex)
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error(ex.Message);
             }
         }
 
-        public async Task<bool> Recusar(long id, long userId)
+        public async Task<ServiceResponse<bool>> Recusar(long id, long userId)
         {
             await _unit.BeginTransaction();
 
             try
             {
-                var troca = await _repository
-                    .ConsultarPorId<TrocaPlantaoModel>(id);
+                var troca = await _repository.ConsultarPorId<TrocaPlantaoModel>(id);
                 var prof = await _profRepository.ConsultarPorUserId(userId);
 
                 if (troca is null)
-                    throw new Exception("Troca não existe");
+                    return ServiceResponse<bool>.BadRequest("Troca não existe");
+
                 if (prof is null)
-                    throw new Exception("É necessario estar logado como um profissional");
-                
+                    return ServiceResponse<bool>.BadRequest("É necessario estar logado como um profissional");
 
                 if (prof.Id != troca.DestinatarioId)
-                    throw new Exception("Apenas o destinatário pode recusar");
+                    return ServiceResponse<bool>.BadRequest("Apenas o destinatário pode recusar");
 
                 if (troca.Status != StatusTrocaPlantaoEnum.Pendente)
-                    throw new Exception("Troca não pode ser recusada");
+                    return ServiceResponse<bool>.BadRequest("Troca não pode ser recusada");
 
                 troca.Status = StatusTrocaPlantaoEnum.Recusada;
 
@@ -166,20 +184,20 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 };
 
                 await _repository.EditarComHistorico(troca, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
-                return true;
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
+                return ServiceResponse<bool>.Ok(true);
             }
-            catch
+            catch (Exception ex)
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error(ex.Message);
             }
         }
 
-        public async Task<bool> EnviarParaAprovacao(long id, long userId)
+        public async Task<ServiceResponse<bool>> EnviarParaAprovacao(long id, long userId)
         {
             await _unit.BeginTransaction();
 
@@ -188,14 +206,13 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 var troca = await _repository.ConsultarTrocaCompleta(id);
 
                 if (troca is null)
-                    throw new Exception("Precisa ser uma troca existente");
+                    return ServiceResponse<bool>.BadRequest("Precisa ser uma troca existente");
 
                 if (troca.Plantao.Setor.RepresentanteId != userId)
-                    throw new Exception("Apenas o representante pode enviar para aprovação");
+                    return ServiceResponse<bool>.BadRequest("Apenas o representante pode enviar para aprovação");
 
                 if (troca.Status != StatusTrocaPlantaoEnum.Aceita)
-                    throw new Exception("Troca precisa estar aceita");
-
+                    return ServiceResponse<bool>.BadRequest("Troca precisa estar aceita");
 
                 troca.Status = StatusTrocaPlantaoEnum.AguardandoAprovacao;
 
@@ -207,35 +224,35 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 };
 
                 await _repository.EditarComHistorico(troca, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
-                return true;
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
+                return ServiceResponse<bool>.Ok(true);
             }
-            catch
+            catch (Exception ex)
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error(ex.Message);
             }
         }
 
-        public async Task<bool> Aprovar(long id, long userId)
+        public async Task<ServiceResponse<bool>> Aprovar(long id, long userId)
         {
             await _unit.BeginTransaction();
 
-            try{
+            try
+            {
                 var troca = await _repository.ConsultarTrocaCompleta(id);
 
                 if (troca is null)
-                    throw new Exception("Precisa ser uma troca existente");
+                    return ServiceResponse<bool>.BadRequest("Precisa ser uma troca existente");
 
                 if (troca.Plantao.Setor.RepresentanteId != userId)
-                    throw new Exception("Apenas o representante pode aprovar");
+                    return ServiceResponse<bool>.BadRequest("Apenas o representante pode aprovar");
 
                 if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
-                    throw new Exception("Troca não está aguardando aprovação");
-
+                    return ServiceResponse<bool>.BadRequest("Troca não está aguardando aprovação");
 
                 troca.Status = StatusTrocaPlantaoEnum.Aprovada;
                 troca.Plantao.ProfissionalResponsavelId = troca.SolicitanteId;
@@ -250,21 +267,21 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 };
 
                 await _repository.EditarComHistorico(troca, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
-                return true;
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
+                return ServiceResponse<bool>.Ok(true);
             }
-            catch
+            catch (Exception ex)
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error(ex.Message);
             }
         }
 
-        public async Task<bool> Reprovar(long id, long userId)
-        {   
+        public async Task<ServiceResponse<bool>> Reprovar(long id, long userId)
+        {
             await _unit.BeginTransaction();
 
             try
@@ -272,13 +289,13 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 var troca = await _repository.ConsultarTrocaCompleta(id);
 
                 if (troca is null)
-                    throw new Exception("Precisa ser uma troca existente");
+                    return ServiceResponse<bool>.BadRequest("Precisa ser uma troca existente");
 
                 if (troca.Plantao.Setor.RepresentanteId != userId)
-                    throw new Exception("Apenas o representante pode reprovar");
+                    return ServiceResponse<bool>.BadRequest("Apenas o representante pode reprovar");
 
                 if (troca.Status != StatusTrocaPlantaoEnum.AguardandoAprovacao)
-                    throw new Exception("Troca não está aguardando aprovação");
+                    return ServiceResponse<bool>.BadRequest("Troca não está aguardando aprovação");
 
                 troca.Status = StatusTrocaPlantaoEnum.Reprovada;
 
@@ -290,28 +307,37 @@ namespace MeuPlantao.Application.Services.TrocaPlantao
                 };
 
                 await _repository.EditarComHistorico(troca, novoHistorico);
-                
-                await _unit.Commit();              // salva no banco
-                await _unit.CommitTransaction();   // confirma transação
-                
-                return true;
+
+                await _unit.Commit();
+                await _unit.CommitTransaction();
+
+                return ServiceResponse<bool>.Ok(true);
             }
-            catch
+            catch (Exception ex)
             {
                 await _unit.RollbackTransaction();
-                throw;
+                return ServiceResponse<bool>.Error(ex.Message);
             }
         }
 
-        public async Task<TrocaPlantaoModel?> Deletar(long id)
+        public async Task<ServiceResponse<TrocaPlantaoModel>> Deletar(long id)
         {
-            var existente = await ConsultarId(id);
-            if (existente is null)
-                return null;
+            try
+            {
+                var existente = await _repository.ConsultarPorId<TrocaPlantaoModel>(id);
 
-            await _repository.Excluir(existente);
-            await _unit.Commit();
-            return existente;
+                if (existente is null)
+                    return ServiceResponse<TrocaPlantaoModel>.BadRequest("Registro não encontrado");
+
+                await _repository.Excluir(existente);
+                await _unit.Commit();
+
+                return ServiceResponse<TrocaPlantaoModel>.Ok(existente);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<TrocaPlantaoModel>.Error(ex.Message);
+            }
         }
     }
 }

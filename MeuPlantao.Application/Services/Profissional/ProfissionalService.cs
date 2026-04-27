@@ -1,4 +1,5 @@
 using MeuPlantao.Communication.Dto.Requests;
+using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Communication.Enums;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
@@ -17,77 +18,135 @@ namespace MeuPlantao.Application.Services.Profissional
             _unit = unit;
         }
 
-        public async Task<List<ProfissionalModel>> Consultar()
+        public async Task<ServiceResponse<List<ProfissionalModel>>> Consultar()
         {
-            return await _repository.Consultar<ProfissionalModel>()
-                .OrderBy(p => p.Id)
-                .ToListAsync();
-        }
-
-        public async Task<ProfissionalModel?> ConsultarId(long id)
-        {
-            return await _repository.ConsultarPorId<ProfissionalModel>(id);
-        }
-
-        public async Task<ProfissionalModel?> ConsultarUserId(long id)
-        {
-            return await _repository.ConsultarPorUserId(id);
-        }
-
-        public async Task<bool> Cadastrar(RequestProfissionalRegisterJson profissional)
-        {
-            // Valida se o usuário vinculado existe antes de cadastrar o profissional
-            var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
-            if (existente is null)
-                return false;
-
-            var novo = new ProfissionalModel
+            try
             {
-                Nome = profissional.Nome,
-                Role = profissional.Role,
-                Crm = profissional.Crm,
-                Coren = profissional.Crm,
-                Telefone = profissional.Telefone,
-                UserId = profissional.UserId,
-                User = existente,
-            };
+                var data = await _repository.Consultar<ProfissionalModel>()
+                    .OrderBy(p => p.Id)
+                    .ToListAsync();
 
-            await _repository.Cadastrar(novo);
-            return await _unit.Commit();
-        }
-
-        public async Task<bool> Editar(RequestProfissionalRegisterJson profissional)
-        {
-            // Valida se o usuário vinculado existe antes de editar o profissional
-            var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
-            if (existente is null)
-                return false;
-
-            var novo = new ProfissionalModel
+                return ServiceResponse<List<ProfissionalModel>>.Ok(data);
+            }
+            catch (Exception ex)
             {
-                Id = profissional.Id,
-                Nome = profissional.Nome,
-                Role = profissional.Role,
-                Crm = profissional.Crm,
-                Coren = profissional.Crm,
-                Telefone = profissional.Telefone,
-                UserId = profissional.UserId,
-                User = existente,
-            };
-
-            await _repository.Editar(novo);
-            return await _unit.Commit();
+                return ServiceResponse<List<ProfissionalModel>>.Error(ex.Message);
+            }
         }
 
-        public async Task<ProfissionalModel?> Deletar(long id)
+        public async Task<ServiceResponse<ProfissionalModel>> ConsultarId(long id)
         {
-            var existente = await ConsultarId(id);
-            if (existente is null)
-                return null;
+            try
+            {
+                var data = await _repository.ConsultarPorId<ProfissionalModel>(id);
 
-            await _repository.Excluir(existente);
-            await _unit.Commit();
-            return existente;
+                if (data is null)
+                    return ServiceResponse<ProfissionalModel>.BadRequest("Registro não encontrado");
+
+                return ServiceResponse<ProfissionalModel>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<ProfissionalModel>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<ProfissionalModel>> ConsultarUserId(long id)
+        {
+            try
+            {
+                var data = await _repository.ConsultarPorUserId(id);
+
+                if (data is null)
+                    return ServiceResponse<ProfissionalModel>.BadRequest("Registro não encontrado");
+
+                return ServiceResponse<ProfissionalModel>.Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<ProfissionalModel>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Cadastrar(RequestProfissionalRegisterJson profissional)
+        {
+            try
+            {
+                var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
+                if (existente is null)
+                    return ServiceResponse<bool>.BadRequest("Usuário não encontrado");
+
+                var novo = new ProfissionalModel
+                {
+                    Nome = profissional.Nome,
+                    Role = profissional.Role,
+                    Crm = profissional.Crm,
+                    Coren = profissional.Crm,
+                    Telefone = profissional.Telefone,
+                    UserId = profissional.UserId,
+                    User = existente,
+                };
+
+                await _repository.Cadastrar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> Editar(RequestProfissionalRegisterJson profissional)
+        {
+            try
+            {
+                var existente = await _repository.ConsultarPorId<UserModel>(profissional.UserId);
+                if (existente is null)
+                    return ServiceResponse<bool>.BadRequest("Usuário não encontrado");
+
+                var novo = new ProfissionalModel
+                {
+                    Id = profissional.Id,
+                    Nome = profissional.Nome,
+                    Role = profissional.Role,
+                    Crm = profissional.Crm,
+                    Coren = profissional.Crm,
+                    Telefone = profissional.Telefone,
+                    UserId = profissional.UserId,
+                    User = existente,
+                };
+
+                await _repository.Editar(novo);
+                var result = await _unit.Commit();
+
+                return ServiceResponse<bool>.Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<bool>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<ProfissionalModel>> Deletar(long id)
+        {
+            try
+            {
+                var existente = await ConsultarId(id);
+
+                if (!existente.Success || existente.Data is null)
+                    return ServiceResponse<ProfissionalModel>.BadRequest("Registro não encontrado");
+
+                await _repository.Excluir(existente.Data);
+                await _unit.Commit();
+
+                return ServiceResponse<ProfissionalModel>.Ok(existente.Data);
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<ProfissionalModel>.Error(ex.Message);
+            }
         }
     }
 }

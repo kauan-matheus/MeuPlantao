@@ -4,23 +4,20 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
     container: {
         width: "100%",
-        height: 50,
-        backgroundColor: colors.gray[400],
-        borderRadius: 25,
-        paddingHorizontal: 10,
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.3)",
+        // height: 50,
+        // backgroundColor: colors.gray[800],
+        borderRadius: 15,
+        paddingHorizontal: 16,
         flexDirection: "row",
         justifyContent: "space-between",
-        alignItems: "center"
-    },
-    group: {
-        width: "85%",
-        flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        borderBottomWidth: 1,
+        borderColor: colors.gray[500]
     },
     input: {
-        fontSize: 17,
-        fontWeight: "bold",
-        width: "100%"
+        fontSize: 15,
+        fontFamily: "Poppins-Regular",
+        width: "90%",
+        color: colors.gray[100]
     }
 })

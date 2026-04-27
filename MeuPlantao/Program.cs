@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using MeuPlantao.Domain.Entities;
 using MeuPlantao.Application.Services.TrocaHistorico;
 using MeuPlantao.Application.Services.TrocaPlantao;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,12 +20,22 @@ using MeuPlantao.Infrastructure.UnitOfWork;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MeuPlantao.Application.Validators;
+using MeuPlantao.Filters;
+using Microsoft.AspNetCore.Mvc;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 builder.Services.AddFluentValidationAutoValidation();
 
@@ -106,15 +115,25 @@ builder.Services.AddAuthorization();
 var connectionString = builder.Configuration.GetConnectionString("Default");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 }
 
-Console.WriteLine(builder.Configuration.GetConnectionString("Default"));
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -23,7 +23,7 @@ public class AuthService : IAuthService
         _unit = unit;
     }
 
-    public async Task<AuthServiceResponse<ResponseAuthLoginJson>> Login(RequestAuthLoginJson auth)
+    public async Task<ServiceResponse<ResponseAuthLoginJson>> Login(RequestAuthLoginJson auth)
     {
         var usuario = await _repository.ConsultarUsuarioPorEmail(auth.Email);
 
@@ -33,15 +33,15 @@ public class AuthService : IAuthService
 
         // Mesma mensagem para email inexistente e senha errada (segurança)
         if (usuario == null || !senhaValida)
-            return AuthServiceResponse<ResponseAuthLoginJson>.Unauthorized("Email ou senha inválidos");
+            return ServiceResponse<ResponseAuthLoginJson>.Unauthorized("Email ou senha inválidos");
 
         if (!usuario.Active)
-            return AuthServiceResponse<ResponseAuthLoginJson>.Unauthorized("Usuário inativo");
+            return ServiceResponse<ResponseAuthLoginJson>.Unauthorized("Usuário inativo");
 
         // gerar o token do JWT
         var token = _tokenService.GenerateToken(usuario);
 
-        return AuthServiceResponse<ResponseAuthLoginJson>.Ok(new ResponseAuthLoginJson
+        return ServiceResponse<ResponseAuthLoginJson>.Ok(new ResponseAuthLoginJson
         {
             Token = token,
             ExpiresIn = "8h",
@@ -54,11 +54,11 @@ public class AuthService : IAuthService
         });
     }
 
-    public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterMedico(RequestAuthRegisterMedicoJson request)
+    public async Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterMedico(RequestAuthRegisterMedicoJson request)
     {
         var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
         if (emailExiste)
-            return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
+            return ServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
 
         // BCrypt em background — HashPassword é pesado por design (segurança)
         var passwordHash = await Task.Run(() => BCrypt.Net.BCrypt.HashPassword(request.Password));
@@ -95,14 +95,14 @@ public class AuthService : IAuthService
 
             // Loga o erro real para debug, mas retorna mensagem genérica ao cliente
             _logger.LogError(ex, "Erro ao registrar usuário: {Email}", request.Email);
-            return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
+            return ServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
         }
 
         // Após o cadastro o EF Core já preencheu usuario.Id com o valor gerado pelo banco
         // Só geramos o token aqui para garantir que o Id é válido
         var token = _tokenService.GenerateToken(usuario);
 
-        return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
+        return ServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
         {
             Message = "Usuário registrado com sucesso",
             Token = token,
@@ -114,11 +114,11 @@ public class AuthService : IAuthService
         });
     }
 
-    public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterEnfermeiro(RequestAuthRegisterEnfermeiroJson request)
+    public async Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterEnfermeiro(RequestAuthRegisterEnfermeiroJson request)
     {
         var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
         if (emailExiste)
-            return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
+            return ServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
 
         // BCrypt em background — HashPassword é pesado por design (segurança)
         var passwordHash = await Task.Run(() => BCrypt.Net.BCrypt.HashPassword(request.Password));
@@ -155,14 +155,14 @@ public class AuthService : IAuthService
             
             // Loga o erro real para debug, mas retorna mensagem genérica ao cliente
             _logger.LogError(ex, "Erro ao registrar usuário: {Email}", request.Email);
-            return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
+            return ServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o usuário");
         }
 
         // Após o cadastro o EF Core já preencheu usuario.Id com o valor gerado pelo banco
         // Só geramos o token aqui para garantir que o Id é válido
         var token = _tokenService.GenerateToken(usuario);
 
-        return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
+        return ServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
         {
             Message = "Usuário registrado com sucesso",
             Token = token,
@@ -174,11 +174,11 @@ public class AuthService : IAuthService
         });
     }
 
-    public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterAdmin(RequestAuthRegisterAdminJson request)
+    public async Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterAdmin(RequestAuthRegisterAdminJson request)
     {
         var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
         if (emailExiste)
-            return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
+            return ServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
 
         // BCrypt em background — mesma razão do Register
         var passwordHash = await Task.Run(() => BCrypt.Net.BCrypt.HashPassword(request.Password));
@@ -200,13 +200,13 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao registrar admin: {Email}", request.Email);
-            return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o admin");
+            return ServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o admin");
         }
 
         // Token gerado após cadastro para garantir que usuario.Id foi populado
         var token = _tokenService.GenerateToken(usuario);
 
-        return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
+        return ServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
         {
             Message = "Admin registrado com sucesso",
             Token = token,
@@ -219,11 +219,11 @@ public class AuthService : IAuthService
         });
     }
 
-    public async Task<AuthServiceResponse<ResponseAuthRegisterJson>> RegisterGestor(RequestAuthRegisterGestorJson request)
+    public async Task<ServiceResponse<ResponseAuthRegisterJson>> RegisterGestor(RequestAuthRegisterGestorJson request)
     {
         var emailExiste = await _repository.ExisteUsuarioPorEmail(request.Email);
         if (emailExiste)
-            return AuthServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
+            return ServiceResponse<ResponseAuthRegisterJson>.BadRequest("Email já cadastrado");
 
         // BCrypt em background — mesma razão do Register
         var passwordHash = await Task.Run(() => BCrypt.Net.BCrypt.HashPassword(request.Password));
@@ -245,12 +245,12 @@ public class AuthService : IAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Erro ao registrar gestor: {Email}", request.Email);
-            return AuthServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o gestor");
+            return ServiceResponse<ResponseAuthRegisterJson>.Error("Não foi possível registrar o gestor");
         }
 
         // Token gerado após cadastro para garantir que usuario.Id foi populado
         var token = _tokenService.GenerateToken(usuario);
-        return AuthServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
+        return ServiceResponse<ResponseAuthRegisterJson>.Ok(new ResponseAuthRegisterJson
         {
             Message = "Gestor registrado com sucesso",
             Token = token,
