@@ -30,7 +30,7 @@ export function ListPlantao({plantao, showFooter, isEmpty}: Props) {
                 duration={item.duration}
                 locale={item.locale}
                 sector={item.sector}
-                oncall={item.oncall}
+                oncall={item.onduty}
                 onDetails={() => setShowModal(true)}
                 />
             )}
