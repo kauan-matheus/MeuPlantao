@@ -41,7 +41,11 @@ jobs:
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-              cd ~/meuplantao
-              docker compose pull backend
-              docker compose up -d
-              docker image prune -f
+            cd ~/meuplantao
+            docker compose pull
+            docker run --rm \
+            --network meuplantao-network \
+            -e ConnectionStrings__Default="Host=postgres;Port=5432;Database=MeuPlantaoDB;Username=postgres;Password=8643" \
+            zhunixy/meuplantao-migrations
+            docker compose up -d
+            docker image prune -f
