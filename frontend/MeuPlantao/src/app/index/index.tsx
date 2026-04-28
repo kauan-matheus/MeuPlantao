@@ -11,7 +11,7 @@ import { colors } from "@/styles/colors"
 import { Input } from "@/components/input/input"
 import { Button } from "@/components/button"
 
-import { login, getAuth } from "@/services/user"
+import { login, getAuth, registerProfessional } from "@/services/user"
 
 export default function Index() {
 
@@ -32,8 +32,6 @@ export default function Index() {
     const [name, setName] = useState("")
     const [document, setDocument] = useState("")
     const [telephone, setTelephone] = useState("")
-    const [confirmEmail, setConfirmEmail] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
     const [option, setOption] = useState<"CRM" | "Coren">("CRM")
 
     const [showModalLogin, setShowModalLogin] = useState(false)
@@ -77,8 +75,6 @@ export default function Index() {
         setTelephone(""),
         setEmail(""),
         setPassword(""),
-        setConfirmEmail(""),
-        setConfirmPassword(""),
         setOption("CRM")
     }
 
@@ -228,21 +224,27 @@ export default function Index() {
                                 placeholder="Senha"
                                 onChangeText={setPassword}
                                 />
-                                <Input
-                                type="text"
-                                placeholder="Confirme seu email"
-                                onChangeText={setConfirmEmail}
-                                />
-                                <Input
-                                type="password"
-                                placeholder="Confirm sua senha"
-                                onChangeText={setConfirmPassword}
-                                />
                                 <Button 
                                 text="Enviar"
                                 color={colors.blue[500]}
                                 textColor={colors.gray[700]}
-                                onPress={() => null}
+                                onPress={async () => {
+                                    if (loading) return
+
+                                    setLoading(true)
+                                    const data = await registerProfessional(email, password, name, document, telephone, option)
+                                    setLoading(false)
+
+                                    if (data.type === "success") {
+                                        setLoading(true)
+                                        await login(email, password)
+                                        setLoading(false)
+                                        router.navigate("./interfaceUser")
+                                    } else {
+                                        const type = typeof data.message
+                                        showError(type === "string" ? data.message : data.message[0])
+                                    }
+                                }}
                                 />
                             </View>
                         </KeyboardAvoidingView>
