@@ -2,6 +2,7 @@
 **/.env
 **/.git
 **/.gitignore
+**/.gitattributes
 **/.project
 **/.settings
 **/.toolstarget
@@ -17,6 +18,13 @@
 # **/docker-compose*
 # **/Dockerfile*
 **/node_modules
+**/.pnpm-store
+**/.npm
+**/.yarn
+**/.expo
+**/dist
+**/build
+**/coverage
 **/npm-debug.log
 **/obj
 **/secrets.dev.yaml

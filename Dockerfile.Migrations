@@ -1,0 +1,34 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+WORKDIR /src
+
+COPY ["MeuPlantao.sln", "."]
+COPY ["MeuPlantao/MeuPlantao.csproj", "MeuPlantao/"]
+COPY ["MeuPlantao.Application/MeuPlantao.Application.csproj", "MeuPlantao.Application/"]
+COPY ["MeuPlantao.Communication/MeuPlantao.Communication.csproj", "MeuPlantao.Communication/"]
+COPY ["MeuPlantao.Domain/MeuPlantao.Domain.csproj", "MeuPlantao.Domain/"]
+COPY ["MeuPlantao.Infrastructure/MeuPlantao.Infrastructure.csproj", "MeuPlantao.Infrastructure/"]
+
+RUN dotnet restore "MeuPlantao.sln"
+
+COPY . .
+
+RUN dotnet tool install --global dotnet-ef && \
+    export PATH="$PATH:/root/.dotnet/tools" && \
+    dotnet ef migrations bundle \
+    --project "MeuPlantao.Infrastructure" \
+    --startup-project "MeuPlantao" \
+    --configuration Release \
+    --self-contained \
+    --runtime linux-x64 \
+    --output /out/efbundle
+
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0
+
+WORKDIR /app
+
+COPY --from=build /out/efbundle ./efbundle
+
+RUN chmod +x ./efbundle
+
+ENTRYPOINT ["./efbundle"]

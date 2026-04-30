@@ -34,17 +34,20 @@ LocaleConfig.defaultLocale = 'pt-br'
 
 export function ScreenCalendar() {
 
-    // useEffect(() => {
-    //     async function load() {
-    //         setLoading(true)
-            
-    //         const data = await getPlantoes()
-    //         console.log(data)
-    //         setLoading(false)
-    //     }
+    useEffect(() => {
+        async function load() {
+            setLoading(true)
+            const data = await getPlantoes()
+            setLoading(false)
 
-    //     load()
-    // }, [])
+            if (data.type === "success")
+                console.log(data.result)
+            else
+                console.log(data.result)
+        }
+
+        load()
+    }, [])
 
     const [daySelected, setDaySelected] = useState(dayjs().format("YYYY-MM-DD"))
     const [search, setSearch] = useState("")

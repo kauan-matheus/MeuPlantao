@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<PlantaoModel> Plantoes { get; set; }
     public DbSet<ProfissionalModel> Profissionais { get; set; }
     public DbSet<SetorModel> Setores { get; set; }
+    public DbSet<EstabelecimentoModel> Estabelecimentos { get; set; }
     public DbSet<TrocaHistoricoModel> Historico { get; set; }
     public DbSet<PlantaoHistoricoModel> HistoricoPlantao { get; set; }
     public DbSet<TrocaPlantaoModel> TrocaPlantoes { get; set; }
@@ -56,14 +57,20 @@ public class AppDbContext : DbContext
             .HasForeignKey(s => s.ProfissionalId)
             .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<SolicitacaoModel>()
-                .HasIndex(s => new { s.PlantaoId, s.ProfissionalId })
-                .IsUnique();
+            .HasIndex(s => new { s.PlantaoId, s.ProfissionalId })
+            .IsUnique();
 
         //Builder pro FK do setor 
         modelBuilder.Entity<SetorModel>()
-            .HasOne(p => p.Representante)
+            .HasOne(s => s.Representante)
             .WithMany()
-            .HasForeignKey(p => p.RepresentanteId)
+            .HasForeignKey(s => s.RepresentanteId)
+            .IsRequired(true);
+        
+        modelBuilder.Entity<SetorModel>()
+            .HasOne(s => s.Estabelecimento)
+            .WithMany()
+            .HasForeignKey(s => s.EstabelecimentoId)
             .IsRequired(true);
         
         //Builder pras FK de troca plantao

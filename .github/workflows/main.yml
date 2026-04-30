@@ -29,6 +29,14 @@ jobs:
           push: true
           tags: zhunixy/meuplantao:latest
 
+      - name: Build and push Migrations Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.Migrations
+          push: true
+          tags: zhunixy/meuplantao-migrations:latest
+
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
@@ -42,10 +50,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/meuplantao
-            docker compose pull
-            docker run --rm \
-            --network meuplantao-network \
-            -e ConnectionStrings__Default="Host=postgres;Port=5432;Database=MeuPlantaoDB;Username=postgres;Password=8643" \
-            zhunixy/meuplantao-migrations
-            docker compose up -d
+            docker compose pull backend migrations
+            docker compose up -d postgres
+            docker compose run --rm migrations
+            docker compose up -d backend
             docker image prune -f

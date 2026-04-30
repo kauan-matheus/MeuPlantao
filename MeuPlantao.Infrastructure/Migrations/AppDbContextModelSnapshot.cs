@@ -22,6 +22,24 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("MeuPlantao.Domain.Entities.EstabelecimentoModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Estabelecimentos");
+                });
+
             modelBuilder.Entity("MeuPlantao.Domain.Entities.PlantaoHistoricoModel", b =>
                 {
                     b.Property<long>("Id")
@@ -139,6 +157,9 @@ namespace MeuPlantao.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("EstabelecimentoId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -148,6 +169,8 @@ namespace MeuPlantao.Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EstabelecimentoId");
 
                     b.HasIndex("RepresentanteId");
 
@@ -332,11 +355,19 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             modelBuilder.Entity("MeuPlantao.Domain.Entities.SetorModel", b =>
                 {
+                    b.HasOne("MeuPlantao.Domain.Entities.EstabelecimentoModel", "Estabelecimento")
+                        .WithMany()
+                        .HasForeignKey("EstabelecimentoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MeuPlantao.Domain.Entities.UserModel", "Representante")
                         .WithMany()
                         .HasForeignKey("RepresentanteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Estabelecimento");
 
                     b.Navigation("Representante");
                 });

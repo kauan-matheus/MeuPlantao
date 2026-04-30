@@ -41,6 +41,19 @@ services:
       - meuplantao-network
     restart: unless-stopped
 
+  migrations:
+    image: zhunixy/meuplantao-migrations:latest
+    container_name: meuplantao-migrations
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=MeuPlantaoDB;Username=postgres;Password=8643
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - meuplantao-network
+    restart: "no"
+
 volumes:
   postgres_data:
     driver: local

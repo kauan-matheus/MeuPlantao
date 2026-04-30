@@ -13,6 +13,19 @@ namespace MeuPlantao.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Estabelecimentos",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Estabelecimentos", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Usuarios",
                 columns: table => new
                 {
@@ -59,11 +72,18 @@ namespace MeuPlantao.Infrastructure.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    RepresentanteId = table.Column<long>(type: "bigint", nullable: false)
+                    RepresentanteId = table.Column<long>(type: "bigint", nullable: false),
+                    EstabelecimentoId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Setores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Setores_Estabelecimentos_EstabelecimentoId",
+                        column: x => x.EstabelecimentoId,
+                        principalTable: "Estabelecimentos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Setores_Usuarios_RepresentanteId",
                         column: x => x.RepresentanteId,
@@ -259,6 +279,11 @@ namespace MeuPlantao.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Setores_EstabelecimentoId",
+                table: "Setores",
+                column: "EstabelecimentoId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Setores_RepresentanteId",
                 table: "Setores",
                 column: "RepresentanteId");
@@ -313,6 +338,9 @@ namespace MeuPlantao.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Setores");
+
+            migrationBuilder.DropTable(
+                name: "Estabelecimentos");
 
             migrationBuilder.DropTable(
                 name: "Usuarios");

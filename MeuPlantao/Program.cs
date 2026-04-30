@@ -44,6 +44,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IPlantaoRepository, PlantaoRepository>();
 builder.Services.AddScoped<ITrocaRepository, TrocaRepository>();
 builder.Services.AddScoped<IProfRepository, ProfRepository>();
+builder.Services.AddScoped<ISetorRepository, SetorRepository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPlantaoService, PlantaoService>();
@@ -125,12 +126,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
 
 app.UseSwagger();
 app.UseSwaggerUI();

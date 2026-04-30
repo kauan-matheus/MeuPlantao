@@ -3,10 +3,10 @@ import { api } from "./api";
 export const getPlantoes = async () => {
     try {
         const response = await api.get("/api/Plantao/plantoes")
-        return response.data
+        return {type: "success", result: response.data}
     } catch (error: any) {
         console.log(error.response?.data)
-        return null
+        return {type: "error", result: "Não foi possível listar os plantões"}
     }
 }
 

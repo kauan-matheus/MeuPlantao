@@ -23,19 +23,33 @@ namespace MeuPlantao.Application.Services.Plantao
             _profRepository = profRepository;
         }
 
-        public async Task<ServiceResponse<List<PlantaoModel>>> Consultar()
+        public async Task<ServiceResponse<List<ResponsePlantaoJson>>> Consultar()
         {
             try
             {
-                var plantoes = await _repository.Consultar<PlantaoModel>()
-                    .OrderBy(p => p.Id)
-                    .ToListAsync();
+                var query = _repository.Consultar<PlantaoModel>()
+                    .OrderBy(p => p.Id);
 
-                return ServiceResponse<List<PlantaoModel>>.Ok(plantoes);
+                var plantoes = await query.Select(p => new ResponsePlantaoJson
+                {
+                    Id = p.Id,
+                    Date = p.Inicio.ToString("dd/MM/yyyy"),
+                    Start = p.Inicio.ToString("HH:mm"),
+                    Duration = (p.Fim - p.Inicio).ToString(@"hh\:mm"),
+                    Locale = p.Setor.Estabelecimento.Nome,
+                    Sector = p.Setor.Nome,
+                    Value = p.Valor,
+                    Responsable = p.Setor.Representante.Email,
+                    OnDuty = p.ProfissionalResponsavel != null 
+                        ? p.ProfissionalResponsavel.Nome 
+                        : "Disponivel"
+                }).ToListAsync();
+
+                return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
             }
             catch (Exception ex)
             {
-                return ServiceResponse<List<PlantaoModel>>.Error(ex.Message);
+                return ServiceResponse<List<ResponsePlantaoJson>>.Error(ex.Message);
             }
         }
 
@@ -62,36 +76,34 @@ namespace MeuPlantao.Application.Services.Plantao
             }
         }
 
-        public async Task<ServiceResponse<PlantaoModel>> ConsultarId(long id)
+        public async Task<ServiceResponse<ResponsePlantaoJson>> ConsultarId(long id)
         {
             try
             {
                 var result = await _repository.ConsultarPorId<PlantaoModel>(id);
 
                 if (result is null)
-                    return ServiceResponse<PlantaoModel>.BadRequest("Plantao nao existe");
+                    return ServiceResponse<ResponsePlantaoJson>.BadRequest("Plantao nao existe");
 
-                if (result.ProfissionalResponsavelId is null)
-                    return ServiceResponse<PlantaoModel>.Ok(new PlantaoModel
-                    {
-                        Valor = result.Valor,
-                        SetorId = result.SetorId,
-                        Inicio = result.Inicio,
-                        Fim = result.Fim,
-                    });
-
-                return ServiceResponse<PlantaoModel>.Ok(new PlantaoModel
+                
+                return ServiceResponse<ResponsePlantaoJson>.Ok(new ResponsePlantaoJson
                 {
-                    Valor = result.Valor,
-                    SetorId = result.SetorId,
-                    Inicio = result.Inicio,
-                    Fim = result.Fim,
-                    ProfissionalResponsavelId = (long)result.ProfissionalResponsavelId
+                    Id = result.Id,
+                    Date = result.Inicio.ToString("dd/MM/yyyy"),
+                    Start = result.Inicio.ToString("HH:mm"),
+                    Duration = (result.Fim - result.Inicio).ToString(@"hh\:mm"),
+                    Locale = result.Setor.Estabelecimento.Nome,
+                    Sector = result.Setor.Nome,
+                    Value = result.Valor,
+                    Responsable = result.Setor.Representante.Email,
+                    OnDuty = result.ProfissionalResponsavel != null 
+                        ? result.ProfissionalResponsavel.Nome 
+                        : "Disponivel"
                 });
             }
             catch (Exception ex)
             {
-                return ServiceResponse<PlantaoModel>.Error(ex.Message);
+                return ServiceResponse<ResponsePlantaoJson>.Error(ex.Message);
             }
         }
 
