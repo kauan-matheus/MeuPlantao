@@ -48,8 +48,10 @@ jobs:
           host: ${{ vars.EC2_HOST }}
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
           script: |
             cd ~/meuplantao
+            git pull --ff-only origin ${{ github.ref_name }}
             docker compose pull backend migrations
             docker compose up -d postgres
             docker compose run --rm migrations
