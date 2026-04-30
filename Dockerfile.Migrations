@@ -9,7 +9,7 @@ COPY ["MeuPlantao.Communication/MeuPlantao.Communication.csproj", "MeuPlantao.Co
 COPY ["MeuPlantao.Domain/MeuPlantao.Domain.csproj", "MeuPlantao.Domain/"]
 COPY ["MeuPlantao.Infrastructure/MeuPlantao.Infrastructure.csproj", "MeuPlantao.Infrastructure/"]
 
-RUN dotnet restore "MeuPlantao.sln"
+RUN dotnet restore "MeuPlantao.sln" -r linux-x64
 
 COPY . .
 
