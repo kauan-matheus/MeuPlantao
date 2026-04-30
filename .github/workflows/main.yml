@@ -51,7 +51,9 @@ jobs:
           script_stop: true
           script: |
             cd ~/meuplantao
-            git pull --ff-only origin ${{ github.ref_name }}
+            if [ -d .git ]; then
+              git pull --ff-only origin ${{ github.ref_name }}
+            fi
             docker compose pull backend migrations
             docker compose up -d postgres
             docker compose run --rm migrations
