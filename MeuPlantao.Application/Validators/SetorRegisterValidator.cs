@@ -14,9 +14,10 @@ namespace MeuPlantao.Application.Validators
             RuleFor(x => x.Nome)
                 .NotEmpty().WithMessage("Nome é obrigatorio")
                 .MaximumLength(100);
-
-            RuleFor(x => x.RepresentanteId)
-                .NotEmpty().WithMessage("Representante é obrigatorio");
+            
+            RuleFor(x => x.EstabelecimentoNome)
+                .NotEmpty().WithMessage("Nome de estabelecimento é obrigatorio")
+                .MaximumLength(100);
         }
     }
 }

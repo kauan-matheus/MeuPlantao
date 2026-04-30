@@ -9,4 +9,6 @@ public class SetorModel
     public string Nome { get; set; } = String.Empty;
     public long RepresentanteId { get; set; }
     public UserModel Representante { get; set; } = null!;
+    public long EstabelecimentoId { get; set; }
+    public EstabelecimentoModel Estabelecimento { get; set; } = null!;
 }

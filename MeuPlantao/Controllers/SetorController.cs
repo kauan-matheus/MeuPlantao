@@ -1,3 +1,4 @@
+﻿using System.Security.Claims;
 using MeuPlantao.Application.Services.Setor;
 using MeuPlantao.Communication.Dto.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,9 @@ public class SetorController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var response = await _service.Cadastrar(setor);
+        var userLogado = GetUserId();
+
+        var response = await _service.Cadastrar(setor, userLogado);
         if (response.Success)
             return StatusCode(response.StatusCode, response.Data);
 
@@ -63,7 +66,9 @@ public class SetorController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var response = await _service.Editar(setor);
+        var userLogado = GetUserId();
+
+        var response = await _service.Editar(setor, userLogado);
         if (response.Success)
             return StatusCode(response.StatusCode, response.Data);
 
@@ -80,5 +85,18 @@ public class SetorController : ControllerBase
             return StatusCode(response.StatusCode, response.Data);
 
         return StatusCode(response.StatusCode, response.Message);
+    }
+
+    private long GetUserId()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Usuário não autenticado");
+
+        if (!long.TryParse(userId, out var id))
+            throw new Exception("Id do usuário inválido no token");
+
+        return id;
     }
 }

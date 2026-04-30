@@ -6,10 +6,10 @@ namespace MeuPlantao.Application.Services.Plantao
 {
     public interface IPlantaoService
     {
-        Task<ServiceResponse<List<PlantaoModel>>> Consultar();
+        Task<ServiceResponse<List<ResponsePlantaoJson>>> Consultar();
         Task<ServiceResponse<List<ResponseSolicitacoesJson>>> ConsultarSolicitacoes(long id);
         // Nullable pois o plantão pode não ser encontrado
-        Task<ServiceResponse<PlantaoModel>> ConsultarId(long id);
+        Task<ServiceResponse<ResponsePlantaoJson>> ConsultarId(long id);
 
         Task<ServiceResponse<bool>> Cadastrar(RequestPlantaoRegisterJson plantao, long userId);
         Task<ServiceResponse<bool>> Editar(RequestPlantaoRegisterJson plantao, long userId);

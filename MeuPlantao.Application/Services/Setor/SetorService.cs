@@ -9,10 +9,10 @@ namespace MeuPlantao.Application.Services.Setor
 {
     public class SetorService : ISetorService
     {
-        private readonly IRepository _repository;
+        private readonly ISetorRepository _repository;
         private readonly IUnitOfWork _unit;
 
-        public SetorService(IRepository repository, IUnitOfWork unit)
+        public SetorService(ISetorRepository repository, IUnitOfWork unit)
         {
             _repository = repository;
             _unit = unit;
@@ -51,25 +51,44 @@ namespace MeuPlantao.Application.Services.Setor
             }
         }
 
-        public async Task<ServiceResponse<bool>> Cadastrar(RequestSetorRegisterJson setor)
+        public async Task<ServiceResponse<bool>> Cadastrar(RequestSetorRegisterJson setor, long userLogado)
         {
             try
             {
-                var user = await _repository.ConsultarPorId<UserModel>(setor.RepresentanteId);
+                var user = await _repository.ConsultarPorId<UserModel>(userLogado);
+                long estabelecimentoId;
 
                 if (user is null)
                     return ServiceResponse<bool>.BadRequest("Representante precisa ser um usuario existente");
 
                 if (user.Role != RoleEnum.Gestor)
                     return ServiceResponse<bool>.BadRequest("Usuario que não é um gestor não pode representar um setor");
+                
+                var existeEstabelecimento = await _repository.ExisteEstabelecimento(setor.EstabelecimentoNome);
 
-                var novo = new SetorModel
+                if (existeEstabelecimento is null)
+                {
+                    var novoEstabelecimento = new EstabelecimentoModel
+                    {
+                        Nome = setor.EstabelecimentoNome
+                    };
+
+                    await _repository.Cadastrar(novoEstabelecimento);
+                    await _unit.Commit();
+                    estabelecimentoId = novoEstabelecimento.Id;
+                }
+                else
+                    estabelecimentoId = existeEstabelecimento.Id;
+                
+                var novoSetor = new SetorModel
                 {
                     Nome = setor.Nome,
-                    RepresentanteId = setor.RepresentanteId
+                    RepresentanteId = userLogado,
+                    EstabelecimentoId = estabelecimentoId
                 };
 
-                await _repository.Cadastrar(novo);
+                await _repository.Cadastrar(novoSetor);
+
                 var result = await _unit.Commit();
 
                 return ServiceResponse<bool>.Ok(result);
@@ -80,11 +99,11 @@ namespace MeuPlantao.Application.Services.Setor
             }
         }
 
-        public async Task<ServiceResponse<bool>> Editar(RequestSetorRegisterJson setor)
+        public async Task<ServiceResponse<bool>> Editar(RequestSetorRegisterJson setor, long userLogado)
         {
             try
             {
-                var user = await _repository.ConsultarPorId<UserModel>(setor.RepresentanteId);
+                var user = await _repository.ConsultarPorId<UserModel>(userLogado);
 
                 if (user is null)
                     return ServiceResponse<bool>.BadRequest("Representante precisa ser um usuario existente");
@@ -96,7 +115,7 @@ namespace MeuPlantao.Application.Services.Setor
                 {
                     Id = setor.Id,
                     Nome = setor.Nome,
-                    RepresentanteId = setor.RepresentanteId
+                    RepresentanteId = userLogado
                 };
 
                 await _repository.Editar(novo);

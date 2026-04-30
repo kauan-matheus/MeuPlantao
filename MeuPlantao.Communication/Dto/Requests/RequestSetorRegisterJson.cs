@@ -8,5 +8,5 @@ public class RequestSetorRegisterJson
 {
     public long Id { get; set; }
     public string Nome { get; set; } = string.Empty;
-    public long RepresentanteId { get; set; }
+    public string EstabelecimentoNome { get; set; } = string.Empty;
 }

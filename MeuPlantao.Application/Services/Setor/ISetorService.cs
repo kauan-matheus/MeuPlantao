@@ -11,8 +11,8 @@ namespace MeuPlantao.Application.Services.Setor
         // Nullable pois o setor pode não ser encontrado
         Task<ServiceResponse<SetorModel>> ConsultarId(long id);
 
-        Task<ServiceResponse<bool>> Cadastrar(RequestSetorRegisterJson setor);
-        Task<ServiceResponse<bool>> Editar(RequestSetorRegisterJson setor);
+        Task<ServiceResponse<bool>> Cadastrar(RequestSetorRegisterJson setor, long userLogado);
+        Task<ServiceResponse<bool>> Editar(RequestSetorRegisterJson setor, long userLogado);
 
         // Nullable pois retorna null se o setor não existir
         Task<ServiceResponse<SetorModel>> Deletar(long id);

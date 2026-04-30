@@ -44,6 +44,7 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IPlantaoRepository, PlantaoRepository>();
 builder.Services.AddScoped<ITrocaRepository, TrocaRepository>();
 builder.Services.AddScoped<IProfRepository, ProfRepository>();
+builder.Services.AddScoped<ISetorRepository, SetorRepository>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPlantaoService, PlantaoService>();

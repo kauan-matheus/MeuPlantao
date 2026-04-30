@@ -19,6 +19,7 @@ namespace MeuPlantao.Infrastructure.Repository
         {
             return await _appDbContext.Plantoes
                 .Include(p => p.Setor)
+                .ThenInclude(s => s.Estabelecimento)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
         public async Task<bool> CadastrarComHistorico(PlantaoModel plantao, PlantaoHistoricoModel historico)
