@@ -5,7 +5,7 @@ riderModule.iml
 /_ReSharper.Caches/
 /.vs
 *.user
-
+**/.terraform/*
 .fake
 
 # Docker & Local Development
