@@ -15,18 +15,5 @@ export const styles = StyleSheet.create({
     },
     footer: {
         height: 75
-    },
-    modal: {
-        flex: 1,
-        justifyContent: "flex-end"
-    },
-    close: {
-        padding: 10,
-        alignSelf: "flex-end"
-    },
-    modalContent: {
-        width: "100%",
-        height: "90%",
-        backgroundColor: colors.gray[700]
     }
 })

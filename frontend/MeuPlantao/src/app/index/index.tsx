@@ -84,7 +84,7 @@ export default function Index() {
         style={styles.background} 
         resizeMode="cover"
         >
-            <View style={styles.container}>
+            <View style={styles.container}>          
                 <Button 
                 text="Acessar "
                 text2="Meu Plantão"

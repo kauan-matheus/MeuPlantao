@@ -1,36 +1,53 @@
-import { View, Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
+import { View, Text, TouchableOpacity, TouchableOpacityProps, Modal } from "react-native";
 import { styles } from "./styles";
 import { colors } from "@/styles/colors";
+import { Ionicons } from "@expo/vector-icons"
+import { useState } from "react"
 
-type Props = TouchableOpacityProps & {
-    date: string
-    start: string
-    duration: number
-    locale: string
-    sector: string
-    onDuty?: string
-    onDetails: () => void
+import { ModalPlantao } from "../modalPlantao"
+import { Plantao } from "@/utils/objects";
+
+type Props = {
+    item: Plantao
 }
 
-export function PlantaoItem({date, start, duration, locale, sector, onDuty, onDetails, ...rest}: Props) {
+export function PlantaoItem({item}: Props) {
+    const [showModal, setShowModal] = useState(false)
+
     return (
-        <TouchableOpacity style={styles.container} activeOpacity={0.7} onPress={onDetails}>
-            <View style={styles.nav}>
-                <View>
-                    <Text style={styles.title}>{locale}</Text>
-                    <Text style={styles.subTitle}>{sector}</Text>
+        <>
+            <TouchableOpacity style={styles.container} activeOpacity={0.7} onPress={() => setShowModal(true)}>
+                <View style={styles.nav}>
+                    <View>
+                        <Text style={styles.title}>{item.locale}</Text>
+                        <Text style={styles.subTitle}>{item.sector}</Text>
+                    </View>
+                    <View>
+                        <Text style={[styles.status, {backgroundColor: item.onDuty !== "Disponivel" ? colors.red[300] : colors.blue[500]}]}>
+                            {item.onDuty !== "Disponivel" ? "Reservado" : "Disponível"}
+                        </Text>
+                    </View>
                 </View>
-                <View>
-                    <Text style={[styles.status, {backgroundColor: onDuty !== "Disponivel" ? colors.red[300] : colors.blue[500]}]}>
-                        {onDuty !== "Disponivel" ? "Reservado" : "Disponível"}
-                    </Text>
+                <View style={styles.info}>
+                    <Text style={styles.textInfo}>Data: {item.date}</Text>
+                    <Text style={styles.textInfo}>Horário: {item.start}</Text>
+                    <Text style={styles.textInfo}>Duração: {item.duration}h</Text>
                 </View>
-            </View>
-            <View style={styles.info}>
-                <Text style={styles.textInfo}>Data: {date}</Text>
-                <Text style={styles.textInfo}>Horário: {start}</Text>
-                <Text style={styles.textInfo}>Duração: {duration}h</Text>
-            </View>
-        </TouchableOpacity>
+            </TouchableOpacity>
+            <Modal transparent visible={showModal} animationType="slide">
+                <View style={styles.modal}>
+                    <View style={styles.modalContent}>
+                        <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => setShowModal(false)}>
+                            <Ionicons
+                            name="close"
+                            size={20}
+                            color={colors.gray[500]}
+                        />
+                        </TouchableOpacity>
+                        <ModalPlantao item={item} />
+                    </View>
+                </View>
+            </Modal>  
+        </>
     )
 }

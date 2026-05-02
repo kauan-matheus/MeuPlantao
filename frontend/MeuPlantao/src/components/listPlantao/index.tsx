@@ -1,13 +1,10 @@
 import { FlatList, Text, View, Modal, TouchableOpacity } from "react-native"
-import { Ionicons } from "@expo/vector-icons"
-import { useState } from "react"
 
 import { styles } from "./styles"
-import { colors } from "@/styles/colors"
 
 import { PlantaoItem } from "../plantaoItem"
 import { Plantao } from "@/utils/objects"
-import { ModalPlantao } from "../modalPlantao"
+
 
 type Props = {
     plantao: Plantao[],
@@ -17,48 +14,23 @@ type Props = {
 
 export function ListPlantao({plantao, showFooter, isEmpty}: Props) {
 
-    const [showModal, setShowModal] = useState(false)
-
     return (
-        <>
-            <FlatList
-            data={plantao}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-                <PlantaoItem 
-                date={item.date}
-                start={item.start}
-                duration={item.duration}
-                locale={item.locale}
-                sector={item.sector}
-                onDuty={item.onDuty}
-                onDetails={() => setShowModal(true)}
-                />
-            )}
-            style={styles.listContent}
-            ListEmptyComponent={() => (
-                <Text style={styles.textListEmpty}>{isEmpty}</Text>
-            )}
-            ListFooterComponent={() => showFooter && (
-                <View style={styles.footer}></View>
-            )}
-            showsVerticalScrollIndicator={false}
+        <FlatList
+        data={plantao}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+            <PlantaoItem 
+            item={item}
             />
-
-            <Modal transparent visible={showModal} animationType="slide">
-                <View style={styles.modal}>
-                    <View style={styles.modalContent}>
-                        <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => setShowModal(false)}>
-                            <Ionicons
-                            name="close"
-                            size={20}
-                            color={colors.gray[500]}
-                        />
-                        </TouchableOpacity>
-                        <ModalPlantao />
-                    </View>
-                </View>
-            </Modal>  
-        </>
+        )}
+        style={styles.listContent}
+        ListEmptyComponent={() => (
+            <Text style={styles.textListEmpty}>{isEmpty}</Text>
+        )}
+        ListFooterComponent={() => showFooter && (
+            <View style={styles.footer}></View>
+        )}
+        showsVerticalScrollIndicator={false}
+        />
     )
 }
