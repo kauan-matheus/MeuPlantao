@@ -17,14 +17,16 @@ export const styles = StyleSheet.create({
         height: 75
     },
     modal: {
-        flex: 1
+        flex: 1,
+        justifyContent: "flex-end"
     },
     close: {
         padding: 10,
         alignSelf: "flex-end"
     },
     modalContent: {
-        flex: 1,
+        width: "100%",
+        height: "90%",
         backgroundColor: colors.gray[700]
     }
 })

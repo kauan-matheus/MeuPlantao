@@ -8,11 +8,11 @@ type Props = TouchableOpacityProps & {
     duration: number
     locale: string
     sector: string
-    oncall?: string
+    onDuty?: string
     onDetails: () => void
 }
 
-export function PlantaoItem({date, start, duration, locale, sector, oncall, onDetails, ...rest}: Props) {
+export function PlantaoItem({date, start, duration, locale, sector, onDuty, onDetails, ...rest}: Props) {
     return (
         <TouchableOpacity style={styles.container} activeOpacity={0.7} onPress={onDetails}>
             <View style={styles.nav}>
@@ -21,8 +21,8 @@ export function PlantaoItem({date, start, duration, locale, sector, oncall, onDe
                     <Text style={styles.subTitle}>{sector}</Text>
                 </View>
                 <View>
-                    <Text style={[styles.status, {backgroundColor: oncall ? colors.red[300] : colors.blue[500]}]}>
-                        {oncall ? "Reservado" : "Disponível"}
+                    <Text style={[styles.status, {backgroundColor: onDuty !== "Disponivel" ? colors.red[300] : colors.blue[500]}]}>
+                        {onDuty !== "Disponivel" ? "Reservado" : "Disponível"}
                     </Text>
                 </View>
             </View>

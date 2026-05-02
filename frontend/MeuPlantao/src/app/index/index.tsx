@@ -163,7 +163,7 @@ export default function Index() {
             <Modal transparent visible={showModalRegister} animationType="slide">
                 <View style={styles.modalRegister}>
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.modalContentRegister}>
+                        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "padding"} style={styles.modalContentRegister}>
                             <TouchableOpacity style={styles.close} activeOpacity={0.7} onPress={() => (setShowModalRegister(false), reset())}>
                                 <Ionicons
                                 name="close"

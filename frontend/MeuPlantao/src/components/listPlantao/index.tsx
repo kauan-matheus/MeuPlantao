@@ -6,7 +6,8 @@ import { styles } from "./styles"
 import { colors } from "@/styles/colors"
 
 import { PlantaoItem } from "../plantaoItem"
-import { Plantao } from "@/utils/plantoes"
+import { Plantao } from "@/utils/objects"
+import { ModalPlantao } from "../modalPlantao"
 
 type Props = {
     plantao: Plantao[],
@@ -30,7 +31,7 @@ export function ListPlantao({plantao, showFooter, isEmpty}: Props) {
                 duration={item.duration}
                 locale={item.locale}
                 sector={item.sector}
-                oncall={item.onduty}
+                onDuty={item.onDuty}
                 onDetails={() => setShowModal(true)}
                 />
             )}
@@ -54,6 +55,7 @@ export function ListPlantao({plantao, showFooter, isEmpty}: Props) {
                             color={colors.gray[500]}
                         />
                         </TouchableOpacity>
+                        <ModalPlantao />
                     </View>
                 </View>
             </Modal>  

@@ -13,8 +13,9 @@ export const styles = StyleSheet.create({
         bottom: 90
     },
     modalContentLogin: {
+        flex: 1,
         width: "100%",
-        height: "75%",
+        minHeight: "50%",
         backgroundColor: colors.gray[700],
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,

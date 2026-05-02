@@ -1,4 +1,4 @@
-import { View, KeyboardAvoidingView, Platform } from "react-native";
+import { View, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import { LocaleConfig, Calendar} from 'react-native-calendars';
 import { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
@@ -6,7 +6,7 @@ import dayjs from "dayjs"
 
 import { styles } from "./styles";
 import { colors } from "@/styles/colors";
-import { plantoes, Plantao } from "@/utils/plantoes";
+import { Plantao } from "@/utils/objects";
 
 import { ListPlantao } from "../listPlantao";
 import { Input } from "../input/input";
@@ -38,12 +38,12 @@ export function ScreenCalendar() {
         async function load() {
             setLoading(true)
             const data = await getPlantoes()
-            setLoading(false)
-
-            if (data.type === "success")
-                console.log(data.result)
+            if (data.type === "success"){
+                setPlantoes(data.result)
+            }
             else
                 console.log(data.result)
+            setLoading(false)
         }
 
         load()
@@ -51,6 +51,7 @@ export function ScreenCalendar() {
 
     const [daySelected, setDaySelected] = useState(dayjs().format("YYYY-MM-DD"))
     const [search, setSearch] = useState("")
+    const [plantoes, setPlantoes] = useState<Plantao[]>([])
     const [plantao, setPlantao] = useState<Plantao[]>([])
     const [loading, setLoading] = useState(false)
 
@@ -63,7 +64,7 @@ export function ScreenCalendar() {
     useFocusEffect(
         useCallback(() => {
             getPlantao()
-        }, [daySelected, search])
+        }, [daySelected, search, plantoes])
     )
 
     return (
@@ -101,7 +102,11 @@ export function ScreenCalendar() {
                 placeholder="Pesquisar"
                 onChangeText={setSearch}
                 />
-                <ListPlantao plantao={plantao} showFooter={true} isEmpty="Não há plantões para solicitar" />
+                {
+                    loading
+                    ? <ActivityIndicator style={[{marginTop: 20}]} size="large" color={colors.blue[400]} />
+                    :<ListPlantao plantao={plantao} showFooter={true} isEmpty="Não há plantões para solicitar" />
+                }
             </View>
         </KeyboardAvoidingView>
     )
