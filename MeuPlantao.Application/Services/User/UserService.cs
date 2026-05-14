@@ -1,24 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeuPlantao.Application.Services.User
 {
     public class UserService : IUserService
     {
-        private readonly IRepository _repository;
+        private readonly IUserRepository _repository;
         private readonly IUnitOfWork _unit;
+        private readonly S3Service _s3Service;
 
-        public UserService(IRepository repository, IUnitOfWork unit)
+        public UserService(IUserRepository repository, IUnitOfWork unit, S3Service s3Service)
         {
             _repository = repository;
             _unit = unit;
+            _s3Service = s3Service;
         }
 
         public async Task<ServiceResponse<List<UserModel>>> Consultar()
@@ -119,6 +118,32 @@ namespace MeuPlantao.Application.Services.User
             {
                 return ServiceResponse<UserModel>.Error(ex.Message);
             }
+        }
+
+        public async Task<ServiceResponse<string>> UploadFotoPerfil(long id, IFormFile arquivo)
+        {
+            var usuario = await _repository.ConsultarPorId<UserModel>(id);
+
+            if (usuario == null)
+                return ServiceResponse<string>.BadRequest("Usuario nao existe");
+
+            if (arquivo == null || arquivo.Length == 0)
+                return ServiceResponse<string>.BadRequest("E necessario enviar uma imagem para fazer upload");
+
+            var nomeArquivo =
+                $"usuarios/{id}/" +
+                $"{Guid.NewGuid()}-{arquivo.FileName}";
+
+            var url =
+                await _s3Service.UploadArquivo(
+                    arquivo,
+                    nomeArquivo);
+
+            usuario.FotoPerfilUrl = url;
+
+            await _unit.Commit();
+
+            return ServiceResponse<string>.Ok(url);
         }
     }
 }

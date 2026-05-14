@@ -7,6 +7,7 @@ public class UserModel
 {
     public long Id { get; set; }
     [MaxLength(100)]
+    public string? FotoPerfilUrl { get; set; }
     public string Email { get; set; } = string.Empty;
     [MaxLength(100)]
     public string PasswordHash { get; set; } = string.Empty;

@@ -22,6 +22,7 @@ using FluentValidation.AspNetCore;
 using MeuPlantao.Application.Validators;
 using MeuPlantao.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Amazon.S3;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -39,8 +40,14 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.AddFluentValidationAutoValidation();
 
+builder.Services.AddDefaultAWSOptions(
+    builder.Configuration.GetAWSOptions()
+);
+
+builder.Services.AddAWSService<IAmazonS3>();
+
 builder.Services.AddScoped<IRepository, Repository>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPlantaoRepository, PlantaoRepository>();
 builder.Services.AddScoped<ITrocaRepository, TrocaRepository>();
 builder.Services.AddScoped<IProfRepository, ProfRepository>();
@@ -56,6 +63,7 @@ builder.Services.AddScoped<ITrocaPlantaoService, TrocaPlantaoService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<S3Service>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(AuthLoginValidator).Assembly);
 

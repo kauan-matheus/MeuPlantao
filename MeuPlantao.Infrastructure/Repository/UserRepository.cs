@@ -2,14 +2,16 @@ using MeuPlantao.Domain.Entities;
 using MeuPlantao.Domain.Interfaces;
 using MeuPlantao.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.VisualBasic;
 
 namespace MeuPlantao.Infrastructure.Repository
 {
-    public class AuthRepository : Repository, IAuthRepository
+    public class UserRepository : Repository, IUserRepository
     {
-        public AuthRepository(AppDbContext appDbContext) : base(appDbContext)
-        {
-        }
+
+        public UserRepository(AppDbContext appDbContext) : base(appDbContext)
+        {}
         public async Task<UserModel?> ConsultarUsuarioPorEmail(string email)
         {
             return await _appDbContext.Usuarios

@@ -88,5 +88,17 @@ namespace MeuPlantao.Controllers
 
             return StatusCode(response.StatusCode, response.Message);
         }
+
+        [HttpPost("usuarios/{id}/foto")]
+        [ProducesResponseType(StatusCodes.Status200OK)] // PUT retorna 200, não 201
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UploadFoto(int id, IFormFile arquivo)
+        {
+            var response = await _service.UploadFotoPerfil(id, arquivo);
+            if (response.Success)
+                return StatusCode(response.StatusCode, response.Data);
+
+            return StatusCode(response.StatusCode, response.Message);
+        }
     }
 }

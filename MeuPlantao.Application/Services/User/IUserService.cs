@@ -1,6 +1,7 @@
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Dto.Responses;
 using MeuPlantao.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace MeuPlantao.Application.Services.User
 {
@@ -16,5 +17,7 @@ namespace MeuPlantao.Application.Services.User
 
         // Nullable pois retorna null se o usuário não existir
         Task<ServiceResponse<UserModel>> Deletar(long id);
+
+        Task<ServiceResponse<string>> UploadFotoPerfil(long id, IFormFile arquivo);
     }
 }

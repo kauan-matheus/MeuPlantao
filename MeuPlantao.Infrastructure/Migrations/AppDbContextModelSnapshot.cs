@@ -290,6 +290,9 @@ namespace MeuPlantao.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FotoPerfilUrl")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 

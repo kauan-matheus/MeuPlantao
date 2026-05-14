@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeuPlantao.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260430131138_Initial")]
+    [Migration("20260514140316_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -293,6 +293,9 @@ namespace MeuPlantao.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FotoPerfilUrl")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
