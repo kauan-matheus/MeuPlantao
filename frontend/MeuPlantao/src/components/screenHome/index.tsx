@@ -1,43 +1,75 @@
-import { View, Text} from "react-native";
+import { View, Text, Alert} from "react-native";
 
 import { styles } from "./styles";
 
 import { ListPlantao } from "../listPlantao";
-import { Plantao, plantoes } from "@/utils/plantoes";
 import { Input } from "../input/input";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Kpi } from "../kpi";
 import { colors } from "@/styles/colors";
+import { getProfessionalPlantoes, getProfessionalPlantoesSolicitados } from "@/services/professional";
+
+export type Plantao = {
+    id: string
+    date: string
+    start: string
+    duration: number
+    locale: string
+    sector: string
+    value: string
+    responsable: string
+    onDuty?: string
+}
 
 export function ScreenHome() {
 
     const [search, setSearch] = useState("")
-    const [plantao, setPlantao] = useState<Plantao[]>([])
+    const [plantoesSolicitados, setPlantoesSolicitados] = useState<Plantao[]>([])
+    const [profissionalPlantoes, setProfissionalPlantoes] = useState<Plantao[]>([])
+    const [plantoes, setPlantoes] = useState<Plantao[]>([])
 
-    function getPlantao() {
-        const filtered = plantoes.filter(p => (p.locale.toUpperCase().includes(search.toUpperCase()) || p.sector.toUpperCase().includes(search.toUpperCase())))
+    const fetchData = async () => {
+        try{
+            const response1 = await getProfessionalPlantoesSolicitados()
+            const response2 = await getProfessionalPlantoes()
 
-        setPlantao(filtered)
+            setPlantoesSolicitados(response1.result)
+            setProfissionalPlantoes(response2.result)
+            setPlantoes([...response1.result, ...response2.result])
+        }catch (error: any) {
+            if (error.response) {
+                // erro vindo da API (400, 401, etc)
+                console.log("Erro da API:", error.response.data)
+
+                Alert.alert("Erro", JSON.stringify(error.response.data))
+            } else {
+                // erro de rede
+                console.log("Erro geral:", error)
+                Alert.alert("Erro de conexão")
+            }
+        }
     }
 
-    useFocusEffect(
-        useCallback(() => {
-            getPlantao()
-        }, [search])
-    )
+    useEffect(() => {
+        fetchData()
+
+        const interval = setInterval(fetchData, 3000); // atualiza a cada 3s
+
+        return () => clearInterval(interval);
+    }, [])
 
     return (
         <View style={styles.container}>
             <View style={styles.card}>
                 <Text style={styles.title}>Em andamento</Text>
-                <ListPlantao plantao={plantoes.slice(0, 0)} showFooter={false} isEmpty="Não há plantão em andamento" />
+                <ListPlantao plantao={profissionalPlantoes.filter(p => (new Date(converterData(p.date)) > new Date))} showFooter={false} isEmpty="Não há plantão em andamento" />
             </View>
             <View style={styles.kpis}>
-                <Kpi value="3" text="Solicitados" color={colors.red[300]} />
-                <Kpi value="2" text="Pendentes" color={colors.yellow[200]} />
-                <Kpi value="4" text="Concluídos" color={colors.green[100]} />
-                <Kpi value="9" text="Total" color={colors.blue[400]} />
+                <Kpi value={plantoesSolicitados.length.toString()} text="Solicitados" color={colors.red[300]} />
+                <Kpi value={plantoes.filter(p => (new Date(converterData(p.date)) > new Date )).length.toString()} text="Pendentes" color={colors.yellow[200]} />
+                <Kpi value={plantoes.filter(p => (new Date(converterData(p.date)) < new Date )).length.toString()} text="Concluídos" color={colors.green[100]} />
+                <Kpi value={plantoes.length.toString()} text="Total" color={colors.blue[400]} />
             </View>
             <View style={styles.list}>
                 <View style={{width: "100%", paddingBottom: 5}}>
@@ -49,8 +81,14 @@ export function ScreenHome() {
                 placeholder="Pesquisar"
                 onChangeText={setSearch}
                 />
-                <ListPlantao plantao={plantao} showFooter={true} isEmpty="Sem histórico de plantões" />
+                <ListPlantao plantao={plantoes.filter(p => (p.locale.toUpperCase().includes(search.toUpperCase()) || p.sector.toUpperCase().includes(search.toUpperCase())))} showFooter={true} isEmpty="Sem histórico de plantões" />
             </View>
         </View>
     )
+}
+
+function converterData(data: string): Date {
+  const [dia, mes, ano] = data.split("/")
+
+  return new Date(Number(ano), Number(mes) - 1, Number(dia))
 }

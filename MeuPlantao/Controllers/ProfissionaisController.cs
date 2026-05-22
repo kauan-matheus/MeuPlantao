@@ -1,4 +1,5 @@
-﻿using MeuPlantao.Application.Services.Profissional;
+﻿using System.Security.Claims;
+using MeuPlantao.Application.Services.Profissional;
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +25,32 @@ public class ProfissionaisController : ControllerBase
     public async Task<IActionResult> GetProfissionais()
     {
         var response = await _service.Consultar();
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+
+    [HttpGet("profissionais/plantoes")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetProfissionalPlantoes()
+    {
+        var userLogado = GetUserId();
+        var response = await _service.ConsultarPlantoes(userLogado);
+        if (response.Success)
+            return StatusCode(response.StatusCode, response.Data);
+
+        return StatusCode(response.StatusCode, response.Message);
+    }
+
+    [HttpGet("profissionais/plantoes/solicitados")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetProfissionalPlantoesSolicitados()
+    {
+        var userLogado = GetUserId();
+        var response = await _service.ConsultarPlantoesSolicitados(userLogado);
         if (response.Success)
             return StatusCode(response.StatusCode, response.Data);
 
@@ -96,5 +123,18 @@ public class ProfissionaisController : ControllerBase
             return StatusCode(response.StatusCode, response.Data);
 
         return StatusCode(response.StatusCode, response.Message);
+    }
+
+    private long GetUserId()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            throw new UnauthorizedAccessException("Usuário não autenticado");
+
+        if (!long.TryParse(userId, out var id))
+            throw new Exception("Id do usuário inválido no token");
+
+        return id;
     }
 }

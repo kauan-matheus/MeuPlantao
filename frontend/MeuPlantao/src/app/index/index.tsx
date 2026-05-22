@@ -136,17 +136,21 @@ export default function Index() {
                                 color={colors.blue[500]}
                                 textColor={colors.gray[700]}
                                 onPress={async () => {
-                                    if (loading) return
+                                    try{
+                                        if (loading) return
 
-                                    setLoading(true)
-                                    const data = await login(email, password)
-                                    setLoading(false)
+                                        setLoading(true)
+                                        const data = await login(email, password)
+                                        setLoading(false)
 
-                                    if (data.type === "success")
-                                        router.navigate("./interfaceUser")
-                                    else {
-                                        const type = typeof data.message
-                                        showError(type === "string" ? data.message : data.message[0])
+                                        if (data.type === "success")
+                                            router.navigate("./interfaceUser")
+                                        else {
+                                            const type = typeof data.message
+                                            showError(type === "string" ? data.message : data.message[0])
+                                        }
+                                    } catch (err) {
+                                        console.log("ERRO:", err)
                                     }
                                 }}
                                 />

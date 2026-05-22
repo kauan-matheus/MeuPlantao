@@ -20,6 +20,23 @@ namespace MeuPlantao.Infrastructure.Repository
             return await _appDbContext.Profissionais
                 .FirstOrDefaultAsync(t => t.UserId == id);
         }
+
+        public IQueryable<PlantaoModel> ConsultarPlantoes(long id)
+        {
+
+            return _appDbContext.Plantoes
+                .Where(p => p.ProfissionalResponsavelId == id)
+                .OrderBy(p => p.Inicio);
+        }
+
+        public IQueryable<PlantaoModel> ConsultarPlantoesSolicitados(long id)
+        {
+            return _appDbContext.Solicitacoes
+                .Where(s => s.ProfissionalId == id)
+                .Select(s => s.Plantao)
+                .OrderByDescending(p => p.Inicio);
+
+        }
         
     }
 }

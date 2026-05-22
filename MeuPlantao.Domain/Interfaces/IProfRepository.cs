@@ -9,5 +9,7 @@ namespace MeuPlantao.Domain.Interfaces
     public interface IProfRepository : IRepository
     {
         Task<ProfissionalModel?> ConsultarPorUserId(long id);
+        IQueryable<PlantaoModel> ConsultarPlantoes(long id);
+        IQueryable<PlantaoModel> ConsultarPlantoesSolicitados(long id);
     }
 }

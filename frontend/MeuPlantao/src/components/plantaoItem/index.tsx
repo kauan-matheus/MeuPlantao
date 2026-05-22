@@ -23,8 +23,8 @@ export function PlantaoItem({item}: Props) {
                         <Text style={styles.subTitle}>{item.sector}</Text>
                     </View>
                     <View>
-                        <Text style={[styles.status, {backgroundColor: item.onDuty !== "Disponivel" ? colors.red[300] : colors.blue[500]}]}>
-                            {item.onDuty !== "Disponivel" ? "Reservado" : "Disponível"}
+                        <Text style={[styles.status, {backgroundColor: (item.onDuty !== "Disponivel") || (new Date(converterData(item.date)) < new Date) ? colors.red[300] : colors.blue[500]}]}>
+                            {new Date(converterData(item.date)) > new Date ? item.onDuty !== "Disponivel" ? "Reservado" : "Disponível" : "Concluido"}
                         </Text>
                     </View>
                 </View>
@@ -50,4 +50,10 @@ export function PlantaoItem({item}: Props) {
             </Modal>  
         </>
     )
+}
+
+function converterData(data: string): Date {
+  const [dia, mes, ano] = data.split("/")
+
+  return new Date(Number(ano), Number(mes) - 1, Number(dia))
 }

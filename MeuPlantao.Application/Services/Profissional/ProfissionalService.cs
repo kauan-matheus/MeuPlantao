@@ -148,5 +148,81 @@ namespace MeuPlantao.Application.Services.Profissional
                 return ServiceResponse<ProfissionalModel>.Error(ex.Message);
             }
         }
+
+        public async Task<ServiceResponse<List<ResponsePlantaoJson>>> ConsultarPlantoes(long userLogado)
+        {
+            try
+            {
+                var existente = await _repository.ConsultarPorId<UserModel>(userLogado);
+                if (existente is null)
+                    return ServiceResponse<List<ResponsePlantaoJson>>.BadRequest("Registro não encontrado");
+                
+                var profId = await _repository.ConsultarPorUserId(userLogado);
+                if (profId is null)
+                    return ServiceResponse<List<ResponsePlantaoJson>>.BadRequest("É necessario estar logado como um profissional");
+                
+                var query = _repository.ConsultarPlantoes(profId.Id);
+
+                var plantoes = await query.Select(p => new ResponsePlantaoJson
+                {
+                    Id = p.Id,
+                    Date = p.Inicio.ToString("dd/MM/yyyy"),
+                    Start = p.Inicio.ToString("HH:mm"),
+                    Duration = (p.Fim - p.Inicio).ToString(@"hh\:mm"),
+                    Locale = p.Setor.Estabelecimento.Nome,
+                    Sector = p.Setor.Nome,
+                    Value = p.Valor,
+                    Responsable = p.Setor.Representante.Email,
+                    OnDuty = p.ProfissionalResponsavel != null 
+                        ? p.ProfissionalResponsavel.Nome 
+                        : "Disponivel"
+                }).ToListAsync();
+
+                return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
+                
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<List<ResponsePlantaoJson>>.Error(ex.Message);
+            }
+        }
+
+        public async Task<ServiceResponse<List<ResponsePlantaoJson>>> ConsultarPlantoesSolicitados(long userLogado)
+        {
+            try
+            {
+                var existente = await _repository.ConsultarPorId<UserModel>(userLogado);
+                if (existente is null)
+                    return ServiceResponse<List<ResponsePlantaoJson>>.BadRequest("Registro não encontrado");
+
+                var profId = await _repository.ConsultarPorUserId(userLogado);
+                if (profId is null)
+                    return ServiceResponse<List<ResponsePlantaoJson>>.BadRequest("É necessario estar logado como um profissional");
+                
+                var query = _repository.ConsultarPlantoesSolicitados(profId.Id);
+
+                var plantoes = await query.Select(p => new ResponsePlantaoJson
+                {
+                    Id = p.Id,
+                    Date = p.Inicio.ToString("dd/MM/yyyy"),
+                    Start = p.Inicio.ToString("HH:mm"),
+                    Duration = (p.Fim - p.Inicio).ToString(@"hh\:mm"),
+                    Locale = p.Setor.Estabelecimento.Nome,
+                    Sector = p.Setor.Nome,
+                    Value = p.Valor,
+                    Responsable = p.Setor.Representante.Email,
+                    OnDuty = p.ProfissionalResponsavel != null 
+                        ? p.ProfissionalResponsavel.Nome 
+                        : "Disponivel"
+                }).ToListAsync();
+
+                return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
+                
+            }
+            catch (Exception ex)
+            {
+                return ServiceResponse<List<ResponsePlantaoJson>>.Error(ex.Message);
+            }
+        }
     }
 }

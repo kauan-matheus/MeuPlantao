@@ -17,5 +17,8 @@ namespace MeuPlantao.Application.Services.Profissional
 
         // Nullable pois retorna null se o profissional não existir
         Task<ServiceResponse<ProfissionalModel>> Deletar(long id);
+
+        Task<ServiceResponse<List<ResponsePlantaoJson>>> ConsultarPlantoes(long userLogado);
+        Task<ServiceResponse<List<ResponsePlantaoJson>>> ConsultarPlantoesSolicitados(long userLogado);
     }
 }
