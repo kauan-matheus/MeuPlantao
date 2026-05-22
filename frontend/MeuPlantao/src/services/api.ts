@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store"
 
 export const api = axios.create({
     // baseURL: "https://meuplantao.eu1.netbird.services"
-    baseURL: "http://192.168.0.38:5269"
+    baseURL: "http://44.204.201.189:80"
     // baseURL: "http://10.0.2.2:5269"
 })
 
