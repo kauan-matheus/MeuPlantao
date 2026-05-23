@@ -19,14 +19,20 @@ export default function InterfaceUser() {
 
     useEffect(() => {
         async function load() {
-            const auth = await getAuth()
+            try{
+                const auth = await getAuth()
 
-            if (!auth) {
-                router.navigate("./index")
+                if (!auth) {
+                    router.navigate("./index")
+                }else if (auth.expiresIn < Date.now()/1000){
+                    router.navigate("./index")
+                }
+
+                const data = await getProfessional(auth.user.id)
+                setName(data.nome)
+            }catch(error: any){
+                console.log("error: " + error)
             }
-
-            const data = await getProfessional(auth.user.id)
-            setName(data.nome)
         }
 
         load()

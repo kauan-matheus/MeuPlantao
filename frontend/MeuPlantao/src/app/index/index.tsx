@@ -17,10 +17,16 @@ export default function Index() {
 
     useEffect(() => {
         async function load() {
-            const auth = await getAuth()
-    
-            if (auth) {
-                router.navigate("./interfaceUser")
+            try{
+                const auth = await getAuth()
+        
+                if (auth) {
+                    if (auth.expiresIn > Date.now()/1000){
+                        router.navigate("./interfaceUser")
+                    }
+                }
+            }catch(error: any){
+                console.log("error: " + error)
             }
         }
     

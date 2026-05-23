@@ -1,4 +1,4 @@
-import { View, Text } from "react-native"
+import { View, Text, Alert } from "react-native"
 import MapView, { UrlTile } from "react-native-maps";
 
 import { styles } from "./styles";
@@ -6,12 +6,32 @@ import { About } from "../about";
 import { Button } from "../button";
 import { colors } from "@/styles/colors";
 import { Plantao } from "@/utils/objects";
+import { requestPlantoes } from "@/services/plantao";
 
 type Props = {
     item: Plantao
 }
 
 export function ModalPlantao({item}: Props) {
+
+    const handleSolicitacao = async () => {
+        try{
+            await requestPlantoes(Number(item.id))
+
+            Alert.alert("Solicitação efetuada")
+        }catch (error: any) {
+            if (error.response) {
+                // erro vindo da API (400, 401, etc)
+                console.log("Erro da API:", error.response.data)
+
+                Alert.alert("Erro", JSON.stringify(error.response.data))
+            } else {
+                // erro de rede
+                console.log("Erro geral:", error)
+                Alert.alert("Erro de conexão")
+            }
+        }
+    }
     
     return (
         <View style={styles.container}>
@@ -64,7 +84,7 @@ export function ModalPlantao({item}: Props) {
                     </View>
                 </View>
             </View>
-            <Button text="SOLICITAR" color={colors.blue[500]} textColor={colors.gray[700]} />
+            <Button text="SOLICITAR" color={colors.blue[500]} textColor={colors.gray[700]} onPress={handleSolicitacao}/>
         </View>
     )
 }
