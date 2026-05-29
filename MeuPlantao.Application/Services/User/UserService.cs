@@ -120,9 +120,9 @@ namespace MeuPlantao.Application.Services.User
             }
         }
 
-        public async Task<ServiceResponse<string>> UploadFotoPerfil(long id, IFormFile arquivo)
+        public async Task<ServiceResponse<string>> UploadFotoPerfil(long logadoId, IFormFile arquivo)
         {
-            var usuario = await _repository.ConsultarPorId<UserModel>(id);
+            var usuario = await _repository.ConsultarPorId<UserModel>(logadoId);
 
             if (usuario == null)
                 return ServiceResponse<string>.BadRequest("Usuario nao existe");
@@ -131,8 +131,8 @@ namespace MeuPlantao.Application.Services.User
                 return ServiceResponse<string>.BadRequest("E necessario enviar uma imagem para fazer upload");
 
             var nomeArquivo =
-                $"usuarios/{id}/" +
-                $"{Guid.NewGuid()}-{arquivo.FileName}";
+                $"usuarios/{logadoId}/" +
+                $"foto-perfil";
 
             var url =
                 await _s3Service.UploadArquivo(

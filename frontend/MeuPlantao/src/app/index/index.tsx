@@ -147,10 +147,15 @@ export default function Index() {
 
                                         setLoading(true)
                                         const data = await login(email, password)
+                                        const auth = await getAuth()
                                         setLoading(false)
 
                                         if (data.type === "success")
-                                            router.navigate("./interfaceUser")
+                                            if (auth.user.role === "Profissional")
+                                                router.navigate("./interfaceUser")
+                                            else{
+                                                showError("Usuario não é um Profissional")
+                                            }
                                         else {
                                             const type = typeof data.message
                                             showError(type === "string" ? data.message : data.message[0])

@@ -64,7 +64,7 @@ export default function InterfaceUser() {
                                 source={
                                     typeof fotoPerfilUrl === "string" &&
                                     fotoPerfilUrl.trim().length > 0
-                                    ? { uri: fotoPerfilUrl }
+                                    ? { uri: `${fotoPerfilUrl}?t=${Date.now()}` }
                                     : require("../../assets/images/profile.jpg")
                                 }
                                 style={styles.imageProfile}

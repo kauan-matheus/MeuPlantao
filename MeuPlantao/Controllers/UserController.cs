@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MeuPlantao.Application.Services.User;
 using MeuPlantao.Communication.Dto.Requests;
 using MeuPlantao.Communication.Enums;
@@ -89,16 +90,31 @@ namespace MeuPlantao.Controllers
             return StatusCode(response.StatusCode, response.Message);
         }
 
-        [HttpPost("usuarios/{id}/foto")]
+        [HttpPost("usuarios/foto")]
         [ProducesResponseType(StatusCodes.Status200OK)] // PUT retorna 200, não 201
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UploadFoto(int id, IFormFile arquivo)
+        public async Task<IActionResult> UploadFoto(IFormFile arquivo)
         {
-            var response = await _service.UploadFotoPerfil(id, arquivo);
+            var logadoId = GetUserId();
+
+            var response = await _service.UploadFotoPerfil(logadoId, arquivo);
             if (response.Success)
                 return StatusCode(response.StatusCode, response.Data);
 
             return StatusCode(response.StatusCode, response.Message);
+        }
+
+        private long GetUserId()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("Usuário não autenticado");
+
+            if (!long.TryParse(userId, out var id))
+                throw new Exception("Id do usuário inválido no token");
+
+            return id;
         }
     }
 }

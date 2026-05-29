@@ -18,6 +18,6 @@ namespace MeuPlantao.Application.Services.User
         // Nullable pois retorna null se o usuário não existir
         Task<ServiceResponse<UserModel>> Deletar(long id);
 
-        Task<ServiceResponse<string>> UploadFotoPerfil(long id, IFormFile arquivo);
+        Task<ServiceResponse<string>> UploadFotoPerfil(long logadoId, IFormFile arquivo);
     }
 }

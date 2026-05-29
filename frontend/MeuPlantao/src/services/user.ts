@@ -1,5 +1,7 @@
+import { Image } from "react-native";
 import { api } from "./api";
 import * as SecureStore from "expo-secure-store"
+import * as ImagePicker from "expo-image-picker"
 
 export const login = async (email: string, password: string) => {
     try {
@@ -57,6 +59,33 @@ export const registerProfessional = async (email: string, password: string, name
                 return {type: "error", message: "Opção de profissional inexistente"}
         }
     } catch (error: any) {
+        return {type: "error", message: error.response?.data}
+    }
+}
+
+export const uploadFotoPerfil = async (imagem: ImagePicker.ImagePickerAsset) => {
+    try{
+        if (!imagem) return;
+
+        const formData = new FormData();
+
+        formData.append("arquivo", {
+            uri: imagem.uri,
+            name: imagem.fileName || "foto.jpg",
+            type: imagem.mimeType || "image/jpeg",
+        } as any);
+
+
+        const response = await api.post("/api/User/usuarios/foto", formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        )
+
+        return {type: "success", "message": response.data}
+    }catch(error: any){
         return {type: "error", message: error.response?.data}
     }
 }

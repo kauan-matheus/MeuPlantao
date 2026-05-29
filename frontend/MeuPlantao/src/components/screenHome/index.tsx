@@ -76,10 +76,10 @@ export function ScreenHome() {
                     <Text style={styles.title}>Meus plantões</Text>
                 </View>
                 <Input 
-                type="text"
-                icon="search-sharp"
-                placeholder="Pesquisar"
-                onChangeText={setSearch}
+                    type="text"
+                    icon="search-sharp"
+                    placeholder="Pesquisar"
+                    onChangeText={setSearch}
                 />
                 <ListPlantao plantao={plantoes.filter(p => (p.locale.toUpperCase().includes(search.toUpperCase()) || p.sector.toUpperCase().includes(search.toUpperCase())))} showFooter={true} isEmpty="Sem histórico de plantões" />
             </View>
