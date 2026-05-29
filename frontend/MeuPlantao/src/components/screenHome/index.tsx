@@ -9,18 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Kpi } from "../kpi";
 import { colors } from "@/styles/colors";
 import { getProfessionalPlantoes, getProfessionalPlantoesSolicitados } from "@/services/professional";
-
-export type Plantao = {
-    id: string
-    date: string
-    start: string
-    duration: number
-    locale: string
-    sector: string
-    value: string
-    responsable: string
-    onDuty?: string
-}
+import { Plantao } from "@/utils/objects";
 
 export function ScreenHome() {
 

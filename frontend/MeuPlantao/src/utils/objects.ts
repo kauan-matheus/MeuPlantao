@@ -18,5 +18,5 @@ export type Plantao = {
     responsable: string
     sector: string
     start: string
-    value: string
+    value: number
 }
