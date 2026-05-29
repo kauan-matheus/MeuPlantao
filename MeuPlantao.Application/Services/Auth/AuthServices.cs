@@ -49,6 +49,7 @@ public class AuthService : IAuthService
             {
                 Id = usuario.Id,
                 Email = usuario.Email,
+                FotoPerfilUrl = usuario.FotoPerfilUrl,
                 Role = usuario.Role.ToString()
             }
         });
@@ -109,7 +110,8 @@ public class AuthService : IAuthService
             Usuario = new ResponseAuthUserJson
             {
                 Id = usuario.Id,   // Id já populado pelo EF Core
-                Email = usuario.Email
+                Email = usuario.Email,
+                FotoPerfilUrl = usuario.FotoPerfilUrl
             }
         });
     }
@@ -169,7 +171,8 @@ public class AuthService : IAuthService
             Usuario = new ResponseAuthUserJson
             {
                 Id = usuario.Id,   // Id já populado pelo EF Core
-                Email = usuario.Email
+                Email = usuario.Email,
+                FotoPerfilUrl = usuario.FotoPerfilUrl
             }
         });
     }
@@ -214,6 +217,7 @@ public class AuthService : IAuthService
             {
                 Id = usuario.Id,
                 Email = usuario.Email,
+                FotoPerfilUrl = usuario.FotoPerfilUrl,
                 Role = usuario.Role.ToString()
             }
         });
@@ -258,7 +262,9 @@ public class AuthService : IAuthService
             {
                 Id = usuario.Id,
                 Email = usuario.Email,
+                FotoPerfilUrl = usuario.FotoPerfilUrl,
                 Role = usuario.Role.ToString()
+
             }
         });
     }

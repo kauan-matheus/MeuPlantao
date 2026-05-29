@@ -20,6 +20,7 @@ export function ScreenProfile() {
             const auth = await getAuth()
             const data = await getProfessional(auth.user.id)
             setData(data)
+            setFotoPerfilUrl(auth.user.fotoPerfilUrl)
             setLoading(false)
         }
 
@@ -27,12 +28,21 @@ export function ScreenProfile() {
     }, [])
 
     const [data, setData] = useState<Professional>()
+    const [fotoPerfilUrl, setFotoPerfilUrl] = useState("")
     
     const [loading, setLoading] = useState(false)
 
     return (
         <View style={styles.container}>
-            <Image source={require("@/assets/images/profile.jpg")} style={styles.imageProfile} />
+            <Image
+                source={
+                    typeof fotoPerfilUrl === "string" &&
+                    fotoPerfilUrl.trim().length > 0
+                    ? { uri: fotoPerfilUrl }
+                    : require("../../assets/images/profile.jpg")
+                }
+                style={styles.imageProfile}
+            />
             {!loading ? (
                 <View style={styles.dataUser}>
                     <About title="Nome" text={data?.nome} />

@@ -17,6 +17,12 @@ import { getProfessional } from "@/services/professional";
 
 export default function InterfaceUser() {
 
+    const [name, setName] = useState("")
+
+    const [ fotoPerfilUrl, setFotoPerfilUrl ] = useState("")
+
+    const [option, setOption] = useState(options[0].name)
+
     useEffect(() => {
         async function load() {
             try{
@@ -30,6 +36,7 @@ export default function InterfaceUser() {
 
                 const data = await getProfessional(auth.user.id)
                 setName(data.nome)
+                setFotoPerfilUrl(auth.user.fotoPerfilUrl)
             }catch(error: any){
                 console.log("error: " + error)
             }
@@ -37,10 +44,6 @@ export default function InterfaceUser() {
 
         load()
     }, [])
-
-    const [name, setName] = useState("")
-
-    const [option, setOption] = useState(options[0].name)
 
     const [fonts] = useFonts({
         'Poppins-Regular': require('@/assets/fonts/Poppins-Regular.ttf'),
@@ -57,7 +60,15 @@ export default function InterfaceUser() {
                 {option !== "Profile" && (
                     <View style={styles.top}>
                         <View style={styles.topDiv}>
-                            <Image source={require("@/assets/images/profile.jpg")} style={styles.imageProfile} />
+                            <Image
+                                source={
+                                    typeof fotoPerfilUrl === "string" &&
+                                    fotoPerfilUrl.trim().length > 0
+                                    ? { uri: fotoPerfilUrl }
+                                    : require("../../assets/images/profile.jpg")
+                                }
+                                style={styles.imageProfile}
+                            />
                         </View>
                         <View style={styles.topDiv}>
                             <Text style={styles.topText}>Olá, {name} 👋</Text>
@@ -72,18 +83,18 @@ export default function InterfaceUser() {
                     null}
                 </View>
                 <FlatList
-                data={options}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <NavLink
-                    icon={item.icon}
-                    isSelected={item.name === option}
-                    onPress={() => setOption(item.name)}
-                    />
-                )}
-                horizontal
-                style={styles.navBar}
-                contentContainerStyle={styles.navBarContent}
+                    data={options}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <NavLink
+                        icon={item.icon}
+                        isSelected={item.name === option}
+                        onPress={() => setOption(item.name)}
+                        />
+                    )}
+                    horizontal
+                    style={styles.navBar}
+                    contentContainerStyle={styles.navBarContent}
                 />
             </View>
         </TouchableWithoutFeedback>

@@ -4,5 +4,6 @@ public class ResponseAuthUserJson
 {
     public long Id { get; set; }
     public string Email { get; set; } = string.Empty;
+    public string? FotoPerfilUrl { get; set; }
     public string? Role { get; set; }
 }
