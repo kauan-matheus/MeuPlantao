@@ -52,12 +52,12 @@ export function ScreenHome() {
         <View style={styles.container}>
             <View style={styles.card}>
                 <Text style={styles.title}>Em andamento</Text>
-                <ListPlantao plantao={profissionalPlantoes.filter(p => (new Date(converterData(p.date)) > new Date))} showFooter={false} isEmpty="Não há plantão em andamento" />
+                <ListPlantao plantao={profissionalPlantoes.filter(p => (new Date(converterData(p.date)) >= new Date))} showFooter={false} isEmpty="Não há plantão em andamento" />
             </View>
             <View style={styles.kpis}>
-                <Kpi value={plantoesSolicitados.length.toString()} text="Solicitados" color={colors.red[300]} />
-                <Kpi value={plantoes.filter(p => (new Date(converterData(p.date)) > new Date )).length.toString()} text="Pendentes" color={colors.yellow[200]} />
-                <Kpi value={plantoes.filter(p => (new Date(converterData(p.date)) < new Date )).length.toString()} text="Concluídos" color={colors.green[100]} />
+                <Kpi value={plantoesSolicitados.filter(p => (converterData(p.date) >= new Date)).length.toString()} text="Solicitados" color={colors.red[300]} />
+                <Kpi value={plantoes.filter(p => (new Date(converterData(p.date)) >= new Date )).length.toString()} text="Pendentes" color={colors.yellow[200]} />
+                <Kpi value={profissionalPlantoes.filter(p => (new Date(converterData(p.date)) < new Date )).length.toString()} text="Concluídos" color={colors.green[100]} />
                 <Kpi value={plantoes.length.toString()} text="Total" color={colors.blue[400]} />
             </View>
             <View style={styles.list}>
@@ -70,7 +70,7 @@ export function ScreenHome() {
                     placeholder="Pesquisar"
                     onChangeText={setSearch}
                 />
-                <ListPlantao plantao={plantoes.filter(p => (p.locale.toUpperCase().includes(search.toUpperCase()) || p.sector.toUpperCase().includes(search.toUpperCase())))} showFooter={true} isEmpty="Sem histórico de plantões" />
+                <ListPlantao plantao={plantoesSolicitados.filter(p => ((p.locale.toUpperCase().includes(search.toUpperCase()) || p.sector.toUpperCase().includes(search.toUpperCase()))) && (new Date(converterData(p.date)) >= new Date))} showFooter={true} isEmpty="Sem histórico de plantões" />
             </View>
         </View>
     )

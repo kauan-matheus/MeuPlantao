@@ -24,10 +24,9 @@ export function ScreenFinancial() {
 
     const fetchData = async () => {
         try{
-            const response1 = await getProfessionalPlantoesSolicitados()
-            const response2 = await getProfessionalPlantoes()
+            const response = await getProfessionalPlantoes()
 
-            setPlantoes([...response1.result, ...response2.result])
+            setPlantoes(response.result)
         }catch (error: any) {
             if (error.response) {
                 // erro vindo da API (400, 401, etc)
@@ -43,9 +42,9 @@ export function ScreenFinancial() {
     }
 
     const receitaTotal = plantoes.reduce((total, plantao) => total + plantao.value, 0)
-    const receitaPendente = plantoes.filter(p => (new Date(converterData(p.date)) > new Date )).reduce((total, plantao) => total + plantao.value, 0)
+    const receitaPendente = plantoes.filter(p => (new Date(converterData(p.date)) >= new Date )).reduce((total, plantao) => total + plantao.value, 0)
     const receitaRecebido = plantoes.filter(p => (new Date(converterData(p.date)) < new Date )).reduce((total, plantao) => total + plantao.value, 0)
-    const ticketMedio = plantoes.length > 0? receitaTotal / plantoes.length: 0
+    const ticketMedio = plantoes.length > 0 ? receitaTotal / plantoes.length : 0
 
     useEffect(() => {
         fetchData()
@@ -143,8 +142,8 @@ export function ScreenFinancial() {
     )
 }
 
-function converterData(data: string): Date {
-  const [dia, mes, ano] = data.split("/")
+function converterData(data: string): Date{
+    const [dia, mes, ano] = data.split("/")
 
-  return new Date(Number(ano), Number(mes) - 1, Number(dia))
+    return new Date(Number(ano), Number(mes) - 1, Number(dia))
 }
