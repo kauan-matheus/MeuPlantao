@@ -274,7 +274,10 @@ namespace MeuPlantao.Application.Services.Plantao
 
                 var solicitacao = await _repository.ConsultarSolicitacaoPorPlantaoSolicitante(id, solicitanteId);
 
-                if (plantao.Setor.RepresentanteId != userId)
+                var usuarioLogado = await _repository.ConsultarPorId<UserModel>(userId);
+                bool isAdminOuGestor = usuarioLogado?.Role == RoleEnum.Admin || usuarioLogado?.Role == RoleEnum.Gestor;
+
+                if (plantao.Setor.RepresentanteId != userId && !isAdminOuGestor)
                     return ServiceResponse<bool>.BadRequest("Apenas o representante pode aceitar solicitacoes");
                 if (solicitacao is null)
                     return ServiceResponse<bool>.BadRequest("Esse profissional nao fez solicitacao para esse plantao");
@@ -320,7 +323,10 @@ namespace MeuPlantao.Application.Services.Plantao
 
                 var solicitacao = await _repository.ConsultarSolicitacaoPorPlantaoSolicitante(id, solicitanteId);
 
-                if (plantao.Setor.RepresentanteId != userId)
+                var usuarioLogado = await _repository.ConsultarPorId<UserModel>(userId);
+                bool isAdminOuGestor = usuarioLogado?.Role == RoleEnum.Admin || usuarioLogado?.Role == RoleEnum.Gestor;
+
+                if (plantao.Setor.RepresentanteId != userId && !isAdminOuGestor)
                     return ServiceResponse<bool>.BadRequest("Apenas o representante pode recusar solicitacoes");
                 if (solicitacao is null)
                     return ServiceResponse<bool>.BadRequest("Esse profissional nao fez solicitacao para esse plantao");
