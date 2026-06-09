@@ -16,5 +16,6 @@ namespace MeuPlantao.Communication.Dto.Responses
         public float Value { get; set; }
         public string Responsable { get; set; } = string.Empty;
         public string? OnDuty { get; set; }
+        public int Status { get; set; }
     }
 }

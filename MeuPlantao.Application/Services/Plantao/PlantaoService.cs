@@ -42,7 +42,8 @@ namespace MeuPlantao.Application.Services.Plantao
                     Responsable = p.Setor.Representante.Email,
                     OnDuty = p.ProfissionalResponsavel != null 
                         ? p.ProfissionalResponsavel.Nome 
-                        : "Disponivel"
+                        : "Disponivel",
+                    Status = (int)p.Status
                 }).ToListAsync();
 
                 return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
@@ -98,7 +99,8 @@ namespace MeuPlantao.Application.Services.Plantao
                     Responsable = result.Setor.Representante.Email,
                     OnDuty = result.ProfissionalResponsavel != null 
                         ? result.ProfissionalResponsavel.Nome 
-                        : "Disponivel"
+                        : "Disponivel",
+                    Status = (int)result.Status
                 });
             }
             catch (Exception ex)
