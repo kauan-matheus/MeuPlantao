@@ -342,6 +342,8 @@ namespace MeuPlantao.Application.Services.Plantao
                     Observacao = "Solicita recusada"
                 };
 
+                plantao.Status = StatusPlantaoEnum.Recusado;
+
                 await _repository.EditarComHistorico(plantao, novoHistorico);
                 await _repository.Excluir(solicitacao);
 
