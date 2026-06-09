@@ -17,5 +17,7 @@ namespace MeuPlantao.Communication.Dto.Responses
         public string Responsable { get; set; } = string.Empty;
         public string? OnDuty { get; set; }
         public int Status { get; set; }
+        public string? RequesterName { get; set; }
+        public bool HasSolicitacao { get; set; }
     }
 }

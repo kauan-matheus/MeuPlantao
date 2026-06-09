@@ -43,7 +43,9 @@ namespace MeuPlantao.Application.Services.Plantao
                     OnDuty = p.ProfissionalResponsavel != null 
                         ? p.ProfissionalResponsavel.Nome 
                         : "Disponivel",
-                    Status = (int)p.Status
+                    Status = (int)p.Status,
+                    HasSolicitacao = p.Solicitacoes.Any(),
+                    RequesterName = p.Solicitacoes.Any() ? p.Solicitacoes.FirstOrDefault()!.Profissional.Nome : null
                 }).ToListAsync();
 
                 return ServiceResponse<List<ResponsePlantaoJson>>.Ok(plantoes);
@@ -100,7 +102,9 @@ namespace MeuPlantao.Application.Services.Plantao
                     OnDuty = result.ProfissionalResponsavel != null 
                         ? result.ProfissionalResponsavel.Nome 
                         : "Disponivel",
-                    Status = (int)result.Status
+                    Status = (int)result.Status,
+                    HasSolicitacao = result.Solicitacoes.Any(),
+                    RequesterName = result.Solicitacoes.Any() ? result.Solicitacoes.FirstOrDefault()!.Profissional.Nome : null
                 });
             }
             catch (Exception ex)
