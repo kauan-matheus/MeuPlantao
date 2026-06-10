@@ -1,4 +1,4 @@
-import { View, Text, Alert} from "react-native";
+import { View, Text, Alert, ScrollView} from "react-native";
 
 import { styles } from "./styles";
 

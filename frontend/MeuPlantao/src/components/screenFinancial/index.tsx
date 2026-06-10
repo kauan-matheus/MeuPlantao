@@ -60,11 +60,11 @@ export function ScreenFinancial() {
                 <Text style={styles.title}>Controle Financeiro</Text>
                 <View style={styles.row}>
                     <View style={styles.col}>
-                        <Text style={styles.textValue}>R$ {receitaTotal}</Text>
+                        <Text style={styles.textValue}>R$ {receitaTotal.toFixed(2)}</Text>
                         <Text style={styles.title}>Receita</Text>
                     </View>
                     <View style={styles.col}>
-                        <Text style={styles.textValue}>R$ {receitaPendente}</Text>
+                        <Text style={styles.textValue}>R$ {receitaPendente.toFixed(2)}</Text>
                         <Text style={styles.title}>A receber</Text>
                     </View>
                 </View>
@@ -74,7 +74,7 @@ export function ScreenFinancial() {
                         <Text style={styles.title}>Plantões</Text>
                     </View>
                     <View style={styles.col}>
-                        <Text style={styles.textValue}>R$ {ticketMedio}</Text>
+                        <Text style={styles.textValue}>R$ {ticketMedio.toFixed(2)}</Text>
                         <Text style={styles.title}>Ticket médio</Text>
                     </View>
                 </View>
@@ -130,11 +130,11 @@ export function ScreenFinancial() {
                 <View style={styles.row}>
                     <View style={styles.col}>
                         <Text style={styles.title}>Recebido: </Text>
-                        <Text style={styles.textValue}>R$ {receitaRecebido}</Text>
+                        <Text style={styles.textValue}>R$ {receitaRecebido.toFixed(2)}</Text>
                     </View>
                     <View style={styles.col}>
                         <Text style={styles.title}>Pendete: </Text>
-                        <Text style={styles.textValue}>R$ {receitaPendente}</Text>
+                        <Text style={styles.textValue}>R$ {receitaPendente.toFixed(2)}</Text>
                     </View>
                 </View>
             </View>
