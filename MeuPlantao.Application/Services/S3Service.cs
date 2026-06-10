@@ -11,14 +11,14 @@ namespace MeuPlantao.Application.Services
 {
     public class S3Service
     {
-        private readonly IAmazonS3 _s3;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _config;
 
         public S3Service(
-            IAmazonS3 s3,
+            IServiceProvider serviceProvider,
             IConfiguration config)
         {
-            _s3 = s3;
+            _serviceProvider = serviceProvider;
             _config = config;
         }
 
@@ -26,6 +26,14 @@ namespace MeuPlantao.Application.Services
             IFormFile arquivo,
             string caminho)
         {
+            // Resolve IAmazonS3 apenas quando realmente necessário (lazy),
+            // evitando crash por falta de credenciais AWS em operações que não usam S3.
+            var s3 = _serviceProvider.GetService(typeof(IAmazonS3)) as IAmazonS3;
+
+            if (s3 == null)
+                throw new InvalidOperationException(
+                    "Serviço AWS S3 não está configurado. Verifique as credenciais AWS no servidor.");
+
             var bucket =
                 _config["AWS:BucketName"];
 
@@ -40,7 +48,7 @@ namespace MeuPlantao.Application.Services
                 ContentType = arquivo.ContentType
             };
 
-            await _s3.PutObjectAsync(request);
+            await s3.PutObjectAsync(request);
 
             return
                 $"https://{bucket}.s3.amazonaws.com/{caminho}";
